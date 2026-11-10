@@ -95,6 +95,7 @@ Decisões que ainda precisam ser tomadas, mas não exigem pesquisa aprofundada.
 | 9 | ~~Modo "No mercado"~~ | **Decidido:** sem modo separado — uma tela que se adapta sozinha. Riscar o primeiro produto marca "estou comprando". Ver seção 1.1 |
 | 10 | ~~Banco de ícones~~ | **Decidido:** Fluent Emoji Color + complemento próprio (ver seção 4.4) |
 | 11 | ~~Coleta de métricas de uso~~ | **Decidido:** Crashlytics + eventos anônimos; conteúdo da lista nunca sai do celular (ver seção 4.5) |
+| 12 | Rodapé "Adicionar" + "Terminei" | **Em aberto (2026-11-10, #12):** no protótipo os dois ficam lado a lado (1 : 1,5), mas com Lexend Deca 22sp "Adicionar" não cabe num celular de 411dp sem partir a palavra ("ADICION/AR"), nem com a fonte em 100%. Opções: empilhar sempre; lado a lado só com fonte pequena e empilhar acima de ~130%; dividir a largura meio a meio; diminuir a letra do "Adicionar". Decidir na tarefa da tela da lista, conferindo nos screenshots em 100/150/200% |
 
 ---
 
