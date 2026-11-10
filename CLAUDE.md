@@ -24,9 +24,10 @@ Leia o plano e o guia antes de implementar qualquer tela ou texto.
 
 ## Stack e arquitetura
 
-Resumo do [plano §4](docs/plano-implementacao.md#4-tecnologia-decidido). Os módulos ainda não existem (criados na #4).
+Resumo do [plano §4](docs/plano-implementacao.md#4-tecnologia-decidido).
 
-- **Kotlin Multiplatform** + **Jetpack Compose** (Material 3, tema próprio) no Android; minSdk 26
+- **Kotlin Multiplatform** + **Jetpack Compose** (Material 3, tema próprio) no Android; minSdk 26, targetSdk 36, compileSdk 37
+- applicationId e pacote: `br.com.mentealerta.listadecompras`; versões em `gradle/libs.versions.toml`
 - `shared/` — domínio, catálogo, normalização, previsão e dados (Room KMP + `BundledSQLiteDriver`, DataStore), roda também no iOS
 - `androidApp/` — UI Compose e integrações Android (voz, TTS, WorkManager, Glance, Auto Backup)
 - Camadas: UI → ViewModel → casos de uso → repositório; estado via `StateFlow`; coroutines + Flow; Koin para DI
@@ -35,11 +36,12 @@ Resumo do [plano §4](docs/plano-implementacao.md#4-tecnologia-decidido). Os mó
 
 ## Comandos
 
-A preencher conforme as tarefas de setup forem concluídas (#4 projeto, #5 ktlint/detekt, #6 CI). Quem concluir essas tarefas atualiza esta seção.
+Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git). Lint e CI entram nas tarefas #5 e #6, que atualizam esta seção.
 
-- Build: _a definir_
-- Testes: _a definir_
-- Lint: _a definir_
+- Build completo (Android, iOS e testes): `./gradlew build`
+- Instalar no emulador ou celular: `./gradlew :androidApp:installDebug`
+- Testes do `shared` (Android e simulador iOS): `./gradlew :shared:allTests`
+- Lint: _a definir (#5)_
 
 ## Como trabalhar
 
