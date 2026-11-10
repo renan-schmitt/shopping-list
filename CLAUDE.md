@@ -41,6 +41,7 @@ Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git). L
 - Build completo (Android, iOS e testes): `./gradlew build`
 - Instalar no emulador ou celular: `./gradlew :androidApp:installDebug`
 - Testes do `shared` (Android e simulador iOS): `./gradlew :shared:allTests`
+- Screenshots Roborazzi: gravar `./gradlew :androidApp:recordRoborazziDebug`, conferir `./gradlew :androidApp:verifyRoborazziDebug` (referências em `androidApp/src/test/screenshots/`, no git)
 - Lint: _a definir (#5)_
 
 ## Como trabalhar
