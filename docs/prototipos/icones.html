@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anota Aí — ícones do catálogo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bangers&display=swap">
+<style>
+  :root { --papel:#FBF3DC; --tinta:#141414; --verde:#2E6B3A; --cinza:#5E5A52; --borda:#E2D5B3; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:32px 16px 64px; background:var(--papel); color:var(--tinta); font-family:'Atkinson Hyperlegible',system-ui,sans-serif; }
+  main { max-width:1200px; margin:0 auto; }
+  h1, h2 { font-family:Bangers,Impact,sans-serif; font-weight:400; letter-spacing:.04em; }
+  h1 { font-size:44px; margin:0 0 8px; }
+  h2 { font-size:30px; margin:40px 0 12px; display:flex; align-items:center; gap:12px; }
+  h2 img { width:40px; height:40px; }
+  p { font-size:18px; line-height:1.5; max-width:820px; }
+  a { color:var(--verde); font-weight:700; }
+  .resumo { display:flex; flex-wrap:wrap; gap:16px; margin:20px 0; }
+  .num { background:#fff; border:3px solid var(--tinta); box-shadow:4px 4px 0 var(--tinta); border-radius:14px; padding:12px 18px; min-width:180px; }
+  .num b { display:block; font-family:Bangers,Impact,sans-serif; font-weight:400; font-size:40px; letter-spacing:.04em; }
+  .grade { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; }
+  .card { background:#fff; border:3px solid var(--tinta); border-radius:14px; box-shadow:3px 3px 0 var(--tinta); padding:14px 10px 10px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .card img { width:72px; height:72px; }
+  .card .pt { font-weight:700; font-size:18px; line-height:1.2; }
+  .card .en { font-size:13px; color:var(--cinza); }
+  .selo { font-size:12px; font-weight:700; padding:2px 8px; border-radius:999px; border:2px solid currentColor; }
+  .selo.bom { color:var(--verde); }
+  .selo.aprox { color:#8A5A00; }
+  .card.lacuna { background:transparent; border-style:dashed; box-shadow:none; }
+  .card.lacuna img { opacity:.35; filter:grayscale(1); }
+  .legenda { display:flex; flex-wrap:wrap; gap:18px; font-size:16px; align-items:center; }
+  .tamanhos { display:flex; gap:28px; align-items:flex-end; flex-wrap:wrap; }
+  .tamanhos figure { margin:0; text-align:center; font-size:14px; color:var(--cinza); }
+  .estilos { display:flex; gap:28px; flex-wrap:wrap; }
+  .estilos figure { margin:0; text-align:center; font-size:15px; }
+  .estilos img { width:96px; height:96px; background:#fff; border:3px solid var(--tinta); border-radius:14px; padding:8px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Ícones do catálogo</h1>
+<p>Ícones reais do <a href="https://github.com/microsoft/fluentui-emoji">Microsoft Fluent Emoji</a> (licença MIT), variação <b>Color</b>, ligados aos produtos do catálogo.
+As imagens são carregadas direto do repositório oficial, então a página precisa de internet.
+O ícone <b>sempre acompanha o nome</b>, nunca o substitui.</p>
+
+<div class="resumo">
+  <div class="num"><b>99</b>produtos com ícone</div>
+  <div class="num"><b>78</b>ícone fiel ao produto</div>
+  <div class="num"><b>21</b>ícone aproximado</div>
+  <div class="num"><b>43</b>sem ícone (lacunas)</div>
+</div>
+<div class="legenda">
+  <span class="selo bom">fiel</span> representa bem o produto
+  <span class="selo aprox">aproximado</span> serve, mas não é como o produto aparece na prateleira (ex.: arroz em tigela × arroz em pacote)
+</div>
+
+<h2>As variações do Fluent</h2><p>Escolhemos a <b>Color</b> (2D, cores chapadas — fácil de imitar nos ícones próprios). A <b>High Contrast</b> pode ser usada quando o celular estiver em alto contraste. A <b>3D</b> é bonita, mas pesada e difícil de imitar. Exemplo com o tomate:</p><div class="estilos">
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tomato/Color/tomato_color.svg" alt="Tomate, variação Color (escolhida)"><figcaption>Color (escolhida)</figcaption></figure>
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tomato/Flat/tomato_flat.svg" alt="Tomate, variação Flat"><figcaption>Flat</figcaption></figure>
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tomato/High%20Contrast/tomato_high_contrast.svg" alt="Tomate, variação High Contrast"><figcaption>High Contrast</figcaption></figure>
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tomato/3D/tomato_3d.png" alt="Tomate, variação 3D"><figcaption>3D</figcaption></figure>
+</div>
+<h2>No tamanho da lista</h2><p>Na lista o ícone fica no fim da linha, em torno de 32–40dp. Veja se continua reconhecível pequeno:</p><div class="tamanhos">
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Banana/Color/banana_color.svg" width="24" height="24" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bread/Color/bread_color.svg" width="24" height="24" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Soap/Color/soap_color.svg" width="24" height="24" alt=""><figcaption>24px</figcaption></figure>
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Banana/Color/banana_color.svg" width="32" height="32" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bread/Color/bread_color.svg" width="32" height="32" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Soap/Color/soap_color.svg" width="32" height="32" alt=""><figcaption>32px</figcaption></figure>
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Banana/Color/banana_color.svg" width="40" height="40" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bread/Color/bread_color.svg" width="40" height="40" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Soap/Color/soap_color.svg" width="40" height="40" alt=""><figcaption>40px</figcaption></figure>
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Banana/Color/banana_color.svg" width="56" height="56" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bread/Color/bread_color.svg" width="56" height="56" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Soap/Color/soap_color.svg" width="56" height="56" alt=""><figcaption>56px</figcaption></figure>
+<figure><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Banana/Color/banana_color.svg" width="72" height="72" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bread/Color/bread_color.svg" width="72" height="72" alt=""><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Soap/Color/soap_color.svg" width="72" height="72" alt=""><figcaption>72px</figcaption></figure>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="">Hortifrúti</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Banana/Color/banana_color.svg" alt="" loading="lazy"><span class="pt">Banana</span><span class="en">Banana</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Red%20apple/Color/red_apple_color.svg" alt="" loading="lazy"><span class="pt">Maçã</span><span class="en">Red apple</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Green%20apple/Color/green_apple_color.svg" alt="" loading="lazy"><span class="pt">Maçã verde</span><span class="en">Green apple</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tangerine/Color/tangerine_color.svg" alt="" loading="lazy"><span class="pt">Mexerica / bergamota</span><span class="en">Tangerine</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lime/Color/lime_color.svg" alt="" loading="lazy"><span class="pt">Limão</span><span class="en">Lime</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lemon/Color/lemon_color.svg" alt="" loading="lazy"><span class="pt">Limão-siciliano</span><span class="en">Lemon</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Grapes/Color/grapes_color.svg" alt="" loading="lazy"><span class="pt">Uva</span><span class="en">Grapes</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Melon/Color/melon_color.svg" alt="" loading="lazy"><span class="pt">Melão</span><span class="en">Melon</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Watermelon/Color/watermelon_color.svg" alt="" loading="lazy"><span class="pt">Melancia</span><span class="en">Watermelon</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Pear/Color/pear_color.svg" alt="" loading="lazy"><span class="pt">Pera</span><span class="en">Pear</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Peach/Color/peach_color.svg" alt="" loading="lazy"><span class="pt">Pêssego</span><span class="en">Peach</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Strawberry/Color/strawberry_color.svg" alt="" loading="lazy"><span class="pt">Morango</span><span class="en">Strawberry</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Kiwi%20fruit/Color/kiwi_fruit_color.svg" alt="" loading="lazy"><span class="pt">Kiwi</span><span class="en">Kiwi fruit</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Mango/Color/mango_color.svg" alt="" loading="lazy"><span class="pt">Manga</span><span class="en">Mango</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Pineapple/Color/pineapple_color.svg" alt="" loading="lazy"><span class="pt">Abacaxi</span><span class="en">Pineapple</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Coconut/Color/coconut_color.svg" alt="" loading="lazy"><span class="pt">Coco</span><span class="en">Coconut</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Blueberries/Color/blueberries_color.svg" alt="" loading="lazy"><span class="pt">Mirtilo</span><span class="en">Blueberries</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Avocado/Color/avocado_color.svg" alt="" loading="lazy"><span class="pt">Abacate</span><span class="en">Avocado</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Tomato/Color/tomato_color.svg" alt="" loading="lazy"><span class="pt">Tomate</span><span class="en">Tomato</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Potato/Color/potato_color.svg" alt="" loading="lazy"><span class="pt">Batata</span><span class="en">Potato</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Roasted%20sweet%20potato/Color/roasted_sweet_potato_color.svg" alt="" loading="lazy"><span class="pt">Batata-doce</span><span class="en">Roasted sweet potato</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Carrot/Color/carrot_color.svg" alt="" loading="lazy"><span class="pt">Cenoura</span><span class="en">Carrot</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Ear%20of%20corn/Color/ear_of_corn_color.svg" alt="" loading="lazy"><span class="pt">Milho</span><span class="en">Ear of corn</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Hot%20pepper/Color/hot_pepper_color.svg" alt="" loading="lazy"><span class="pt">Pimenta</span><span class="en">Hot pepper</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bell%20pepper/Color/bell_pepper_color.svg" alt="" loading="lazy"><span class="pt">Pimentão</span><span class="en">Bell pepper</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cucumber/Color/cucumber_color.svg" alt="" loading="lazy"><span class="pt">Pepino</span><span class="en">Cucumber</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Alface / couve</span><span class="en">Leafy green</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Broccoli/Color/broccoli_color.svg" alt="" loading="lazy"><span class="pt">Brócolis</span><span class="en">Broccoli</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Garlic/Color/garlic_color.svg" alt="" loading="lazy"><span class="pt">Alho</span><span class="en">Garlic</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Onion/Color/onion_color.svg" alt="" loading="lazy"><span class="pt">Cebola</span><span class="en">Onion</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Mushroom/Color/mushroom_color.svg" alt="" loading="lazy"><span class="pt">Cogumelo</span><span class="en">Mushroom</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Ginger%20root/Color/ginger_root_color.svg" alt="" loading="lazy"><span class="pt">Gengibre</span><span class="en">Ginger root</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Pea%20pod/Color/pea_pod_color.svg" alt="" loading="lazy"><span class="pt">Ervilha / vagem</span><span class="en">Pea pod</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Eggplant/Color/eggplant_color.svg" alt="" loading="lazy"><span class="pt">Berinjela</span><span class="en">Eggplant</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Herb/Color/herb_color.svg" alt="" loading="lazy"><span class="pt">Cheiro-verde</span><span class="en">Herb</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Olive/Color/olive_color.svg" alt="" loading="lazy"><span class="pt">Azeitona</span><span class="en">Olive</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Peanuts/Color/peanuts_color.svg" alt="" loading="lazy"><span class="pt">Amendoim</span><span class="en">Peanuts</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Chestnut/Color/chestnut_color.svg" alt="" loading="lazy"><span class="pt">Castanha</span><span class="en">Chestnut</span><span class="selo aprox">aproximado</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bread/Color/bread_color.svg" alt="">Padaria</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bread/Color/bread_color.svg" alt="" loading="lazy"><span class="pt">Pão de forma</span><span class="en">Bread</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Baguette%20bread/Color/baguette_bread_color.svg" alt="" loading="lazy"><span class="pt">Pão francês / cacetinho</span><span class="en">Baguette bread</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Croissant/Color/croissant_color.svg" alt="" loading="lazy"><span class="pt">Croissant</span><span class="en">Croissant</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Flatbread/Color/flatbread_color.svg" alt="" loading="lazy"><span class="pt">Pão sírio</span><span class="en">Flatbread</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Shortcake/Color/shortcake_color.svg" alt="" loading="lazy"><span class="pt">Bolo</span><span class="en">Shortcake</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cookie/Color/cookie_color.svg" alt="" loading="lazy"><span class="pt">Biscoito / bolacha</span><span class="en">Cookie</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Doughnut/Color/doughnut_color.svg" alt="" loading="lazy"><span class="pt">Rosquinha / sonho</span><span class="en">Doughnut</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Pie/Color/pie_color.svg" alt="" loading="lazy"><span class="pt">Torta</span><span class="en">Pie</span><span class="selo bom">fiel</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cut%20of%20meat/Color/cut_of_meat_color.svg" alt="">Açougue e peixaria</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cut%20of%20meat/Color/cut_of_meat_color.svg" alt="" loading="lazy"><span class="pt">Carne</span><span class="en">Cut of meat</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Meat%20on%20bone/Color/meat_on_bone_color.svg" alt="" loading="lazy"><span class="pt">Costela</span><span class="en">Meat on bone</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Poultry%20leg/Color/poultry_leg_color.svg" alt="" loading="lazy"><span class="pt">Frango</span><span class="en">Poultry leg</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bacon/Color/bacon_color.svg" alt="" loading="lazy"><span class="pt">Bacon</span><span class="en">Bacon</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Fish/Color/fish_color.svg" alt="" loading="lazy"><span class="pt">Peixe</span><span class="en">Fish</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Shrimp/Color/shrimp_color.svg" alt="" loading="lazy"><span class="pt">Camarão</span><span class="en">Shrimp</span><span class="selo bom">fiel</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="">Frios e laticínios</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Queijo</span><span class="en">Cheese wedge</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Butter/Color/butter_color.svg" alt="" loading="lazy"><span class="pt">Manteiga</span><span class="en">Butter</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Egg/Color/egg_color.svg" alt="" loading="lazy"><span class="pt">Ovos</span><span class="en">Egg</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Glass%20of%20milk/Color/glass_of_milk_color.svg" alt="" loading="lazy"><span class="pt">Leite</span><span class="en">Glass of milk</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Custard/Color/custard_color.svg" alt="" loading="lazy"><span class="pt">Pudim</span><span class="en">Custard</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Ice%20cream/Color/ice_cream_color.svg" alt="" loading="lazy"><span class="pt">Sorvete</span><span class="en">Ice cream</span><span class="selo bom">fiel</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="">Mercearia</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cooked%20rice/Color/cooked_rice_color.svg" alt="" loading="lazy"><span class="pt">Arroz</span><span class="en">Cooked rice</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Beans/Color/beans_color.svg" alt="" loading="lazy"><span class="pt">Feijão</span><span class="en">Beans</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Spaghetti/Color/spaghetti_color.svg" alt="" loading="lazy"><span class="pt">Macarrão</span><span class="en">Spaghetti</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Salt/Color/salt_color.svg" alt="" loading="lazy"><span class="pt">Sal</span><span class="en">Salt</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Honey%20pot/Color/honey_pot_color.svg" alt="" loading="lazy"><span class="pt">Mel</span><span class="en">Honey pot</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Enlatados (milho, ervilha…)</span><span class="en">Canned food</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Popcorn/Color/popcorn_color.svg" alt="" loading="lazy"><span class="pt">Pipoca</span><span class="en">Popcorn</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Chocolate%20bar/Color/chocolate_bar_color.svg" alt="" loading="lazy"><span class="pt">Chocolate</span><span class="en">Chocolate bar</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Candy/Color/candy_color.svg" alt="" loading="lazy"><span class="pt">Bala</span><span class="en">Candy</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lollipop/Color/lollipop_color.svg" alt="" loading="lazy"><span class="pt">Pirulito</span><span class="en">Lollipop</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Hot%20beverage/Color/hot_beverage_color.svg" alt="" loading="lazy"><span class="pt">Café</span><span class="en">Hot beverage</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Teacup%20without%20handle/Color/teacup_without_handle_color.svg" alt="" loading="lazy"><span class="pt">Chá</span><span class="en">Teacup without handle</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Mate/Color/mate_color.svg" alt="" loading="lazy"><span class="pt">Erva-mate</span><span class="en">Mate</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Jar/Color/jar_color.svg" alt="" loading="lazy"><span class="pt">Conserva / pote</span><span class="en">Jar</span><span class="selo aprox">aproximado</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cup%20with%20straw/Color/cup_with_straw_color.svg" alt="">Bebidas</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Potable%20water/Color/potable_water_color.svg" alt="" loading="lazy"><span class="pt">Água</span><span class="en">Potable water</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Beverage%20box/Color/beverage_box_color.svg" alt="" loading="lazy"><span class="pt">Suco de caixinha</span><span class="en">Beverage box</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cup%20with%20straw/Color/cup_with_straw_color.svg" alt="" loading="lazy"><span class="pt">Refrigerante</span><span class="en">Cup with straw</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Beer%20mug/Color/beer_mug_color.svg" alt="" loading="lazy"><span class="pt">Cerveja</span><span class="en">Beer mug</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Wine%20glass/Color/wine_glass_color.svg" alt="" loading="lazy"><span class="pt">Vinho</span><span class="en">Wine glass</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bottle%20with%20popping%20cork/Color/bottle_with_popping_cork_color.svg" alt="" loading="lazy"><span class="pt">Espumante</span><span class="en">Bottle with popping cork</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Ice/Color/ice_color.svg" alt="" loading="lazy"><span class="pt">Gelo</span><span class="en">Ice</span><span class="selo bom">fiel</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="">Limpeza</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Soap/Color/soap_color.svg" alt="" loading="lazy"><span class="pt">Sabão em barra</span><span class="en">Soap</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" loading="lazy"><span class="pt">Esponja</span><span class="en">Sponge</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Roll%20of%20paper/Color/roll_of_paper_color.svg" alt="" loading="lazy"><span class="pt">Papel higiênico</span><span class="en">Roll of paper</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Broom/Color/broom_color.svg" alt="" loading="lazy"><span class="pt">Vassoura</span><span class="en">Broom</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bucket/Color/bucket_color.svg" alt="" loading="lazy"><span class="pt">Balde</span><span class="en">Bucket</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Wastebasket/Color/wastebasket_color.svg" alt="" loading="lazy"><span class="pt">Saco de lixo</span><span class="en">Wastebasket</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Plunger/Color/plunger_color.svg" alt="" loading="lazy"><span class="pt">Desentupidor</span><span class="en">Plunger</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Candle/Color/candle_color.svg" alt="" loading="lazy"><span class="pt">Vela</span><span class="en">Candle</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Battery/Color/battery_color.svg" alt="" loading="lazy"><span class="pt">Pilha</span><span class="en">Battery</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Light%20bulb/Color/light_bulb_color.svg" alt="" loading="lazy"><span class="pt">Lâmpada</span><span class="en">Light bulb</span><span class="selo bom">fiel</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lotion%20bottle/Color/lotion_bottle_color.svg" alt="">Higiene e farmácia</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Toothbrush/Color/toothbrush_color.svg" alt="" loading="lazy"><span class="pt">Escova de dente</span><span class="en">Toothbrush</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Soap/Color/soap_color.svg" alt="" loading="lazy"><span class="pt">Sabonete</span><span class="en">Soap</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lotion%20bottle/Color/lotion_bottle_color.svg" alt="" loading="lazy"><span class="pt">Creme / hidratante / xampu</span><span class="en">Lotion bottle</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Razor/Color/razor_color.svg" alt="" loading="lazy"><span class="pt">Aparelho de barbear</span><span class="en">Razor</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Adhesive%20bandage/Color/adhesive_bandage_color.svg" alt="" loading="lazy"><span class="pt">Curativo</span><span class="en">Adhesive bandage</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Pill/Color/pill_color.svg" alt="" loading="lazy"><span class="pt">Remédio</span><span class="en">Pill</span><span class="selo bom">fiel</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Baby%20bottle/Color/baby_bottle_color.svg" alt="" loading="lazy"><span class="pt">Mamadeira</span><span class="en">Baby bottle</span><span class="selo bom">fiel</span></div>
+</div>
+<h2><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Paw%20prints/Color/paw_prints_color.svg" alt="">Pet</h2><div class="grade">
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Dog%20face/Color/dog_face_color.svg" alt="" loading="lazy"><span class="pt">Ração de cachorro</span><span class="en">Dog face</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cat%20face/Color/cat_face_color.svg" alt="" loading="lazy"><span class="pt">Ração de gato</span><span class="en">Cat face</span><span class="selo aprox">aproximado</span></div>
+<div class="card"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bone/Color/bone_color.svg" alt="" loading="lazy"><span class="pt">Petisco / osso</span><span class="en">Bone</span><span class="selo bom">fiel</span></div>
+</div>
+<h2>Lacunas — precisam de ícone próprio</h2><p>Básicos brasileiros que o Fluent não tem. Até ganharem ícone próprio no mesmo estilo, usam o <b>ícone da categoria</b> (mostrado apagado). Esta é a primeira lista para o complemento de ~50–100 ícones previsto na seção 4.4 do plano.</p>
+<h2 style="font-size:24px;margin-top:24px"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" style="width:32px;height:32px">Mercearia</h2><div class="grade">
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Arroz (pacote)</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Feijão (pacote)</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Óleo de soja</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Azeite</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Açúcar</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Farinha de trigo</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Farinha de mandioca</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Fubá / flocão</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Café (pacote)</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Molho / extrato de tomate</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Achocolatado</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Goma de tapioca</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Canned%20food/Color/canned_food_color.svg" alt="" loading="lazy"><span class="pt">Vinagre</span><span class="en">usa ícone da categoria</span></div>
+</div>
+<h2 style="font-size:24px;margin-top:24px"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" style="width:32px;height:32px">Frios e laticínios</h2><div class="grade">
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Leite de caixinha</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Margarina</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Requeijão</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Iogurte</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Presunto</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Mortadela</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Linguiça</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Pão de queijo</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cheese%20wedge/Color/cheese_wedge_color.svg" alt="" loading="lazy"><span class="pt">Queijo coalho</span><span class="en">usa ícone da categoria</span></div>
+</div>
+<h2 style="font-size:24px;margin-top:24px"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" style="width:32px;height:32px">Hortifrúti</h2><div class="grade">
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Mandioca / aipim / macaxeira</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Abóbora</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Chuchu</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Quiabo</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Mamão</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Goiaba</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Maracujá</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Caju</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Leafy%20green/Color/leafy_green_color.svg" alt="" loading="lazy"><span class="pt">Açaí</span><span class="en">usa ícone da categoria</span></div>
+</div>
+<h2 style="font-size:24px;margin-top:24px"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" style="width:32px;height:32px">Limpeza</h2><div class="grade">
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" loading="lazy"><span class="pt">Sabão em pó</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" loading="lazy"><span class="pt">Detergente</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" loading="lazy"><span class="pt">Água sanitária</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" loading="lazy"><span class="pt">Desinfetante</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" loading="lazy"><span class="pt">Amaciante</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Sponge/Color/sponge_color.svg" alt="" loading="lazy"><span class="pt">Papel-toalha</span><span class="en">usa ícone da categoria</span></div>
+</div>
+<h2 style="font-size:24px;margin-top:24px"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lotion%20bottle/Color/lotion_bottle_color.svg" alt="" style="width:32px;height:32px">Higiene e farmácia</h2><div class="grade">
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lotion%20bottle/Color/lotion_bottle_color.svg" alt="" loading="lazy"><span class="pt">Pasta de dente</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lotion%20bottle/Color/lotion_bottle_color.svg" alt="" loading="lazy"><span class="pt">Desodorante</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lotion%20bottle/Color/lotion_bottle_color.svg" alt="" loading="lazy"><span class="pt">Absorvente</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Lotion%20bottle/Color/lotion_bottle_color.svg" alt="" loading="lazy"><span class="pt">Fralda</span><span class="en">usa ícone da categoria</span></div>
+</div>
+<h2 style="font-size:24px;margin-top:24px"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cup%20with%20straw/Color/cup_with_straw_color.svg" alt="" style="width:32px;height:32px">Bebidas</h2><div class="grade">
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cup%20with%20straw/Color/cup_with_straw_color.svg" alt="" loading="lazy"><span class="pt">Guaraná</span><span class="en">usa ícone da categoria</span></div>
+<div class="card lacuna"><img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Cup%20with%20straw/Color/cup_with_straw_color.svg" alt="" loading="lazy"><span class="pt">Cachaça</span><span class="en">usa ícone da categoria</span></div>
+</div>
+<p style="margin-top:40px">Ver todos os ~1.500 emojis do Fluent: <a href="https://github.com/microsoft/fluentui-emoji/tree/main/assets">pasta assets no GitHub</a> (cada pasta tem as variações Color, Flat, High Contrast e 3D).</p>
+</main>
+</body>
+</html>

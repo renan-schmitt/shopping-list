@@ -219,6 +219,12 @@ shopping-list/
 4. **Alto contraste (opcional):** usar a variação High Contrast do Fluent quando o celular estiver em modo alto contraste.
 5. **Fase 0:** mapear o catálogo contra os ícones e medir a cobertura real antes de produzir o complemento.
 
+**Primeiro levantamento (2026-11-10)** — página [prototipos/icones.html](prototipos/icones.html), com os ícones reais do [repositório oficial](https://github.com/microsoft/fluentui-emoji):
+- **99 produtos** com ícone Fluent: **78 fiéis** ao produto e **21 aproximados** (ex.: arroz em tigela, café como xícara, leite como copo).
+- **43 lacunas** sem ícone, que usam o ícone da categoria até ganhar ícone próprio — concentradas nos **básicos em embalagem** (óleo, açúcar, farinha, café em pacote, leite de caixinha, margarina, requeijão, sabão em pó, detergente, água sanitária) e em regionais (mandioca/aipim, chuchu, quiabo, goma de tapioca).
+- Cobertura boa em hortifrúti, padaria e açougue.
+- **Primeira lista do complemento próprio:** as 43 lacunas + revisar os 21 aproximados (~64 ícones, dentro da estimativa de 50–100).
+
 **Descartados:** Noto Emoji (mesmas lacunas, estilo mais simples), OpenMoji (CC BY-SA obriga adaptações na mesma licença; estilo menos atraente), conjunto 100% próprio (custo e prazo).
 
 ### 4.5 Privacidade, métricas e coleta de dados
