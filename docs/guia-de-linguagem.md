@@ -11,7 +11,9 @@
 5. **Ícone sempre acompanhado de texto.** Nenhum botão só com ícone.
 6. **Voltar atrás em vez de pedir confirmação.** Confirmação só para "Jogar a lista fora"; nas outras ações, "Ops, voltar".
 7. **Datas relativas e por extenso:** "ontem", "há 12 dias", "semana passada".
-8. **Sem caixa alta, sem siglas e sem palavras em inglês.**
+8. **Sem siglas e sem palavras em inglês.**
+9. **Caixa alta liberada em textos curtos** (logo, títulos, botões, rótulos, avisos de poucas palavras e nomes da lista) — faz parte do estilo quadrinhos. Frase com mais de uma linha, sempre em caixa normal. O texto é escrito em caixa normal e as maiúsculas vêm do estilo, para o TalkBack não soletrar palavras como se fossem siglas.
+10. **Nada de texto longo.** Se precisa de um parágrafo para explicar, a tela está complicada demais.
 
 ## Termos
 

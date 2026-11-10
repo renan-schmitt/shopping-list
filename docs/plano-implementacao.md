@@ -143,7 +143,7 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 
 ### 3.9 Validação com usuários reais
 - Testes de usabilidade com pessoas 60+ antes do lançamento (gesto de deslizar, vocabulário, tamanho de fonte, entrada por voz).
-- Testar caixa alta também nos nomes da lista (hoje só títulos e botões) e a legibilidade do estilo quadrinhos.
+- Confirmar a legibilidade dos nomes da lista em caixa alta e do estilo quadrinhos.
 
 ---
 
@@ -279,10 +279,10 @@ Decidida em 2026-11-10 a partir do protótipo [prototipos/cores-destaque.html](p
 | Fundo | Papel creme (sem branco puro) |
 | Texto | Tinta quase preta (`#141414`); riscado em cinza (`#66625A`) |
 | Cor de destaque | **Verde-folha `#2E6B3A`** — única cor de destaque (topo, botões principais, marca de riscado). Descartadas: laranja-tijolo `#A8431F`, azul-caneta `#1F4E9C` |
-| Fontes | **Bangers** só no logo, títulos de seção e botões principais; **Atkinson Hyperlegible** na lista e textos (mais legível que Comic Neue para baixa visão) |
-| Caixa alta | Só em títulos e botões; nomes da lista em caixa normal (testar na fase 0, ver 3.9) |
+| Fontes | **Bangers** só no logo, títulos de seção e botões principais; **Lexend Deca** (negrito) na lista e textos, com espaçamento entre letras um pouco maior (+0,04em) — feita para leitura fácil. Escolhida em 2026-11-10 no protótipo [prototipos/espacamento-letras.html](prototipos/espacamento-letras.html); descartadas Comic Neue, Atkinson Hyperlegible e Lexend Exa ([prototipos/fonte-lista.html](prototipos/fonte-lista.html)) |
+| Caixa alta | Liberada em **textos curtos** — logo, títulos, botões, rótulos, avisos de poucas palavras e **nomes da lista** (como no protótipo) — para manter a cara de quadrinhos; o app não tem textos longos. Legibilidade a confirmar na fase 0 (ver 3.9). Texto escrito em caixa normal e maiúsculas aplicadas pelo estilo, para o TalkBack ler direito. Decidido em 2026-11-10 (#2) |
 | Tamanho | Nome do produto ~28sp, linhas ≥ 72dp, botões principais ~88dp |
-| Linha do produto | Marca de riscar → nome → ícone no fim da linha; quantidade só se informada, em letra menor |
+| Linha do produto | Marca de riscar → nome → ícone no fim da linha; quantidade só se informada, em letra menor. Ícones grandes, sempre ao lado do texto e nunca por cima dele. Nome com muitas palavras **quebra a linha** (sem cortar com reticências); a linha cresce em altura |
 | Item riscado | Traço grosso por cima + texto cinza + marca preenchida com ✓ (estado nunca só por cor) |
 | Logo | "Anota Aí!" em Bangers, branco com contorno preto |
 | Ícone do app | Bloquinho com lápis e um item riscado, no estilo quadrinhos — arte final a produzir |
