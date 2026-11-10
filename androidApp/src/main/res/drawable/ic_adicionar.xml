@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sinal de "+" do botão Adicionar (protótipo cores-destaque.html). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="30dp"
+    android:height="30dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M12,4v16M4,12h16"
+        android:strokeWidth="4"
+        android:strokeColor="#FF141414"
+        android:strokeLineCap="round" />
+</vector>
