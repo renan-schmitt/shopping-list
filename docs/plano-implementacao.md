@@ -1,6 +1,6 @@
 # Plano de Implementação — Lista de Compras 60+
 
-> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-09.
+> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-10.
 
 ## Princípios
 
@@ -18,7 +18,8 @@ O que precisa existir na primeira versão publicada.
 
 ### 1.1 Lista
 - [ ] Lista única, com aparência de folha de papel
-- [ ] Produto com ícone, nome e quantidade opcional ("2 leites", "1 kg de carne moída")
+- [ ] Linha do produto: marca de riscar → nome → ícone no fim da linha
+- [ ] Quantidade opcional ("2 leites", "1 kg de carne moída"): só aparece se a pessoa informou, em letra menor
 - [ ] Detalhe livre junto ao nome ("leite **desnatado**", "café da marca X")
 - [ ] Tocar no produto abre edição simples: nome, botões grandes − / + para quantidade, campo de detalhe (sem teclado numérico nem lista de unidades)
 - [ ] Produto repetido não duplica: "Leite já está na lista. Quer mais um?"
@@ -66,7 +67,7 @@ O que precisa existir na primeira versão publicada.
 - [ ] Colar uma lista recebida (texto) e transformar em itens
 
 ### 1.7 Acessibilidade
-- [ ] Letras grandes por padrão e respeito ao tamanho de fonte do sistema
+- [ ] Letras grandes por padrão (nome do produto ~28sp, linhas ≥ 72dp) e respeito ao tamanho de fonte do sistema
 - [ ] Áreas de toque ≥ 64dp
 - [ ] Alto contraste; estado nunca indicado só por cor
 - [ ] Compatível com TalkBack
@@ -87,7 +88,7 @@ Decisões que ainda precisam ser tomadas, mas não exigem pesquisa aprofundada.
 | 2 | ~~Modelo de cobrança do premium~~ | **Decidido:** híbrido — compra única "Premium para sempre" (fase 2) + assinatura "Plano Família" (fase 3). Ver seção 5 |
 | 3 | Preço do premium | **Em discussão** — depende da evolução do app. Referência inicial: Premium para sempre ~R$ 19,90–29,90; Plano Família ~R$ 6,90/mês ou R$ 49,90/ano. Concorrentes: Bring! US$ 8,99/ano, AnyList US$ 9,99–14,99/ano, OurGroceries ~US$ 1/mês. Validar com experimentos de preço do Play Console |
 | 4 | ~~Abrangência regional do catálogo~~ | **Decidido:** Brasil inteiro desde o MVP, só pt-BR. Nome exibido é sempre o que a pessoa usou; preferência aprendida localmente, sem perguntar região. Curadoria na fase 0 com validação em 4 regiões. Portugal/outros países fora do escopo |
-| 5 | Nome e identidade visual | **⚠️ Decidir antes de começar a implementar.** Nomes sugeridos: Caderninho (preferido), Listinha, Papelzinho, Lista da Feira, Vou ao Mercado, Bloquinho — verificar Play Store, INPI e domínio. Diretrizes visuais propostas: fundo creme (sem branco puro), texto grafite/azul-caneta, uma única cor de destaque, item riscado com traço + cinza, fonte Atkinson Hyperlegible, fonte manuscrita só no logo, modo escuro seguindo o sistema, ícone de caderninho com item riscado |
+| 5 | ~~Nome e identidade visual~~ | **Decidido:** nome **Anota Aí** (título na loja "Anota Aí: Lista de Compras"; reservas: Caderninho, Listinha; evitar "vó", "sênior", "melhor idade"). **Pendente:** verificar Play Store, INPI (classes 9 e 42) e domínio. Identidade visual: estilo quadrinhos com destaque verde-folha — ver seção 4.8 |
 | 6 | ~~Tom das mensagens~~ | **Decidido:** ver [guia-de-linguagem.md](guia-de-linguagem.md). Validar vocabulário nos testes da fase 0 |
 | 7 | ~~Quantidade e unidade~~ | **Decidido:** entrada livre com separação automática (quantidade, unidade, produto, detalhe); quantidade opcional; edição com botões − / +. Ver seções 1.1 e 1.2 |
 | 8 | ~~Itens "Sempre compro"~~ | **Decidido:** bloco "Os de sempre" (fase 2, premium). Produtos **nunca** voltam sozinhos para a lista — a pessoa põe todos com um toque ou um a um. Bloco aparece com a lista vazia ou após o "Terminei". Produto vira "de sempre" pelo botão "Compro sempre" na edição ou por sugestão do app baseada no histórico |
@@ -142,6 +143,7 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 
 ### 3.9 Validação com usuários reais
 - Testes de usabilidade com pessoas 60+ antes do lançamento (gesto de deslizar, vocabulário, tamanho de fonte, entrada por voz).
+- Testar caixa alta também nos nomes da lista (hoje só títulos e botões) e a legibilidade do estilo quadrinhos.
 
 ---
 
@@ -260,6 +262,25 @@ shopping-list/
 - **minSdk 26 (Android 8.0):** cobre a grande maioria dos aparelhos em uso, inclusive celulares mais antigos comuns nesse público.
 - **targetSdk:** sempre a versão mais recente exigida pela Play Store.
 - **iOS (fase 5):** a lógica vem do `shared`. A interface será decidida na época entre **SwiftUI nativo** (melhor qualidade e acessibilidade no iPhone) e **Compose Multiplatform** (reaproveita a UI do Android). Recomendação atual: SwiftUI.
+
+### 4.8 Identidade visual
+
+Decidida em 2026-11-10 a partir do protótipo [prototipos/cores-destaque.html](prototipos/cores-destaque.html).
+
+| Elemento | Decisão |
+|---|---|
+| Estilo | **Quadrinhos:** contornos pretos grossos, sombras sólidas deslocadas, fundo com retícula (pontinhos) discreta. Os contornos também deixam botões e áreas de toque bem visíveis |
+| Fundo | Papel creme (sem branco puro) |
+| Texto | Tinta quase preta (`#141414`); riscado em cinza (`#66625A`) |
+| Cor de destaque | **Verde-folha `#2E6B3A`** — única cor de destaque (topo, botões principais, marca de riscado). Descartadas: laranja-tijolo `#A8431F`, azul-caneta `#1F4E9C` |
+| Fontes | **Bangers** só no logo, títulos de seção e botões principais; **Atkinson Hyperlegible** na lista e textos (mais legível que Comic Neue para baixa visão) |
+| Caixa alta | Só em títulos e botões; nomes da lista em caixa normal (testar na fase 0, ver 3.9) |
+| Tamanho | Nome do produto ~28sp, linhas ≥ 72dp, botões principais ~88dp |
+| Linha do produto | Marca de riscar → nome → ícone no fim da linha; quantidade só se informada, em letra menor |
+| Item riscado | Traço grosso por cima + texto cinza + marca preenchida com ✓ (estado nunca só por cor) |
+| Logo | "Anota Aí!" em Bangers, branco com contorno preto |
+| Ícone do app | Bloquinho com lápis e um item riscado, no estilo quadrinhos — arte final a produzir |
+| Modo escuro | Segue o sistema — paleta a definir |
 
 ---
 

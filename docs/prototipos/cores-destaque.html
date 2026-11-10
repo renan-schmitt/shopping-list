@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anota Aí — cores de destaque</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap">
+<style>
+  :root {
+    --papel: #FBF3DC;
+    --tinta: #141414;
+    --riscado: #66625A;
+    --linha: #E2D5B3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    font-family: 'Comic Neue', 'Comic Sans MS', system-ui, sans-serif;
+    font-weight: 700;
+    color: var(--tinta);
+    text-transform: uppercase;
+    background-color: #F4E7C2;
+    background-image: radial-gradient(rgba(0,0,0,.13) 1.4px, transparent 1.6px);
+    background-size: 12px 12px;
+  }
+  h1.pagina {
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    letter-spacing: .04em;
+    font-size: 44px;
+    text-align: center;
+    margin: 0 0 32px;
+  }
+  .grade {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .opcao { width: 400px; max-width: 100%; }
+  .rotulo {
+    display: inline-block;
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: .04em;
+    padding: 6px 16px 2px;
+    margin: 0 0 14px 8px;
+    background: #fff;
+    border: 3px solid var(--tinta);
+    box-shadow: 4px 4px 0 var(--tinta);
+    transform: rotate(-2deg);
+  }
+  .rotulo small { font-family: 'Comic Neue', sans-serif; font-size: 18px; letter-spacing: 0; }
+
+  .celular {
+    background: var(--papel);
+    border: 4px solid var(--tinta);
+    border-radius: 28px;
+    box-shadow: 8px 8px 0 var(--tinta);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 10px 10px 18px;
+    border-bottom: 4px solid var(--tinta);
+    background: var(--acento);
+  }
+  .logo {
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    font-size: 46px;
+    letter-spacing: .05em;
+    line-height: 1;
+    color: #fff;
+    -webkit-text-stroke: 2px var(--tinta);
+    paint-order: stroke fill;
+    text-shadow: 3px 3px 0 var(--tinta);
+    padding: 4px 0;
+  }
+  .menu {
+    width: 64px; height: 64px;
+    border: 3px solid var(--tinta);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 3px 3px 0 var(--tinta);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--tinta);
+  }
+
+  .lista { padding: 6px 14px 14px; display: flex; flex-direction: column; gap: 14px; }
+  .secao { display: flex; flex-direction: column; }
+  .secao h2 {
+    align-self: flex-start;
+    margin: 10px 0 6px;
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: .06em;
+    padding: 4px 12px 0;
+    background: var(--tinta);
+    color: var(--papel);
+    transform: rotate(-1.5deg);
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 72px;
+    width: 100%;
+    padding: 6px 2px;
+    border: none;
+    border-bottom: 2px dashed var(--linha);
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    text-transform: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .marca {
+    width: 40px; height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 3px solid var(--tinta);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .item.riscado .marca { background: var(--acento); box-shadow: 2px 2px 0 var(--tinta); }
+  .icone { font-size: 32px; width: 38px; text-align: center; flex-shrink: 0; }
+  .nome { flex-grow: 1; font-size: 28px; line-height: 1.1; }
+  .qtd { font-size: 24px; white-space: nowrap; }
+  .item.riscado .nome, .item.riscado .qtd {
+    color: var(--riscado);
+    text-decoration: line-through;
+    text-decoration-thickness: 4px;
+    text-decoration-color: var(--tinta);
+  }
+  .item.riscado .icone { opacity: .5; }
+
+  .rodape {
+    display: flex;
+    gap: 14px;
+    padding: 18px 16px 22px;
+    border-top: 4px solid var(--tinta);
+    background-image: radial-gradient(rgba(0,0,0,.09) 1.3px, transparent 1.5px);
+    background-size: 10px 10px;
+  }
+  .botao {
+    height: 88px;
+    border: 4px solid var(--tinta);
+    border-radius: 18px;
+    box-shadow: 5px 5px 0 var(--tinta);
+    font: inherit;
+    text-transform: inherit;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .botao:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--tinta); }
+  .adicionar {
+    flex: 1 1 0;
+    background: #fff;
+    color: var(--acento);
+    font-size: 22px;
+    gap: 4px;
+    flex-direction: column;
+  }
+  .terminei {
+    flex: 1.5 1 0;
+    background: var(--acento);
+    color: #fff;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .terminei .grande {
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    font-size: 38px;
+    letter-spacing: .05em;
+    line-height: 1;
+    -webkit-text-stroke: 1.5px var(--tinta);
+    paint-order: stroke fill;
+    text-shadow: 2px 2px 0 var(--tinta);
+  }
+  .terminei .pequeno { font-size: 20px; }
+
+  .nota {
+    max-width: 1300px;
+    margin: 40px auto 0;
+    text-align: center;
+    font-size: 18px;
+    text-transform: none;
+  }
+</style>
+</head>
+<body>
+  <h1 class="pagina">Anota Aí — qual cor de destaque?</h1>
+  <div class="grade" id="grade"></div>
+  <p class="nota">Ícones: emojis do sistema só como ilustração (no app serão Fluent Emoji Color).</p>
+
+<script>
+  const opcoes = [
+    { letra: 'A', nome: 'Verde-folha',    cor: '#2E6B3A' },
+    { letra: 'B', nome: 'Laranja-tijolo', cor: '#A8431F' },
+    { letra: 'C', nome: 'Azul-caneta',    cor: '#1F4E9C' },
+  ];
+
+  const secoes = [
+    { nome: 'Hortifrúti', itens: [['🍌', 'Banana', '6', true], ['🍅', 'Tomate', '', false], ['🥬', 'Alface', '', false]] },
+    { nome: 'Padaria',    itens: [['🥖', 'Pão francês', '10', true]] },
+    { nome: 'Açougue',    itens: [['🥩', 'Carne moída', '½ kg', false]] },
+    { nome: 'Mercearia',  itens: [['🍚', 'Arroz', '5 kg', true], ['☕', 'Café', '', false], ['🥛', 'Leite desnatado', '2', false]] },
+  ];
+
+  const check = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
+  const mais  = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg>';
+  const pontos = '<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="12" cy="12" r="2.4"/><circle cx="12" cy="19" r="2.4"/></svg>';
+
+  function faltam() {
+    return secoes.flatMap(s => s.itens).filter(i => !i[3]).length;
+  }
+
+  function celular(op) {
+    const lista = secoes.map(s => `
+      <section class="secao">
+        <h2>${s.nome}</h2>
+        ${s.itens.map(([icone, nome, qtd, riscado]) => `
+          <button class="item${riscado ? ' riscado' : ''}" aria-pressed="${riscado}">
+            <span class="marca">${riscado ? check : ''}</span>
+            <span class="nome">${nome}</span>
+            <span class="icone" aria-hidden="true">${icone}</span>
+          </button>`).join('')}
+      </section>`).join('');
+
+    return `
+      <div class="opcao" style="--acento: ${op.cor}">
+        <div class="rotulo">${op.letra} · ${op.nome} <small>${op.cor}</small></div>
+        <div class="celular">
+          <header class="topo">
+            <span class="logo">Anota Aí!</span>
+            <button class="menu" aria-label="Mais opções">${pontos}</button>
+          </header>
+          <div class="lista">${lista}</div>
+          <div class="rodape">
+            <button class="botao adicionar">${mais}Adicionar</button>
+            <button class="botao terminei">
+              <span class="grande">Terminei!</span>
+              <span class="pequeno">Faltam ${faltam()}</span>
+            </button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('grade').innerHTML = opcoes.map(celular).join('');
+
+  // Tocar num item risca / desrisca (só para sentir a interação)
+  document.addEventListener('click', e => {
+    const item = e.target.closest('.item');
+    if (!item) return;
+    const riscado = item.classList.toggle('riscado');
+    item.setAttribute('aria-pressed', riscado);
+    item.querySelector('.marca').innerHTML = riscado ? check : '';
+    const celularEl = item.closest('.celular');
+    const restantes = celularEl.querySelectorAll('.item:not(.riscado)').length;
+    celularEl.querySelector('.terminei .pequeno').textContent = `Faltam ${restantes}`;
+  });
+</script>
+</body>
+</html>
