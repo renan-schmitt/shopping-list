@@ -1,6 +1,6 @@
-# Anota Aí!
+# Lista de Compras: Mente Alerta
 
-Lista de compras para pessoas **60+**. Android primeiro (iPhone na fase 5), sem login, sem cadastro e **sem servidor no MVP**. O app abre direto numa folha de lista. Fases de 0 a 5: [plano §6](docs/plano-implementacao.md#6-fases-sugeridas).
+Lista de compras para pessoas **60+**, da família de apps **Mente Alerta**. Android primeiro (iPhone na fase 5), sem login, sem cadastro e **sem servidor no MVP**. O app abre direto numa folha de lista. Fases de 0 a 5: [plano §6](docs/plano-implementacao.md#6-fases-sugeridas).
 
 ## Documentos
 

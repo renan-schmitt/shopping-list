@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ícone na tela do celular</title>
+<style>
+  :root { --tinta: #141414; --papel: #FBF3DC; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px 64px;
+    font-family: system-ui, sans-serif; color: var(--tinta);
+    background: #F4E7C2;
+  }
+  h1 { text-align: center; font-size: 32px; margin: 0 0 8px; }
+  p.sub { text-align: center; margin: 0 0 32px; font-size: 18px; }
+  h2 { font-size: 22px; margin: 32px 0 12px; }
+  section { max-width: 1100px; margin: 0 auto; }
+
+  .tamanhos { display: flex; gap: 32px; align-items: flex-end; flex-wrap: wrap; }
+  .tamanhos figure { margin: 0; text-align: center; font-size: 15px; }
+  .tamanhos img { display: block; margin: 0 auto 6px; }
+
+  .telas { display: flex; gap: 24px; flex-wrap: wrap; }
+  .tela {
+    width: 340px; max-width: 100%; padding: 24px 12px;
+    border: 4px solid var(--tinta); border-radius: 28px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 6px;
+  }
+  .tela.clara  { background: linear-gradient(160deg, #cfe3f5, #f5e7d0); }
+  .tela.escura { background: linear-gradient(160deg, #1b2433, #3a2a3f); color: #fff; }
+  .tela h3 { grid-column: 1 / -1; margin: 0; font-size: 16px; text-align: center; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+  .app .ic { width: 56px; height: 56px; overflow: hidden; background: #ccc; }
+  .app .ic img { width: 100%; height: 100%; display: block; }
+  .app span { font-size: 13px; text-align: center; width: 100%; }
+  .uma span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .duas span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .circulo .ic { border-radius: 50%; }
+  .arredondado .ic { border-radius: 30%; }
+  .ic.vazio { background: rgba(255,255,255,.35); }
+  .ic.outro { display: flex; align-items: center; justify-content: center; font-size: 30px; }
+
+  .nota { max-width: 1100px; margin: 32px auto 0; font-size: 16px; }
+</style>
+</head>
+<body>
+  <h1>Ícone na tela do celular</h1>
+  <p class="sub">Como o ícone fica no tamanho real (em px de tela, perto do tamanho no celular)</p>
+
+  <section>
+    <h2>Tamanhos</h2>
+    <div class="tamanhos">
+      <figure><img src="img/icone-lista-compras.png" width="40" height="40" alt=""><figcaption>40 · notificação / pasta</figcaption></figure>
+      <figure><img src="img/icone-lista-compras.png" width="56" height="56" alt=""><figcaption>56 · tela inicial</figcaption></figure>
+      <figure><img src="img/icone-lista-compras.png" width="72" height="72" alt=""><figcaption>72 · tela inicial com ícones grandes</figcaption></figure>
+      <figure><img src="img/icone-lista-compras.png" width="128" height="128" alt=""><figcaption>128 · Play Store</figcaption></figure>
+    </div>
+
+    <h2>Na tela inicial</h2>
+    <div class="telas" id="telas"></div>
+  </section>
+
+  <p class="nota">O Android recorta o ícone no formato do celular (círculo, quadrado arredondado). No círculo, as bordas da imagem somem — rostos e mãos perto da borda podem ser cortados.</p>
+
+<script>
+  const outros = ['📞', '💬', '📷', '🌤️', '📅', '🎵', '📺', '🗺️', '⚙️', '🛡️', '🧮'];
+  const nomes  = ['Telefone', 'WhatsApp', 'Câmera', 'Tempo', 'Agenda', 'Música', 'YouTube', 'Mapas', 'Ajustes', 'Mente Alerta', 'Calculadora'];
+  const telas = [
+    { titulo: 'Motorola (círculo, 1 linha)', classes: 'clara circulo uma' },
+    { titulo: 'Samsung (quadrado arredondado, 2 linhas)', classes: 'clara arredondado duas' },
+    { titulo: 'Modo escuro (círculo, 1 linha)', classes: 'escura circulo uma' },
+  ];
+  document.getElementById('telas').innerHTML = telas.map(t => {
+    const apps = outros.map((e, i) => `<div class="app"><div class="ic outro vazio">${e}</div><span>${nomes[i]}</span></div>`);
+    apps.splice(5, 0, `<div class="app"><div class="ic"><img src="img/icone-lista-compras.png" alt=""></div><span>Lista de Compras</span></div>`);
+    return `<div class="tela ${t.classes}"><h3>${t.titulo}</h3>${apps.join('')}</div>`;
+  }).join('');
+</script>
+</body>
+</html>
