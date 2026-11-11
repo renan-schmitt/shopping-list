@@ -1,0 +1,51 @@
+# CI: build completo (Android, iOS e testes), screenshots Roborazzi e lint a cada push.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # macOS: o build compila os alvos iOS do shared, e as referências do
+    # Roborazzi foram gravadas num Mac (Apple Silicon), igual a este runner.
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Configurar o Gradle (cache e validação do wrapper)
+        uses: gradle/actions/setup-gradle@v5
+
+      # build = compilação, testes (shared, androidApp, build-logic), catálogo e lint.
+      # O verifyRoborazziDebug compara os screenshots com as referências do git.
+      - name: Build, testes, screenshots e lint
+        run: ./gradlew build :androidApp:verifyRoborazziDebug --continue
+
+      - name: Guardar relatórios em caso de falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios
+          path: |
+            **/build/reports/
+            **/build/test-results/
+            androidApp/build/outputs/roborazzi/
+            androidApp/src/test/screenshots/*_compare.png
+            androidApp/src/test/screenshots/*_actual.png
+          if-no-files-found: ignore

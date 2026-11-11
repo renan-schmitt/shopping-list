@@ -36,7 +36,7 @@ Resumo do [plano §4](docs/plano-implementacao.md#4-tecnologia-decidido).
 
 ## Comandos
 
-Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git). O CI entra na tarefa #6, que atualiza esta seção.
+Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git).
 
 - Build completo (Android, iOS e testes): `./gradlew build`
 - Instalar no emulador ou celular: `./gradlew :androidApp:installDebug`
@@ -46,6 +46,7 @@ Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git). O
 - Ícones do catálogo (baixa os SVG do Fluent usados na planilha para `catalog/fluent-svg/`): `./gradlew :shared:downloadFluentIcons` — rodar à mão ao usar um ícone Fluent novo; a conversão para VectorDrawable roda no build
 - Lint (ktlint + detekt + Android Lint, em todos os módulos e no `build-logic`): `./gradlew lint` — também roda no `check`/`build`
 - Corrigir formatação automaticamente: `./gradlew ktlintFormat :build-logic:ktlintFormat`
+- CI (`.github/workflows/ci.yml`, a cada push e PR, runner macOS): `./gradlew build :androidApp:verifyRoborazziDebug` — rode o mesmo comando antes de commitar; em falha, os relatórios e as diferenças de screenshot ficam no artefato `relatorios` do run
 - Regras: `.editorconfig` (ktlint, estilo `intellij_idea`, regras de Compose) e `config/detekt/detekt.yml`; sem baseline, aviso se corrige no código
 
 ## Como trabalhar
