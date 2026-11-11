@@ -26,7 +26,9 @@ class CatalogCodeGeneratorTest {
     @Test
     fun writesIconsRegionsAndEscapedStrings() {
         val code = generateCatalogCode(catalog)
-        assertTrue("CatalogProduct(\"apple\", \"Maçã\", \"produce\", 9999, CatalogIcon.Fluent(\"Red apple\"), IconFit.EXACT)" in code)
+        val apple = "CatalogProduct(\"apple\", \"Maçã\", \"produce\", 9999, " +
+            "CatalogIcon.Fluent(\"Red apple\"), IconFit.EXACT)"
+        assertTrue(apple in code)
         assertTrue("CatalogIcon.Own(\"papaya\"), IconFit.APPROX)" in code)
         assertTrue("CatalogProduct(\"p1\", \"Produto \\\"1\\\" \\\$x\", \"produce\", 10, null, null)" in code)
         assertTrue("CatalogTerm(\"bergamota\", \"p1\", setOf(Region.SOUTH, Region.CENTRAL_SOUTHEAST))" in code)
@@ -41,7 +43,8 @@ class CatalogCodeGeneratorTest {
 
     @Test
     fun emptyListsUseEmptyCollections() {
-        val code = generateCatalogCode(catalog.copy(terms = emptyList(), replacements = emptyMap(), retiredProductIds = emptySet()))
+        val empty = catalog.copy(terms = emptyList(), replacements = emptyMap(), retiredProductIds = emptySet())
+        val code = generateCatalogCode(empty)
         assertTrue("terms = emptyList()," in code)
         assertTrue("replacements = emptyMap()," in code)
         assertTrue("retiredProductIds = emptySet()," in code)

@@ -143,14 +143,12 @@ private fun validateProducts(
         val where = "$PRODUCTS:${row.line}"
         val id = row["id"]
         val section = row["section"]
-        val order = row["order"].toIntOrNull()
-        val icon = row["icon"].ifEmpty { null }
-        val iconFit = row["icon_fit"].ifEmpty { null }
         val status = row["status"]
         checkId(id, where, errors)
         if (!seenIds.add(id)) errors += "$where: produto \"$id\" repetido"
         if (row["name"].isEmpty()) errors += "$where: produto \"$id\" sem nome"
         if (section !in sectionIds) errors += "$where: seção \"$section\" não existe em $SECTIONS"
+        val order = row["order"].toIntOrNull()
         if (order == null) {
             errors += "$where: order \"${row["order"]}\" não é um número"
         } else if (status == "active") {
@@ -158,32 +156,54 @@ private fun validateProducts(
                 errors += "$where: order $order já usada por \"$it\" na seção \"$section\""
             }
         }
-        if (icon != null) checkIcon(icon, where, source, errors)
-        when {
-            icon == null && iconFit != null -> errors += "$where: icon_fit preenchido sem ícone"
-            icon != null && iconFit !in ICON_FITS -> errors += "$where: icon_fit deve ser exact ou approx"
-        }
+        val icon = row["icon"].ifEmpty { null }
+        val iconFit = row["icon_fit"].ifEmpty { null }
+        checkProductIcon(icon, iconFit, where, source, errors)
         if (status !in PRODUCT_STATUSES) errors += "$where: status \"$status\" deve ser active ou retired"
         order?.let {
-            ProductRow(row.line, Product(id, row["name"], section, it, icon, iconFit), status, row["replaced_by"].ifEmpty { null })
+            val product = Product(id, row["name"], section, it, icon, iconFit)
+            ProductRow(row.line, product, status, row["replaced_by"].ifEmpty { null })
         }
     }
+    checkReplacements(products, errors)
+    checkDuplicateNames(products, errors)
+    return products
+}
+
+private fun checkProductIcon(
+    icon: String?,
+    iconFit: String?,
+    where: String,
+    source: CatalogSource,
+    errors: MutableList<String>,
+) {
+    if (icon != null) checkIcon(icon, where, source, errors)
+    when {
+        icon == null && iconFit != null -> errors += "$where: icon_fit preenchido sem ícone"
+        icon != null && iconFit !in ICON_FITS -> errors += "$where: icon_fit deve ser exact ou approx"
+    }
+}
+
+private fun checkReplacements(products: List<ProductRow>, errors: MutableList<String>) {
     val byId = products.associateBy { it.product.id }
     for (row in products) {
         val where = "$PRODUCTS:${row.line}"
         val replacedBy = row.replacedBy ?: continue
         when {
             row.status != "retired" -> errors += "$where: replaced_by só vale para produto retired"
-            byId[replacedBy]?.status != "active" -> errors += "$where: replaced_by \"$replacedBy\" não é um produto active"
+            byId[replacedBy]?.status != "active" ->
+                errors += "$where: replaced_by \"$replacedBy\" não é um produto active"
         }
     }
+}
+
+private fun checkDuplicateNames(products: List<ProductRow>, errors: MutableList<String>) {
     val seenNames = mutableMapOf<String, String>()
     for (row in products.filter { it.status == "active" }) {
         seenNames.put(row.product.name.lowercase(PT_BR), row.product.id)?.let {
             errors += "$PRODUCTS:${row.line}: nome \"${row.product.name}\" já usado por \"$it\""
         }
     }
-    return products
 }
 
 private fun checkIcon(icon: String, where: String, source: CatalogSource, errors: MutableList<String>) {
@@ -208,24 +228,38 @@ private fun validateTerms(rows: List<CsvRow>, products: List<ProductRow>, errors
         val productId = row["product_id"]
         val term = row["term"]
         val regions = row["regions"].split(';').map { it.trim() }.filter { it.isNotEmpty() }
-        val status = row["status"]
-        val ambiguous = row["ambiguous"]
         if (productId !in statusById) errors += "$where: produto \"$productId\" não existe em $PRODUCTS"
-        if (term.isEmpty()) errors += "$where: termo vazio"
-        if (term != term.lowercase(PT_BR)) errors += "$where: termo \"$term\" deve estar em minúsculas"
-        if (term.lowercase(PT_BR) in activeNames) errors += "$where: termo \"$term\" repete o nome de um produto"
+        checkTermText(term, activeNames, where, errors)
         regions.filter { it !in REGIONS }.forEach { errors += "$where: região \"$it\" não existe" }
-        if (status !in TERM_STATUSES) errors += "$where: status \"$status\" deve ser to_confirm, confirmed ou rejected"
-        if (ambiguous !in AMBIGUOUS_VALUES) errors += "$where: ambiguous \"$ambiguous\" deve ser yes ou no"
-        if (status == "confirmed" && regions.isNotEmpty() && row["evidence"].isEmpty()) {
-            errors += "$where: regionalismo confirmed precisa de evidence"
-        }
-        val entersApp = status == "confirmed" || (status == "to_confirm" && ambiguous == "no")
+        val entersApp = checkTermStatus(row, regions, where, errors)
         if (entersApp && statusById[productId] == "retired") {
             errors += "$where: termo \"$term\" entra no app mas aponta para produto retired"
         }
         TermRow(row.line, Term(term, productId, regions), entersApp)
     }
+    checkDuplicateTerms(termRows, errors)
+    return termRows.filter { it.entersApp }.map { it.term }
+}
+
+private fun checkTermText(term: String, activeNames: Set<String>, where: String, errors: MutableList<String>) {
+    if (term.isEmpty()) errors += "$where: termo vazio"
+    if (term != term.lowercase(PT_BR)) errors += "$where: termo \"$term\" deve estar em minúsculas"
+    if (term.lowercase(PT_BR) in activeNames) errors += "$where: termo \"$term\" repete o nome de um produto"
+}
+
+/** Confere `status`, `ambiguous` e `evidence`; devolve se o termo entra no app. */
+private fun checkTermStatus(row: CsvRow, regions: List<String>, where: String, errors: MutableList<String>): Boolean {
+    val status = row["status"]
+    val ambiguous = row["ambiguous"]
+    if (status !in TERM_STATUSES) errors += "$where: status \"$status\" deve ser to_confirm, confirmed ou rejected"
+    if (ambiguous !in AMBIGUOUS_VALUES) errors += "$where: ambiguous \"$ambiguous\" deve ser yes ou no"
+    if (status == "confirmed" && regions.isNotEmpty() && row["evidence"].isEmpty()) {
+        errors += "$where: regionalismo confirmed precisa de evidence"
+    }
+    return status == "confirmed" || (status == "to_confirm" && ambiguous == "no")
+}
+
+private fun checkDuplicateTerms(termRows: List<TermRow>, errors: MutableList<String>) {
     val seenPairs = mutableSetOf<Pair<String, String>>()
     val seenEntering = mutableMapOf<String, TermRow>()
     for (row in termRows) {
@@ -240,7 +274,6 @@ private fun validateTerms(rows: List<CsvRow>, products: List<ProductRow>, errors
             }
         }
     }
-    return termRows.filter { it.entersApp }.map { it.term }
 }
 
 private fun checkId(id: String, where: String, errors: MutableList<String>) {

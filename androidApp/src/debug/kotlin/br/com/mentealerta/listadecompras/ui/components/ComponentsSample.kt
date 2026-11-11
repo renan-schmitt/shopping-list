@@ -21,9 +21,9 @@ import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
  * source set `debug` para não entrar na versão publicada.
  */
 @Composable
-fun ComponentsSample() {
+fun ComponentsSample(modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),

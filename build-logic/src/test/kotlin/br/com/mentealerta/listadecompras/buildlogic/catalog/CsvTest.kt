@@ -17,7 +17,7 @@ class CsvTest {
 
     @Test
     fun ignoresBomCrlfAndEmptyLines() {
-        val table = parseCsv("x.csv", "﻿a,b\r\n1, x \r\n\r\n2,y", columns)
+        val table = parseCsv("x.csv", "\uFEFFa,b\r\n1, x \r\n\r\n2,y", columns)
         assertEquals(emptyList(), table.errors)
         assertEquals(listOf("x", "y"), table.rows.map { it["b"] })
     }

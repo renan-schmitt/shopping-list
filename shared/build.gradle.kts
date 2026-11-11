@@ -34,7 +34,7 @@ kotlin {
     }
 }
 
-// A validação da planilha e os testes do gerador também rodam no check (e no build do CI)
+// A validação da planilha, os testes e o lint do gerador também rodam no check (e no build do CI)
 tasks.named("check") {
-    dependsOn("generateCatalog", gradle.includedBuild("build-logic").task(":test"))
+    dependsOn("generateCatalog", gradle.includedBuild("build-logic").task(":check"))
 }

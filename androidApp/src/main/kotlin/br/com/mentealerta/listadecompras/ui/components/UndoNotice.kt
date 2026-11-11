@@ -40,12 +40,7 @@ fun UndoNotice(data: SnackbarData, modifier: Modifier = Modifier) {
  * em 200%. O TalkBack anuncia o aviso quando ele aparece.
  */
 @Composable
-fun UndoNotice(
-    message: String,
-    actionLabel: String?,
-    onAction: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun UndoNotice(message: String, actionLabel: String?, onAction: () -> Unit, modifier: Modifier = Modifier) {
     val tokens = ComicTheme.tokens
     Column(
         modifier = modifier

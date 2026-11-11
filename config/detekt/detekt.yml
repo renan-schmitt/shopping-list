@@ -1,0 +1,30 @@
+# Parte das regras padrão do detekt (buildUponDefaultConfig) e ajusta só o
+# que conflita com Compose. Sem baseline: avisos são corrigidos no código.
+
+naming:
+  FunctionNaming:
+    # Funções @Composable começam com maiúscula
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  LongParameterList:
+    # Componentes Compose recebem muitos parâmetros opcionais
+    ignoreDefaultParameters: true
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    # Funções privadas pequenas (composables, checagens) são detalhe do arquivo
+    ignorePrivate: true
+  LongMethod:
+    ignoreAnnotated: ['Composable', 'Preview']
+
+style:
+  ReturnCount:
+    # Retornos antecipados de validação (guard clauses) não contam
+    excludeGuardClauses: true
+  MagicNumber:
+    # Tema, componentes (dp, cores) e testes usam números literais por natureza
+    ignoreAnnotated: ['Composable', 'Preview']
+    ignorePropertyDeclaration: true
+    excludes: ['**/test/**', '**/commonTest/**', '**/ui/theme/**']
+  UnusedPrivateFunction:
+    ignoreAnnotated: ['Preview']

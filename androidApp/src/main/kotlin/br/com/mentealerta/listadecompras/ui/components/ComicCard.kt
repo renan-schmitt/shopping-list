@@ -12,10 +12,7 @@ import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
  * grande (plano §4.8). Base da folha da lista e de painéis.
  */
 @Composable
-fun ComicCard(
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit,
-) {
+fun ComicCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val tokens = ComicTheme.tokens
     Column(
         modifier = modifier.comicStyle(

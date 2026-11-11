@@ -43,6 +43,8 @@ private data class CsvRecord(val line: Int, val fields: List<String>)
 
 private data class CsvRecords(val records: List<CsvRecord>, val errors: List<String>)
 
+// Máquina de estados do CSV (aspas, quebras de linha): dividir só espalharia a lógica
+@Suppress("CyclomaticComplexMethod")
 private fun splitRecords(fileName: String, text: String): CsvRecords {
     val records = mutableListOf<CsvRecord>()
     val errors = mutableListOf<String>()
@@ -51,7 +53,7 @@ private fun splitRecords(fileName: String, text: String): CsvRecords {
     var inQuotes = false
     var line = 1
     var recordLine = 1
-    var i = if (text.startsWith('﻿')) 1 else 0
+    var i = if (text.startsWith('\uFEFF')) 1 else 0
 
     fun endRecord() {
         fields += field.toString()

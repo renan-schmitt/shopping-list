@@ -87,10 +87,10 @@ fun UppercaseText(
             Text(
                 text = visible,
                 style = style.copy(
-                    drawStyle = Stroke(width = fontSizePx * LetterOutlineRatio),
+                    drawStyle = Stroke(width = fontSizePx * LETTER_OUTLINE_RATIO),
                     shadow = Shadow(
                         color = letterOutline,
-                        offset = Offset(fontSizePx * LetterShadowRatio, fontSizePx * LetterShadowRatio),
+                        offset = Offset(fontSizePx * LETTER_SHADOW_RATIO, fontSizePx * LETTER_SHADOW_RATIO),
                     ),
                 ),
                 color = letterOutline,
@@ -102,11 +102,14 @@ fun UppercaseText(
 }
 
 /** Contorno da letra em proporção ao tamanho da fonte (1,5px em 38px no protótipo). */
-private const val LetterOutlineRatio = 0.08f
+private const val LETTER_OUTLINE_RATIO = 0.08f
 
 /** Sombra da letra em proporção ao tamanho da fonte (2px em 38px no protótipo). */
-private const val LetterShadowRatio = 0.055f
+private const val LETTER_SHADOW_RATIO = 0.055f
+
+/** Luminância a partir da qual a letra é considerada clara. */
+private const val LIGHT_LETTER_LUMINANCE = 0.5f
 
 /** Letra clara pede contorno escuro; letra escura dispensa contorno. */
 internal fun letterOutlineFor(letter: Color, outline: Color): Color? =
-    if (letter.luminance() > 0.5f) outline else null
+    if (letter.luminance() > LIGHT_LETTER_LUMINANCE) outline else null

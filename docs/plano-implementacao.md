@@ -300,7 +300,7 @@ shopping-list/
 | Interface | Compose UI Test | Fluxos: adicionar, riscar, Terminei, jogar fora, voltar |
 | Screenshots | Roborazzi | Cada tela com fonte do sistema em 100%, 150% e 200%, claro e escuro |
 | Acessibilidade | Accessibility Test Framework (checks no Compose UI Test) | Área de toque, contraste, rótulos para TalkBack |
-| Estilo/estática | ktlint + detekt | |
+| Estilo/estática | ktlint + detekt | Formatação (estilo `intellij_idea`, regras de Compose) e análise estática, sem baseline; `./gradlew lint`. detekt 2.0 (alpha), o único compatível com Kotlin 2.4 (2026-11-11) |
 | CI | GitHub Actions | Build, testes e lint a cada push |
 
 ### 4.7 Plataforma

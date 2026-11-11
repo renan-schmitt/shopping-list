@@ -30,8 +30,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen() {
-    Scaffold { padding ->
+fun HomeScreen(modifier: Modifier = Modifier) {
+    Scaffold(modifier = modifier) { padding ->
         Box(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentAlignment = Alignment.Center,

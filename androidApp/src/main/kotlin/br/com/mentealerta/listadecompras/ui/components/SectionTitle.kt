@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /** Inclinação da faixa, como no protótipo. */
-private const val BannerTilt = -1.5f
+private const val BANNER_TILT = -1.5f
 
 /**
  * Título de seção ("Hortifrúti", "Limpeza"): faixa preta levemente
@@ -31,7 +31,7 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
         textAlign = TextAlign.Start,
         modifier = modifier
             .semantics { heading() }
-            .rotate(BannerTilt)
+            .rotate(BANNER_TILT)
             .background(colors.inverseSurface)
             .padding(horizontal = 12.dp, vertical = 4.dp),
     )

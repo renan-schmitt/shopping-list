@@ -8,10 +8,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 
 /** Tema do app: segue o modo escuro do sistema (paleta escura provisória, #9). */
 @Composable
-fun ShoppingListTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit,
-) {
+fun ShoppingListTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalComicTokens provides ComicTokens()) {
         MaterialTheme(
             colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,

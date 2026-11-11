@@ -53,8 +53,8 @@ private fun StringBuilder.appendFunction(name: String, type: String, items: List
 private fun section(s: Section) =
     "CatalogSection(${str(s.id)}, ${str(s.name)}, ${s.order}, CatalogIcon.Fluent(${str(s.fluentIcon)}))"
 
-private fun product(p: Product) =
-    "CatalogProduct(${str(p.id)}, ${str(p.name)}, ${str(p.sectionId)}, ${p.order}, ${icon(p.icon)}, ${iconFit(p.iconFit)})"
+private fun product(p: Product) = "CatalogProduct(${str(p.id)}, ${str(p.name)}, ${str(p.sectionId)}, ${p.order}, " +
+    "${icon(p.icon)}, ${iconFit(p.iconFit)})"
 
 private fun term(t: Term): String {
     val regions = t.regions.joinToString(", ") { "Region.${it.uppercase()}" }
@@ -69,8 +69,11 @@ private fun icon(icon: String?) = when {
 
 private fun iconFit(fit: String?) = fit?.let { "IconFit.${it.uppercase()}" } ?: "null"
 
-private fun mapOf(map: Map<String, String>): String =
-    if (map.isEmpty()) "emptyMap()" else map.entries.joinToString(", ", "mapOf(", ")") { "${str(it.key)} to ${str(it.value)}" }
+private fun mapOf(map: Map<String, String>): String = if (map.isEmpty()) {
+    "emptyMap()"
+} else {
+    map.entries.joinToString(", ", "mapOf(", ")") { "${str(it.key)} to ${str(it.value)}" }
+}
 
 private fun setOf(items: List<String>): String =
     if (items.isEmpty()) "emptySet()" else items.joinToString(", ", "setOf(", ")") { str(it) }

@@ -17,12 +17,7 @@ data class Catalog(
     val retiredProductIds: Set<String>,
 )
 
-data class CatalogSection(
-    val id: String,
-    val name: String,
-    val order: Int,
-    val icon: CatalogIcon,
-) {
+data class CatalogSection(val id: String, val name: String, val order: Int, val icon: CatalogIcon) {
     companion object {
         /** Seção dos produtos que o app não reconhece. */
         const val OTHER_ID = "other"

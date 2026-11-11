@@ -43,11 +43,15 @@ class CatalogValidatorTest {
         ownIcons = ownIcons,
     )
 
-    private fun errorsOf(source: CatalogSource): List<String> =
-        when (val result = validateCatalog(source)) {
-            is ValidationResult.Invalid -> result.errors
-            is ValidationResult.Valid -> fail("Esperava erro, mas a planilha passou")
-        }
+    private fun errorsOf(source: CatalogSource): List<String> = when (val result = validateCatalog(source)) {
+        is ValidationResult.Invalid -> result.errors
+        is ValidationResult.Valid -> fail("Esperava erro, mas a planilha passou")
+    }
+
+    private fun assertProductError(expected: String, row: String) =
+        assertError(expected, source(products = products + row))
+
+    private fun assertTermError(expected: String, row: String) = assertError(expected, source(terms = terms + row))
 
     private fun assertError(expected: String, source: CatalogSource) {
         val errors = errorsOf(source)
@@ -69,7 +73,8 @@ class CatalogValidatorTest {
     fun sectionErrors() {
         assertError("seção \"produce\" repetida", source(sections = sections + "produce,X,4,Bread"))
         assertError("order 1 repetida", source(sections = listOf(sections[0], "bakery,Padaria,1,Bread", sections[2])))
-        assertError("ícone Fluent \"Nope\"", source(sections = listOf("produce,Hortifrúti,1,Nope") + sections.drop(1)))
+        val badIcon = listOf("produce,Hortifrúti,1,Nope") + sections.drop(1)
+        assertError("ícone Fluent \"Nope\"", source(sections = badIcon))
         assertError("falta a seção \"other\"", source(sections = sections.take(2)))
         assertError("\"other\" (Outros) precisa ser a última", source(sections = sections + "pet,Pet,4,Bread"))
         assertError("id \"Bakery\"", source(sections = listOf(sections[0], "Bakery,Padaria,2,Bread", sections[2])))
@@ -77,38 +82,42 @@ class CatalogValidatorTest {
 
     @Test
     fun productErrors() {
-        assertError("produto \"banana\" repetido", source(products = products + "banana,Banana 2,produce,90,,,active,,"))
-        assertError("seção \"frozen\" não existe", source(products = products + "ice,Gelo,frozen,10,,,active,,"))
-        assertError("order 10 já usada por \"banana\"", source(products = products + "kiwi,Kiwi,produce,10,,,active,,"))
-        assertError("não é um número", source(products = products + "kiwi,Kiwi,produce,dez,,,active,,"))
-        assertError("ícone Fluent \"Kiwi fruit\"", source(products = products + "kiwi,Kiwi,produce,90,fluent:Kiwi fruit,exact,active,,"))
-        assertError("ícone próprio \"kiwi\"", source(products = products + "kiwi,Kiwi,produce,90,own:kiwi,exact,active,,"))
-        assertError("deve começar com fluent: ou own:", source(products = products + "kiwi,Kiwi,produce,90,Banana,exact,active,,"))
-        assertError("icon_fit preenchido sem ícone", source(products = products + "kiwi,Kiwi,produce,90,,exact,active,,"))
-        assertError("icon_fit deve ser exact ou approx", source(products = products + "kiwi,Kiwi,produce,90,fluent:Banana,,active,,"))
-        assertError("status \"old\"", source(products = products + "kiwi,Kiwi,produce,90,,,old,,"))
-        assertError("replaced_by só vale para produto retired", source(products = products + "kiwi,Kiwi,produce,90,,,active,banana,"))
-        assertError("replaced_by \"bread_roll\" não é um produto active", source(products = products + "roll,Rosca,bakery,30,,,retired,bread_roll,"))
-        assertError("nome \"banana\" já usado por \"banana\"", source(products = products + "banana2,banana,produce,90,,,active,,"))
+        assertProductError("produto \"banana\" repetido", "banana,Banana 2,produce,90,,,active,,")
+        assertProductError("seção \"frozen\" não existe", "ice,Gelo,frozen,10,,,active,,")
+        assertProductError("order 10 já usada por \"banana\"", "kiwi,Kiwi,produce,10,,,active,,")
+        assertProductError("não é um número", "kiwi,Kiwi,produce,dez,,,active,,")
+        assertProductError("ícone Fluent \"Kiwi fruit\"", "kiwi,Kiwi,produce,90,fluent:Kiwi fruit,exact,active,,")
+        assertProductError("ícone próprio \"kiwi\"", "kiwi,Kiwi,produce,90,own:kiwi,exact,active,,")
+        assertProductError("deve começar com fluent: ou own:", "kiwi,Kiwi,produce,90,Banana,exact,active,,")
+        assertProductError("icon_fit preenchido sem ícone", "kiwi,Kiwi,produce,90,,exact,active,,")
+        assertProductError("icon_fit deve ser exact ou approx", "kiwi,Kiwi,produce,90,fluent:Banana,,active,,")
+        assertProductError("status \"old\"", "kiwi,Kiwi,produce,90,,,old,,")
+        assertProductError("replaced_by só vale para produto retired", "kiwi,Kiwi,produce,90,,,active,banana,")
+        assertProductError(
+            "replaced_by \"bread_roll\" não é um produto active",
+            "roll,Rosca,bakery,30,,,retired,bread_roll,",
+        )
+        assertProductError("nome \"banana\" já usado por \"banana\"", "banana2,banana,produce,90,,,active,,")
     }
 
     @Test
     fun ownIconThatExistsIsAccepted() {
-        val result = validateCatalog(source(products = products + "kiwi,Kiwi,produce,90,own:kiwi,exact,active,,", ownIcons = setOf("kiwi")))
+        val kiwi = "kiwi,Kiwi,produce,90,own:kiwi,exact,active,,"
+        val result = validateCatalog(source(products = products + kiwi, ownIcons = setOf("kiwi")))
         assertIs<ValidationResult.Valid>(result)
     }
 
     @Test
     fun termErrors() {
-        assertError("produto \"kiwi\" não existe", source(terms = terms + "kiwi,quiuí,,to_confirm,no,,"))
-        assertError("deve estar em minúsculas", source(terms = terms + "banana,Banana-Prata,,to_confirm,no,,"))
-        assertError("repete o nome de um produto", source(terms = terms + "apple,maçã,,to_confirm,no,,"))
-        assertError("região \"southeast\"", source(terms = terms + "banana,prata,southeast,to_confirm,no,,"))
-        assertError("status \"ok\"", source(terms = terms + "banana,prata,,ok,no,,"))
-        assertError("ambiguous \"maybe\"", source(terms = terms + "banana,prata,,to_confirm,maybe,,"))
-        assertError("regionalismo confirmed precisa de evidence", source(terms = terms + "banana,prata,north,confirmed,no,,"))
-        assertError("aponta para produto retired", source(terms = terms + "bread_roll,pão de sal,,to_confirm,no,,"))
-        assertError("repetido para \"apple\"", source(terms = terms + "apple,maçã gala,,to_confirm,no,,"))
+        assertTermError("produto \"kiwi\" não existe", "kiwi,quiuí,,to_confirm,no,,")
+        assertTermError("deve estar em minúsculas", "banana,Banana-Prata,,to_confirm,no,,")
+        assertTermError("repete o nome de um produto", "apple,maçã,,to_confirm,no,,")
+        assertTermError("região \"southeast\"", "banana,prata,southeast,to_confirm,no,,")
+        assertTermError("status \"ok\"", "banana,prata,,ok,no,,")
+        assertTermError("ambiguous \"maybe\"", "banana,prata,,to_confirm,maybe,,")
+        assertTermError("regionalismo confirmed precisa de evidence", "banana,prata,north,confirmed,no,,")
+        assertTermError("aponta para produto retired", "bread_roll,pão de sal,,to_confirm,no,,")
+        assertTermError("repetido para \"apple\"", "apple,maçã gala,,to_confirm,no,,")
     }
 
     @Test

@@ -26,13 +26,13 @@ import androidx.compose.ui.unit.dp
  * `debug` para não entrar na versão publicada.
  */
 @Composable
-fun ThemeSample() {
+fun ThemeSample(modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     val tokens = ComicTheme.tokens
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(colors.background)
             .padding(16.dp),
