@@ -1,0 +1,12 @@
+id,name,order,fluent_icon
+produce,Hortifrúti,1,Leafy green
+bakery,Padaria,2,Bread
+meat,Açougue e peixaria,3,Cut of meat
+deli_dairy,Frios e laticínios,4,Cheese wedge
+frozen,Congelados,5,Ice
+pantry,Mercearia,6,Canned food
+beverages,Bebidas,7,Cup with straw
+cleaning,Limpeza,8,Sponge
+personal_care,Higiene e farmácia,9,Lotion bottle
+pet,Pet,10,Paw prints
+other,Outros,11,Shopping cart

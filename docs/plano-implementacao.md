@@ -56,6 +56,13 @@ O que precisa existir na primeira versão publicada.
 - [ ] Mudar a categoria de um item manualmente (e o app lembra da escolha)
 - [ ] Categorias ordenadas como um mercado costuma ser (hortifrúti, padaria, açougue, frios, mercearia, limpeza, higiene...)
 
+**Seções decididas (2026-11-11, #14)** — lista fechada em [catalog/sections.csv](../catalog/sections.csv), nesta ordem: Hortifrúti, Padaria, Açougue e peixaria, Frios e laticínios, **Congelados**, Mercearia, Bebidas, Limpeza, Higiene e farmácia, Pet e **Outros**.
+- Na interface a palavra é **"Seção"**, nunca "Categoria".
+- **Congelados** é seção própria (sorvete, pizza, lasanha não cabem nas outras) e fica junto de Frios, na área refrigerada.
+- **Outros** recebe os produtos que o app não reconhece e fica sempre por último.
+- Cada seção tem um ícone Fluent, usado como reserva do produto sem ícone próprio (seção 4.4).
+- O id da seção (em inglês) nunca muda; a ordem pode mudar. A planilha mestre do catálogo usa esses ids.
+
 ### 1.5 Histórico e sugestões
 - [ ] Histórico de compras (data + produtos comprados + quantidade) gravado a cada "Terminei"
 - [ ] Previsões no MVP usam só a frequência; quantidade fica gravada para uso futuro
@@ -141,7 +148,7 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 
 **Produtos novos no celular (MVP):**
 - Produto desconhecido vira um **produto próprio da pessoa**: nome normalizado, seção e ícone da categoria. Entra no histórico e nas sugestões como qualquer outro. Fica só no celular.
-- A seção é adivinhada pela palavra principal ("queijo canastra" → Frios). Se não reconhecer nenhuma palavra, vai para a seção genérica (nome definido na #14). A pessoa pode mudar, e o app lembra (seção 1.4).
+- A seção é adivinhada pela palavra principal ("queijo canastra" → Frios). Se não reconhecer nenhuma palavra, vai para a seção **Outros** (seção 1.4). A pessoa pode mudar, e o app lembra (seção 1.4).
 - Se um catálogo novo trouxer o produto, o produto próprio passa a apontar para o do catálogo, sem perder o histórico.
 
 **Evolução do catálogo:**
