@@ -1,4 +1,4 @@
-package br.com.mentealerta.listadecompras.ui.tema
+package br.com.mentealerta.listadecompras.ui.theme
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -19,44 +19,44 @@ import org.robolectric.annotation.GraphicsMode
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [36], qualifiers = TemaScreenshotTest.TELA)
-class TemaScreenshotTest {
+@Config(sdk = [36], qualifiers = ThemeScreenshotTest.SCREEN)
+class ThemeScreenshotTest {
 
     @get:Rule
     val compose = createComposeRule()
 
     @Test
     @Config(fontScale = 1.0f)
-    fun claro_fonte100() = capturar("claro_fonte100")
+    fun light_font100() = capture("light_font100")
 
     @Test
     @Config(fontScale = 1.5f)
-    fun claro_fonte150() = capturar("claro_fonte150")
+    fun light_font150() = capture("light_font150")
 
     @Test
     @Config(fontScale = 2.0f)
-    fun claro_fonte200() = capturar("claro_fonte200")
+    fun light_font200() = capture("light_font200")
 
     @Test
     @Config(qualifiers = "+night", fontScale = 1.0f)
-    fun escuro_fonte100() = capturar("escuro_fonte100")
+    fun dark_font100() = capture("dark_font100")
 
     @Test
     @Config(qualifiers = "+night", fontScale = 1.5f)
-    fun escuro_fonte150() = capturar("escuro_fonte150")
+    fun dark_font150() = capture("dark_font150")
 
     @Test
     @Config(qualifiers = "+night", fontScale = 2.0f)
-    fun escuro_fonte200() = capturar("escuro_fonte200")
+    fun dark_font200() = capture("dark_font200")
 
-    private fun capturar(nome: String) {
+    private fun capture(name: String) {
         // Sem parâmetro: o tema segue o modo escuro do sistema, como no app.
-        compose.setContent { ListaDeComprasTheme { AmostraDoTema() } }
-        compose.onRoot().captureRoboImage("src/test/screenshots/tema_$nome.png")
+        compose.setContent { ShoppingListTheme { ThemeSample() } }
+        compose.onRoot().captureRoboImage("src/test/screenshots/theme_$name.png")
     }
 
     companion object {
         /** Celular comum de 411dp de largura, alto o bastante para a fonte em 200%. */
-        const val TELA = "w411dp-h2200dp-xhdpi"
+        const val SCREEN = "w411dp-h2200dp-xhdpi"
     }
 }

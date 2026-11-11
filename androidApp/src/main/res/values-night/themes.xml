@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Paleta escura provisória até a #9. -->
-    <style name="Theme.ListaDeCompras" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/fundo</item>
+    <style name="Theme.ShoppingList" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/background</item>
     </style>
 </resources>

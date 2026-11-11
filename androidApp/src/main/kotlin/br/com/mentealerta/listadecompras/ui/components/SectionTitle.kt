@@ -1,4 +1,4 @@
-package br.com.mentealerta.listadecompras.ui.componentes
+package br.com.mentealerta.listadecompras.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /** Inclinação da faixa, como no protótipo. */
-private const val InclinacaoDaFaixa = -1.5f
+private const val BannerTilt = -1.5f
 
 /**
  * Título de seção ("Hortifrúti", "Limpeza"): faixa preta levemente
@@ -22,17 +22,17 @@ private const val InclinacaoDaFaixa = -1.5f
  * longos quebram a linha.
  */
 @Composable
-fun TituloDeSecao(texto: String, modifier: Modifier = Modifier) {
-    val cores = MaterialTheme.colorScheme
-    TextoCaixaAlta(
-        texto = texto,
-        estilo = MaterialTheme.typography.titleLarge,
-        cor = cores.inverseOnSurface,
-        alinhamento = TextAlign.Start,
+fun SectionTitle(text: String, modifier: Modifier = Modifier) {
+    val colors = MaterialTheme.colorScheme
+    UppercaseText(
+        text = text,
+        style = MaterialTheme.typography.titleLarge,
+        color = colors.inverseOnSurface,
+        textAlign = TextAlign.Start,
         modifier = modifier
             .semantics { heading() }
-            .rotate(InclinacaoDaFaixa)
-            .background(cores.inverseSurface)
+            .rotate(BannerTilt)
+            .background(colors.inverseSurface)
             .padding(horizontal = 12.dp, vertical = 4.dp),
     )
 }

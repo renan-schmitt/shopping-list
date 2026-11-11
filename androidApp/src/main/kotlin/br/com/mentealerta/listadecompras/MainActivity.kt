@@ -15,29 +15,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.mentealerta.listadecompras.ui.tema.ListaDeComprasTheme
+import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ListaDeComprasTheme {
-                TelaInicial()
+            ShoppingListTheme {
+                HomeScreen()
             }
         }
     }
 }
 
 @Composable
-fun TelaInicial() {
+fun HomeScreen() {
     Scaffold { padding ->
         Box(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = stringResource(R.string.ola),
+                text = stringResource(R.string.hello),
                 style = MaterialTheme.typography.displayMedium,
             )
         }
@@ -46,8 +46,8 @@ fun TelaInicial() {
 
 @Preview(showBackground = true)
 @Composable
-private fun TelaInicialPreview() {
-    ListaDeComprasTheme {
-        TelaInicial()
+private fun HomeScreenPreview() {
+    ShoppingListTheme {
+        HomeScreen()
     }
 }

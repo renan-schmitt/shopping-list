@@ -1,4 +1,4 @@
-package br.com.mentealerta.listadecompras.ui.tema
+package br.com.mentealerta.listadecompras.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -15,23 +15,23 @@ val Bangers = FontFamily(Font(R.font.bangers_regular, FontWeight.Normal))
 /** Lexend Deca negrito: lista e demais textos (plano §4.8). */
 val LexendDeca = FontFamily(Font(R.font.lexend_deca_bold, FontWeight.Bold))
 
-private val EspacoLexend = 0.04.em
-private val EspacoBangers = 0.05.em
+private val LexendLetterSpacing = 0.04.em
+private val BangersLetterSpacing = 0.05.em
 
-private fun bangers(tamanho: Int) = TextStyle(
+private fun bangers(size: Int) = TextStyle(
     fontFamily = Bangers,
     fontWeight = FontWeight.Normal,
-    fontSize = tamanho.sp,
-    lineHeight = (tamanho * 1.1).sp,
-    letterSpacing = EspacoBangers,
+    fontSize = size.sp,
+    lineHeight = (size * 1.1).sp,
+    letterSpacing = BangersLetterSpacing,
 )
 
-private fun lexend(tamanho: Int, alturaDaLinha: Double = 1.2) = TextStyle(
+private fun lexend(size: Int, lineHeightFactor: Double = 1.2) = TextStyle(
     fontFamily = LexendDeca,
     fontWeight = FontWeight.Bold,
-    fontSize = tamanho.sp,
-    lineHeight = (tamanho * alturaDaLinha).sp,
-    letterSpacing = EspacoLexend,
+    fontSize = size.sp,
+    lineHeight = (size * lineHeightFactor).sp,
+    letterSpacing = LexendLetterSpacing,
 )
 
 /**
@@ -49,7 +49,7 @@ private fun lexend(tamanho: Int, alturaDaLinha: Double = 1.2) = TextStyle(
  * Caixa alta não fica aqui: é aplicada pelos componentes, mantendo o texto
  * original para o TalkBack (CLAUDE.md).
  */
-internal val TipografiaQuadrinhos = Typography(
+internal val ComicTypography = Typography(
     displayLarge = bangers(52),
     displayMedium = bangers(46),
     displaySmall = bangers(42),
@@ -59,7 +59,7 @@ internal val TipografiaQuadrinhos = Typography(
     titleLarge = bangers(30),
     titleMedium = lexend(24),
     titleSmall = lexend(22),
-    bodyLarge = lexend(28, alturaDaLinha = 1.15),
+    bodyLarge = lexend(28, lineHeightFactor = 1.15),
     bodyMedium = lexend(24),
     bodySmall = lexend(18),
     labelLarge = lexend(22),

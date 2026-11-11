@@ -202,6 +202,7 @@ shopping-list/
 
 - Padrão: camadas (UI → ViewModel → casos de uso → repositório), com estado exposto via `StateFlow`.
 - Integrações de plataforma (voz, notificações, localização) atrás de interfaces no `shared`, implementadas em cada plataforma.
+- **Idioma do código (2026-11-11, #119):** nomes em inglês (classes, funções, variáveis, parâmetros, arquivos, pastas, recursos e testes). Comentários, KDoc, commits e documentos em português; texto exibido segue o [guia de linguagem](guia-de-linguagem.md). O pacote e o applicationId continuam `br.com.mentealerta.listadecompras` (identidade do app na Play Store).
 
 ### 4.3 Componentes
 

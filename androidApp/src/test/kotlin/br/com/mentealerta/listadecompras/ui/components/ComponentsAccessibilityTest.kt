@@ -1,4 +1,4 @@
-package br.com.mentealerta.listadecompras.ui.componentes
+package br.com.mentealerta.listadecompras.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.res.painterResource
@@ -16,8 +16,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.R
-import br.com.mentealerta.listadecompras.ui.tema.ListaDeComprasTheme
-import br.com.mentealerta.listadecompras.ui.tema.TemaScreenshotTest
+import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
+import br.com.mentealerta.listadecompras.ui.theme.ThemeScreenshotTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -30,7 +30,7 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Acessibilidade dos componentes base (plano §1.7 e §4.6): área de toque,
  * papel de botão, título de seção, texto original para o TalkBack e aviso
- * anunciado. O contraste das cores fica em [ContrasteTest].
+ * anunciado. O contraste das cores fica em [ContrastTest].
  *
  * Os checks do Accessibility Test Framework não rodam no Robolectric (não
  * acusam nem um botão de 20dp sem rótulo), por isso as regras são conferidas
@@ -38,32 +38,32 @@ import org.robolectric.annotation.GraphicsMode
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [36], qualifiers = TemaScreenshotTest.TELA)
-class ComponentesAcessibilidadeTest {
+@Config(sdk = [36], qualifiers = ThemeScreenshotTest.SCREEN)
+class ComponentsAccessibilityTest {
 
     @get:Rule
     val compose = createComposeRule()
 
-    private var toquesNoPrincipal = 0
-    private var toquesNoSecundario = 0
-    private var toquesNoVoltar = 0
+    private var primaryClicks = 0
+    private var secondaryClicks = 0
+    private var undoClicks = 0
 
     @Before
-    fun montar() {
+    fun setUp() {
         compose.setContent {
-            ListaDeComprasTheme(escuro = false) {
+            ShoppingListTheme(darkTheme = false) {
                 Column {
-                    TituloDeSecao("Hortifrúti")
-                    BotaoPrincipal(texto = "Terminei", textoDeApoio = "Faltam 5", aoTocar = { toquesNoPrincipal++ })
-                    BotaoSecundario(
-                        texto = "Adicionar",
-                        icone = painterResource(R.drawable.ic_adicionar),
-                        aoTocar = { toquesNoSecundario++ },
+                    SectionTitle("Hortifrúti")
+                    PrimaryButton(text = "Terminei", supportingText = "Faltam 5", onClick = { primaryClicks++ })
+                    SecondaryButton(
+                        text = "Adicionar",
+                        icon = painterResource(R.drawable.ic_add),
+                        onClick = { secondaryClicks++ },
                     )
-                    AvisoComVoltar(
-                        mensagem = "Feijão saiu da lista.",
-                        textoDoBotao = "Ops, voltar",
-                        aoTocarNoBotao = { toquesNoVoltar++ },
+                    UndoNotice(
+                        message = "Feijão saiu da lista.",
+                        actionLabel = "Ops, voltar",
+                        onAction = { undoClicks++ },
                     )
                 }
             }
@@ -71,31 +71,31 @@ class ComponentesAcessibilidadeTest {
     }
 
     @Test
-    fun botaoPrincipalTemAlturaDe88dpEPapelDeBotao() {
+    fun primaryButtonIs88dpTallWithButtonRole() {
         compose.onNodeWithText("Terminei", substring = true)
             .assertHeightIsAtLeast(88.dp)
             .assertWidthIsAtLeast(64.dp)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .performClick()
-        assertEquals(1, toquesNoPrincipal)
+        assertEquals(1, primaryClicks)
     }
 
     @Test
-    fun botoesSecundariosTemAreaDeToqueDe64dp() {
-        listOf("Adicionar", "Ops, voltar").forEach { texto ->
-            compose.onNodeWithText(texto)
+    fun secondaryButtonsHave64dpTouchTarget() {
+        listOf("Adicionar", "Ops, voltar").forEach { text ->
+            compose.onNodeWithText(text)
                 .assertHeightIsAtLeast(64.dp)
                 .assertWidthIsAtLeast(64.dp)
                 .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
         }
         compose.onNodeWithText("Adicionar").performClick()
         compose.onNodeWithText("Ops, voltar").performClick()
-        assertEquals(1, toquesNoSecundario)
-        assertEquals(1, toquesNoVoltar)
+        assertEquals(1, secondaryClicks)
+        assertEquals(1, undoClicks)
     }
 
     @Test
-    fun talkBackLeTextoEmCaixaNormal() {
+    fun talkBackReadsTextInNormalCase() {
         // Na tela aparece "TERMINEI", mas o TalkBack recebe o texto original.
         compose.onNodeWithText("Terminei", substring = true)
             .assert(
@@ -108,19 +108,19 @@ class ComponentesAcessibilidadeTest {
     }
 
     @Test
-    fun iconeNaoTemRotuloProprio() {
+    fun iconHasNoLabelOfItsOwn() {
         // Só o texto é lido: o ícone acompanha, não substitui (guia, princípio 5).
         compose.onNodeWithText("Adicionar")
             .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ContentDescription))
     }
 
     @Test
-    fun tituloDeSecaoEhTitulo() {
+    fun sectionTitleIsHeading() {
         compose.onNodeWithText("Hortifrúti").assert(isHeading())
     }
 
     @Test
-    fun avisoEhAnunciado() {
+    fun noticeIsAnnounced() {
         compose.onNode(
             SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite),
             useUnmergedTree = true,

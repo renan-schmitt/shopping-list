@@ -3,9 +3,9 @@ package br.com.mentealerta.listadecompras
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class PlataformaTest {
+class PlatformTest {
     @Test
-    fun nomeDaPlataformaNaoEhVazio() {
-        assertTrue(nomeDaPlataforma().isNotBlank())
+    fun platformNameIsNotBlank() {
+        assertTrue(platformName().isNotBlank())
     }
 }

@@ -1,4 +1,4 @@
-package br.com.mentealerta.listadecompras.ui.componentes
+package br.com.mentealerta.listadecompras.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
-private val PortuguesDoBrasil: Locale = Locale.forLanguageTag("pt-BR")
+private val BrazilianPortuguese: Locale = Locale.forLanguageTag("pt-BR")
 
 /**
  * Visual do estilo quadrinhos (plano §4.8): contorno grosso e sombra sólida
@@ -37,77 +37,77 @@ private val PortuguesDoBrasil: Locale = Locale.forLanguageTag("pt-BR")
  * protótipo.
  *
  * O espaço da sombra é reservado no layout (à direita e embaixo), para ela não
- * ser cortada nem invadir o vizinho. Com [afundar] > 0, a face desce e a
+ * ser cortada nem invadir o vizinho. Com [pressOffset] > 0, a face desce e a
  * sombra visível diminui, como o botão pressionado do protótipo.
  */
-fun Modifier.estiloQuadrinhos(
-    forma: Shape,
-    fundo: Color,
-    contorno: Color,
-    larguraDoContorno: Dp,
-    sombra: Dp,
-    afundar: Dp = 0.dp,
+fun Modifier.comicStyle(
+    shape: Shape,
+    background: Color,
+    outline: Color,
+    outlineWidth: Dp,
+    shadow: Dp,
+    pressOffset: Dp = 0.dp,
 ): Modifier = this
-    .padding(end = sombra, bottom = sombra)
+    .padding(end = shadow, bottom = shadow)
     .drawBehind {
-        val deslocamento = sombra.toPx()
-        translate(deslocamento, deslocamento) {
-            drawOutline(forma.createOutline(size, layoutDirection, this), contorno)
+        val offset = shadow.toPx()
+        translate(offset, offset) {
+            drawOutline(shape.createOutline(size, layoutDirection, this), outline)
         }
     }
-    .offset(x = afundar, y = afundar)
-    .border(larguraDoContorno, contorno, forma)
-    .background(fundo, forma)
-    .clip(forma)
+    .offset(x = pressOffset, y = pressOffset)
+    .border(outlineWidth, outline, shape)
+    .background(background, shape)
+    .clip(shape)
 
 /**
  * Texto curto em caixa alta (plano §4.8; guia, princípio 9).
  *
- * As maiúsculas são só visuais: o TalkBack recebe [texto] como foi escrito,
+ * As maiúsculas são só visuais: o TalkBack recebe [text] como foi escrito,
  * para não soletrar palavras como se fossem siglas.
  *
- * Com [contornoDaLetra], a letra ganha contorno e sombra na cor dada (logo e
+ * Com [letterOutline], a letra ganha contorno e sombra na cor dada (logo e
  * botão principal do protótipo).
  */
 @Composable
-fun TextoCaixaAlta(
-    texto: String,
-    estilo: TextStyle,
-    cor: Color,
+fun UppercaseText(
+    text: String,
+    style: TextStyle,
+    color: Color,
     modifier: Modifier = Modifier,
-    alinhamento: TextAlign = TextAlign.Center,
-    contornoDaLetra: Color? = null,
+    textAlign: TextAlign = TextAlign.Center,
+    letterOutline: Color? = null,
 ) {
-    val visivel = texto.uppercase(PortuguesDoBrasil)
-    val tamanhoDaLetra = with(LocalDensity.current) { estilo.fontSize.toPx() }
+    val visible = text.uppercase(BrazilianPortuguese)
+    val fontSizePx = with(LocalDensity.current) { style.fontSize.toPx() }
     Box(
-        modifier = modifier.clearAndSetSemantics { text = AnnotatedString(texto) },
+        modifier = modifier.clearAndSetSemantics { this.text = AnnotatedString(text) },
         contentAlignment = Alignment.Center,
     ) {
-        if (contornoDaLetra != null) {
+        if (letterOutline != null) {
             Text(
-                text = visivel,
-                style = estilo.copy(
-                    drawStyle = Stroke(width = tamanhoDaLetra * ContornoDaLetra),
+                text = visible,
+                style = style.copy(
+                    drawStyle = Stroke(width = fontSizePx * LetterOutlineRatio),
                     shadow = Shadow(
-                        color = contornoDaLetra,
-                        offset = Offset(tamanhoDaLetra * SombraDaLetra, tamanhoDaLetra * SombraDaLetra),
+                        color = letterOutline,
+                        offset = Offset(fontSizePx * LetterShadowRatio, fontSizePx * LetterShadowRatio),
                     ),
                 ),
-                color = contornoDaLetra,
-                textAlign = alinhamento,
+                color = letterOutline,
+                textAlign = textAlign,
             )
         }
-        Text(text = visivel, style = estilo, color = cor, textAlign = alinhamento)
+        Text(text = visible, style = style, color = color, textAlign = textAlign)
     }
 }
 
 /** Contorno da letra em proporção ao tamanho da fonte (1,5px em 38px no protótipo). */
-private const val ContornoDaLetra = 0.08f
+private const val LetterOutlineRatio = 0.08f
 
 /** Sombra da letra em proporção ao tamanho da fonte (2px em 38px no protótipo). */
-private const val SombraDaLetra = 0.055f
+private const val LetterShadowRatio = 0.055f
 
 /** Letra clara pede contorno escuro; letra escura dispensa contorno. */
-internal fun contornoParaLetra(letra: Color, contorno: Color): Color? =
-    if (letra.luminance() > 0.5f) contorno else null
+internal fun letterOutlineFor(letter: Color, outline: Color): Color? =
+    if (letter.luminance() > 0.5f) outline else null

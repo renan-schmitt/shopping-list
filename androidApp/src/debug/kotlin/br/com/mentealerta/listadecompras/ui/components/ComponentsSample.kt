@@ -1,4 +1,4 @@
-package br.com.mentealerta.listadecompras.ui.componentes
+package br.com.mentealerta.listadecompras.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,15 +13,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.R
-import br.com.mentealerta.listadecompras.ui.tema.ListaDeComprasTheme
-import br.com.mentealerta.listadecompras.ui.tema.TemaQuadrinhos
+import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
+import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 
 /**
  * Amostra dos componentes base, para preview e screenshot (#12). Fica no
  * source set `debug` para não entrar na versão publicada.
  */
 @Composable
-fun AmostraDosComponentes() {
+fun ComponentsSample() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -29,23 +29,23 @@ fun AmostraDosComponentes() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        AmostraDoCartao()
-        AmostraDoRodape()
-        AmostraDosBotoesSozinhos()
-        AmostraDoAviso()
+        CardSample()
+        FooterSample()
+        StandaloneButtonsSample()
+        NoticeSample()
     }
 }
 
 @Composable
-private fun AmostraDoCartao() {
-    CartaoQuadrinhos(modifier = Modifier.fillMaxWidth()) {
+private fun CardSample() {
+    ComicCard(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            TituloDeSecao("Hortifrúti")
+            SectionTitle("Hortifrúti")
             Text("Banana", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-            TituloDeSecao("Frios, laticínios e congelados da semana")
+            SectionTitle("Frios, laticínios e congelados da semana")
             Text("Queijo", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
         }
     }
@@ -57,79 +57,79 @@ private fun AmostraDoCartao() {
  * partir a palavra; o arranjo final fica com a tela da lista.
  */
 @Composable
-private fun AmostraDoRodape() {
+private fun FooterSample() {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        BotaoPrincipal(
-            texto = "Terminei",
-            textoDeApoio = "Faltam 5",
-            aoTocar = {},
+        PrimaryButton(
+            text = "Terminei",
+            supportingText = "Faltam 5",
+            onClick = {},
             modifier = Modifier.fillMaxWidth(),
         )
-        BotaoSecundario(
-            texto = "Adicionar",
-            aoTocar = {},
-            icone = painterResource(R.drawable.ic_adicionar),
-            alturaMinima = TemaQuadrinhos.tokens.alturaBotaoPrincipal,
+        SecondaryButton(
+            text = "Adicionar",
+            onClick = {},
+            icon = painterResource(R.drawable.ic_add),
+            minHeight = ComicTheme.tokens.primaryButtonHeight,
             modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
 @Composable
-private fun AmostraDosBotoesSozinhos() {
+private fun StandaloneButtonsSample() {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        BotaoPrincipal(
-            texto = "Adicionar",
-            aoTocar = {},
-            icone = painterResource(R.drawable.ic_adicionar),
+        PrimaryButton(
+            text = "Adicionar",
+            onClick = {},
+            icon = painterResource(R.drawable.ic_add),
             modifier = Modifier.fillMaxWidth(),
         )
-        BotaoSecundario(texto = "Jogar a lista fora", aoTocar = {})
+        SecondaryButton(text = "Jogar a lista fora", onClick = {})
     }
 }
 
 @Composable
-private fun AmostraDoAviso() {
-    AvisoComVoltar(mensagem = "Feijão saiu da lista.", textoDoBotao = "Ops, voltar", aoTocarNoBotao = {})
+private fun NoticeSample() {
+    UndoNotice(message = "Feijão saiu da lista.", actionLabel = "Ops, voltar", onAction = {})
 }
 
 @Composable
-private fun NoTema(escuro: Boolean = false, conteudo: @Composable () -> Unit) {
-    ListaDeComprasTheme(escuro = escuro) {
-        Column(Modifier.background(MaterialTheme.colorScheme.background).padding(16.dp)) { conteudo() }
+private fun InTheme(darkTheme: Boolean = false, content: @Composable () -> Unit) {
+    ShoppingListTheme(darkTheme = darkTheme) {
+        Column(Modifier.background(MaterialTheme.colorScheme.background).padding(16.dp)) { content() }
     }
 }
 
 @Preview(name = "Todos — claro", widthDp = 411)
 @Composable
-private fun TodosClaroPreview() {
-    ListaDeComprasTheme(escuro = false) { AmostraDosComponentes() }
+private fun AllLightPreview() {
+    ShoppingListTheme(darkTheme = false) { ComponentsSample() }
 }
 
 @Preview(name = "Todos — escuro", widthDp = 411)
 @Composable
-private fun TodosEscuroPreview() {
-    ListaDeComprasTheme(escuro = true) { AmostraDosComponentes() }
+private fun AllDarkPreview() {
+    ShoppingListTheme(darkTheme = true) { ComponentsSample() }
 }
 
 @Preview(name = "Todos — fonte 200%", widthDp = 411, fontScale = 2f)
 @Composable
-private fun TodosFonte200Preview() {
-    ListaDeComprasTheme(escuro = false) { AmostraDosComponentes() }
+private fun AllFont200Preview() {
+    ShoppingListTheme(darkTheme = false) { ComponentsSample() }
 }
 
 @Preview(name = "Botões", widthDp = 411)
 @Composable
-private fun BotoesPreview() = NoTema { AmostraDoRodape() }
+private fun ButtonsPreview() = InTheme { FooterSample() }
 
 @Preview(name = "Título de seção", widthDp = 411)
 @Composable
-private fun TituloDeSecaoPreview() = NoTema { TituloDeSecao("Limpeza") }
+private fun SectionTitlePreview() = InTheme { SectionTitle("Limpeza") }
 
 @Preview(name = "Cartão", widthDp = 411)
 @Composable
-private fun CartaoPreview() = NoTema { AmostraDoCartao() }
+private fun CardPreview() = InTheme { CardSample() }
 
 @Preview(name = "Aviso", widthDp = 411)
 @Composable
-private fun AvisoPreview() = NoTema { AmostraDoAviso() }
+private fun NoticePreview() = InTheme { NoticeSample() }
