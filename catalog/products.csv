@@ -124,5 +124,170 @@ sage,Sálvia,produce,1220,fluent:Herb,approx,active,,Raminho genérico
 dill,Endro,produce,1230,fluent:Herb,approx,active,,Raminho genérico
 lemongrass,Capim-santo,produce,1240,fluent:Herb,approx,active,,Raminho genérico
 french_bread,Pão francês,bakery,10,fluent:Baguette bread,approx,active,,Baguete no lugar do pãozinho
+sliced_bread,Pão de forma,bakery,20,fluent:Bread,exact,active,,
+whole_wheat_bread,Pão integral,bakery,30,fluent:Bread,approx,active,,Pão de forma genérico
+italian_bread,Pão italiano,bakery,40,fluent:Bread,approx,active,,Pão de forma no lugar do pão redondo
+homemade_bread,Pão caseiro,bakery,50,fluent:Bread,exact,active,,
+milk_bread_roll,Bisnaguinha,bakery,60,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+baguette,Baguete,bakery,70,fluent:Baguette bread,exact,active,,
+pita_bread,Pão sírio,bakery,80,fluent:Flatbread,exact,active,,
+cheese_bread,Pão de queijo,bakery,90,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sweet_bread,Pão doce,bakery,100,fluent:Bread,approx,active,,Pão genérico
+sweet_braided_bread,Rosca,bakery,110,fluent:Bread,approx,active,,Pão genérico no lugar da rosca trançada
+cornbread,Broa,bakery,120,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+corn_bread,Pão de milho,bakery,130,fluent:Bread,approx,active,,Pão genérico
+potato_bread,Pão de batata,bakery,140,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+rye_bread,Pão de centeio,bakery,150,fluent:Bread,approx,active,,Pão genérico
+australian_bread,Pão australiano,bakery,160,fluent:Bread,approx,active,,Pão genérico
+gluten_free_bread,Pão sem glúten,bakery,170,fluent:Bread,approx,active,,Pão genérico
+hamburger_bun,Pão de hambúrguer,bakery,180,fluent:Hamburger,approx,active,,Sanduíche pronto no lugar do pão
+hot_dog_bun,Pão de cachorro-quente,bakery,190,fluent:Hot dog,approx,active,,Sanduíche pronto no lugar do pão
+croissant,Croissant,bakery,200,fluent:Croissant,exact,active,,
+cream_donut,Sonho,bakery,210,fluent:Doughnut,approx,active,,Rosquinha no lugar do sonho recheado
+cuca,Cuca,bakery,220,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Sul
+cake,Bolo,bakery,230,fluent:Shortcake,approx,active,,Fatia de bolo com morango
+cornmeal_cake,Bolo de fubá,bakery,240,fluent:Shortcake,approx,active,,Fatia de bolo genérica
+carrot_cake,Bolo de cenoura,bakery,250,fluent:Shortcake,approx,active,,Fatia de bolo genérica
+chocolate_cake,Bolo de chocolate,bakery,260,fluent:Shortcake,approx,active,,Fatia de bolo genérica
+corn_cake,Bolo de milho,bakery,270,fluent:Shortcake,approx,active,,Fatia de bolo genérica
+cassava_cake,Bolo de mandioca,bakery,280,fluent:Shortcake,approx,active,,Fatia de bolo genérica
+birthday_cake,Bolo de aniversário,bakery,290,fluent:Birthday cake,exact,active,,
+honey_cake,Pão de mel,bakery,300,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+panettone,Panetone,bakery,310,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pudding,Pudim,bakery,320,fluent:Custard,exact,active,,
+savory_pie,Torta salgada,bakery,330,fluent:Pie,approx,active,,Torta genérica
+sweet_pie,Torta doce,bakery,340,fluent:Pie,exact,active,,
+empada,Empada,bakery,350,fluent:Pie,approx,active,,Torta no lugar da empadinha
+coxinha,Coxinha,bakery,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+esfiha,Esfiha,bakery,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sandwich,Sanduíche natural,bakery,380,fluent:Sandwich,exact,active,,
+ground_beef,Carne moída,meat,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+beef_steak,Bife,meat,20,fluent:Cut of meat,exact,active,,
+picanha,Picanha,meat,30,fluent:Cut of meat,exact,active,,
+top_sirloin,Alcatra,meat,40,fluent:Cut of meat,exact,active,,
+sirloin_steak,Contrafilé,meat,50,fluent:Cut of meat,exact,active,,
+tenderloin,Filé mignon,meat,60,fluent:Cut of meat,exact,active,,
+tri_tip,Maminha,meat,70,fluent:Cut of meat,approx,active,,Bife genérico
+flank_steak,Fraldinha,meat,80,fluent:Cut of meat,approx,active,,Bife genérico
+knuckle,Patinho,meat,90,fluent:Cut of meat,approx,active,,Bife genérico
+topside,Coxão mole,meat,100,fluent:Cut of meat,approx,active,,Bife genérico
+silverside,Coxão duro,meat,110,fluent:Cut of meat,approx,active,,Bife genérico
+eye_round,Lagarto,meat,120,fluent:Cut of meat,approx,active,,Bife genérico
+chuck,Acém,meat,130,fluent:Cut of meat,approx,active,,Bife genérico
+shoulder_clod,Paleta,meat,140,fluent:Cut of meat,approx,active,,Bife genérico
+beef_shank,Músculo,meat,150,fluent:Cut of meat,approx,active,,Bife genérico
+hump,Cupim,meat,160,fluent:Cut of meat,approx,active,,Bife genérico
+beef_ribs,Costela,meat,170,fluent:Meat on bone,approx,active,,Carne no osso genérica
+oxtail,Rabada,meat,180,fluent:Meat on bone,approx,active,,Carne no osso genérica
+cow_foot,Mocotó,meat,190,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+beef_liver,Fígado,meat,200,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tripe,Dobradinha,meat,210,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sun_dried_beef,Carne de sol,meat,220,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+dried_beef,Carne-seca,meat,230,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+jerked_beef,Charque,meat,240,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+goat_meat,Carne de bode,meat,250,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
+lamb,Carne de carneiro,meat,260,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pork_loin,Lombo,meat,270,fluent:Cut of meat,approx,active,,Bife genérico
+pork_chop,Bisteca,meat,280,fluent:Cut of meat,approx,active,,Bife genérico
+pork_ribs,Costela de porco,meat,290,fluent:Meat on bone,approx,active,,Carne no osso genérica
+pork_leg,Pernil,meat,300,fluent:Meat on bone,approx,active,,Carne no osso genérica
+pork_belly,Panceta,meat,310,fluent:Bacon,approx,active,,Bacon no lugar da barriga de porco
+pork_fat,Toucinho,meat,320,fluent:Bacon,approx,active,,Bacon no lugar do toucinho
+pork_rind,Torresmo,meat,330,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pork_feet,Pé de porco,meat,340,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pork_ear,Orelha de porco,meat,350,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+feijoada_kit,Kit feijoada,meat,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sausage,Linguiça,meat,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tuscan_sausage,Linguiça toscana,meat,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+calabrese_sausage,Linguiça calabresa,meat,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+chicken_sausage,Linguiça de frango,meat,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+paio,Paio,meat,410,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+whole_chicken,Frango,meat,420,fluent:Poultry leg,approx,active,,Coxa no lugar do frango inteiro
+free_range_chicken,Frango caipira,meat,430,fluent:Poultry leg,approx,active,,Coxa no lugar do frango inteiro
+chicken_breast,Peito de frango,meat,440,fluent:Poultry leg,approx,active,,Coxa no lugar do peito
+chicken_fillet,Filé de frango,meat,450,fluent:Poultry leg,approx,active,,Coxa no lugar do filé
+chicken_drumstick,Coxa de frango,meat,460,fluent:Poultry leg,exact,active,,
+chicken_thigh,Sobrecoxa,meat,470,fluent:Poultry leg,approx,active,,Coxa no lugar da sobrecoxa
+chicken_wing,Asa de frango,meat,480,fluent:Poultry leg,approx,active,,Coxa no lugar da asa
+chicken_drumette,Coxinha da asa,meat,490,fluent:Poultry leg,exact,active,,
+chicken_heart,Coração de frango,meat,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+chicken_liver,Fígado de frango,meat,510,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+chicken_gizzard,Moela,meat,520,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+turkey,Peru,meat,530,fluent:Poultry leg,approx,active,,Coxa no lugar do peru inteiro
+garlic_bread,Pão de alho,meat,540,,,active,,"Sem ícone Fluent; candidata ao complemento próprio; fica junto do açougue, para o churrasco"
+fish,Peixe,meat,550,fluent:Fish,exact,active,,
+fish_fillet,Filé de peixe,meat,560,fluent:Fish,approx,active,,Peixe inteiro no lugar do filé
+tilapia,Tilápia,meat,570,fluent:Fish,exact,active,,
+tilapia_fillet,Filé de tilápia,meat,580,fluent:Fish,approx,active,,Peixe inteiro no lugar do filé
+sardine,Sardinha,meat,590,fluent:Fish,exact,active,,
+hake,Pescada,meat,600,fluent:Fish,exact,active,,
+merluza,Merluza,meat,610,fluent:Fish,exact,active,,
+salmon,Salmão,meat,620,fluent:Fish,approx,active,,Peixe genérico; salmão costuma vir em posta ou filé
+cod,Bacalhau,meat,630,fluent:Fish,approx,active,,Peixe inteiro no lugar do bacalhau salgado
+dogfish,Cação,meat,640,fluent:Fish,approx,active,,Peixe genérico
+croaker,Corvina,meat,650,fluent:Fish,exact,active,,
+snook,Robalo,meat,660,fluent:Fish,exact,active,,
+tambaqui,Tambaqui,meat,670,fluent:Fish,exact,active,,Regional do Norte
+pirarucu,Pirarucu,meat,680,fluent:Fish,approx,active,,Peixe genérico; regional do Norte
+pintado,Pintado,meat,690,fluent:Fish,exact,active,,
+peacock_bass,Tucunaré,meat,700,fluent:Fish,exact,active,,
+shrimp,Camarão,meat,710,fluent:Shrimp,exact,active,,
+squid,Lula,meat,720,fluent:Squid,exact,active,,
+octopus,Polvo,meat,730,fluent:Octopus,exact,active,,
+crab,Caranguejo,meat,740,fluent:Crab,exact,active,,
+blue_crab,Siri,meat,750,fluent:Crab,approx,active,,Caranguejo no lugar do siri
+lobster,Lagosta,meat,760,fluent:Lobster,exact,active,,
+oyster,Ostra,meat,770,fluent:Oyster,exact,active,,
+mussel,Mexilhão,meat,780,fluent:Oyster,approx,active,,Ostra no lugar do mexilhão
+milk,Leite,deli_dairy,10,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
+skim_milk,Leite desnatado,deli_dairy,20,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
+semi_skimmed_milk,Leite semidesnatado,deli_dairy,30,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
+lactose_free_milk,Leite sem lactose,deli_dairy,40,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
+fermented_milk,Leite fermentado,deli_dairy,50,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+dairy_drink,Bebida láctea,deli_dairy,60,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+yogurt,Iogurte,deli_dairy,70,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+plain_yogurt,Iogurte natural,deli_dairy,80,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+greek_yogurt,Iogurte grego,deli_dairy,90,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+petit_suisse,Petit suisse,deli_dairy,100,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+curd,Coalhada,deli_dairy,110,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+butter,Manteiga,deli_dairy,120,fluent:Butter,exact,active,,
+clarified_butter,Manteiga de garrafa,deli_dairy,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
+margarine,Margarina,deli_dairy,140,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+fresh_cream,Creme de leite fresco,deli_dairy,150,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cream_cheese_spread,Requeijão,deli_dairy,160,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cream_cheese,Cream cheese,deli_dairy,170,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cheese,Queijo,deli_dairy,180,fluent:Cheese wedge,exact,active,,
+mozzarella,Muçarela,deli_dairy,190,fluent:Cheese wedge,approx,active,,Queijo amarelo genérico
+prato_cheese,Queijo prato,deli_dairy,200,fluent:Cheese wedge,exact,active,,
+minas_cheese,Queijo minas,deli_dairy,210,fluent:Cheese wedge,approx,active,,Queijo amarelo no lugar do branco
+cured_minas_cheese,Queijo minas padrão,deli_dairy,220,fluent:Cheese wedge,exact,active,,
+coalho_cheese,Queijo coalho,deli_dairy,230,fluent:Cheese wedge,approx,active,,Queijo amarelo no lugar do branco
+parmesan,Parmesão,deli_dairy,240,fluent:Cheese wedge,exact,active,,
+grated_cheese,Queijo ralado,deli_dairy,250,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+provolone,Provolone,deli_dairy,260,fluent:Cheese wedge,approx,active,,Queijo genérico
+gorgonzola,Gorgonzola,deli_dairy,270,fluent:Cheese wedge,approx,active,,Queijo genérico
+gouda,Queijo gouda,deli_dairy,280,fluent:Cheese wedge,exact,active,,
+brie,Queijo brie,deli_dairy,290,fluent:Cheese wedge,approx,active,,Queijo genérico
+canastra_cheese,Queijo canastra,deli_dairy,300,fluent:Cheese wedge,exact,active,,
+reino_cheese,Queijo do reino,deli_dairy,310,fluent:Cheese wedge,approx,active,,Queijo genérico
+butter_cheese,Queijo manteiga,deli_dairy,320,fluent:Cheese wedge,approx,active,,Queijo genérico; regional do Nordeste
+ricotta,Ricota,deli_dairy,330,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cottage_cheese,Queijo cottage,deli_dairy,340,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+egg,Ovo,deli_dairy,350,fluent:Egg,exact,active,,
+free_range_egg,Ovo caipira,deli_dairy,360,fluent:Egg,exact,active,,
+quail_egg,Ovo de codorna,deli_dairy,370,fluent:Egg,approx,active,,Ovo de galinha no lugar do de codorna
+ham,Presunto,deli_dairy,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+ham_product,Apresuntado,deli_dairy,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+mortadella,Mortadela,deli_dairy,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+salami,Salame,deli_dairy,410,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+turkey_breast,Peito de peru,deli_dairy,420,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+hot_dog_sausage,Salsicha,deli_dairy,430,fluent:Hot dog,approx,active,,Cachorro-quente no lugar da salsicha
+bacon,Bacon,deli_dairy,440,fluent:Bacon,exact,active,,
+coppa,Copa,deli_dairy,450,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+canadian_bacon,Lombo canadense,deli_dairy,460,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pate,Patê,deli_dairy,470,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pastry_dough,Massa de pastel,deli_dairy,480,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+fresh_pasta,Macarrão fresco,deli_dairy,490,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tofu,Tofu,deli_dairy,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 cooking_oil,Óleo,pantry,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 tapioca_starch,Goma de tapioca,pantry,20,,,active,,Sem ícone Fluent; candidata ao complemento próprio
