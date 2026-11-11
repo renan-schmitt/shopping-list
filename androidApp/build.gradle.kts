@@ -30,6 +30,12 @@ android {
         compose = true
     }
 
+    androidResources {
+        // Lista de idiomas montada a partir das pastas values-*; values/ é pt-BR
+        // (res/resources.properties). Plano §4.2, traduções.
+        generateLocaleConfig = true
+    }
+
     testOptions {
         unitTests {
             // Robolectric precisa dos recursos (fontes, cores) nos testes de screenshot.

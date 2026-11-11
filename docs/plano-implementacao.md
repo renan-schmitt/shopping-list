@@ -212,6 +212,15 @@ shopping-list/
 - Padrão: camadas (UI → ViewModel → casos de uso → repositório), com estado exposto via `StateFlow`.
 - Integrações de plataforma (voz, notificações, localização) atrás de interfaces no `shared`, implementadas em cada plataforma.
 - **Idioma do código (2026-11-11, #119):** nomes em inglês (classes, funções, variáveis, parâmetros, arquivos, pastas, recursos e testes). Comentários, KDoc, commits e documentos em português; texto exibido segue o [guia de linguagem](guia-de-linguagem.md). O pacote e o applicationId continuam `br.com.mentealerta.listadecompras` (identidade do app na Play Store).
+- **Traduções (2026-11-11, #120):** o MVP é só pt-BR, mas o código fica pronto para outros idiomas:
+  - Todo texto exibido fica em `androidApp/src/main/res/values/strings.xml` (`values/` é o pt-BR, declarado em `res/resources.properties`); nunca fixo no código. A lista de idiomas do app é gerada pelo Android (`generateLocaleConfig`).
+  - Plural com `<plurals>` ("Falta 1" / "Faltam 5"); frases com marcadores (`%1$s`), nunca montadas por concatenação.
+  - O `shared` devolve dados (ids, números, datas), nunca frase pronta; quem monta o texto é a UI.
+  - Caixa alta, datas e números seguem o idioma do aparelho, sem pt-BR fixo.
+  - O que depende do idioma no `shared` (plural da normalização, voz) recebe o idioma por parâmetro ou interface.
+  - Catálogo: os ids são neutros; `name` e os termos são pt-BR. Outro idioma ganha arquivos próprios com os mesmos ids.
+  - O [guia de linguagem](guia-de-linguagem.md) vale para o pt-BR; cada idioma novo precisa do seu guia.
+  - Textos ficam em recursos do Android, não em Compose Multiplatform Resources; rever na fase 5, se o iPhone usar Compose.
 
 ### 4.3 Componentes
 

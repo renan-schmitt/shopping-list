@@ -24,13 +24,11 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import java.util.Locale
-
-private val BrazilianPortuguese: Locale = Locale.forLanguageTag("pt-BR")
-
 /**
  * Visual do estilo quadrinhos (plano §4.8): contorno grosso e sombra sólida
  * deslocada para baixo e para a direita, como o `box-shadow: 5px 5px 0` do
@@ -64,7 +62,8 @@ fun Modifier.comicStyle(
  * Texto curto em caixa alta (plano §4.8; guia, princípio 9).
  *
  * As maiúsculas são só visuais: o TalkBack recebe [text] como foi escrito,
- * para não soletrar palavras como se fossem siglas.
+ * para não soletrar palavras como se fossem siglas. A caixa alta segue o
+ * idioma do aparelho (plano §4.2, traduções).
  *
  * Com [letterOutline], a letra ganha contorno e sombra na cor dada (logo e
  * botão principal do protótipo).
@@ -78,7 +77,7 @@ fun UppercaseText(
     textAlign: TextAlign = TextAlign.Center,
     letterOutline: Color? = null,
 ) {
-    val visible = text.uppercase(BrazilianPortuguese)
+    val visible = text.toUpperCase(LocaleList.current)
     val fontSizePx = with(LocalDensity.current) { style.fontSize.toPx() }
     Box(
         modifier = modifier.clearAndSetSemantics { this.text = AnnotatedString(text) },

@@ -48,6 +48,7 @@ Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git). L
 
 - **Português** em conversas, commits, comentários/KDoc, documentos e todo texto exibido ao usuário.
 - **Inglês nos nomes do código**: classes, funções, variáveis, parâmetros, arquivos, pastas, recursos (`ic_add`, `@string/hello`) e testes. Pacote e applicationId seguem `br.com.mentealerta.listadecompras`.
+- **Texto exibido sempre em `strings.xml`**, nunca fixo no código: plural com `<plurals>`, frases com marcadores (`%1$s`), sem concatenar; o `shared` não monta frase ([plano §4.2](docs/plano-implementacao.md#42-arquitetura), traduções).
 - Tarefas vêm do GitHub Project #5 ("Shopping List"), executadas com `/pick-task`. Cada issue traz contexto, critérios de aceite e dependências.
 - Decisões: discutir um ponto por vez, com opções e uma recomendação; só depois registrar no plano (com data).
 - Protótipos e HTML sempre como arquivo local em `docs/prototipos/` — nunca publicar no Claude (artifacts/docs).

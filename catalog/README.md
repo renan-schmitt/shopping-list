@@ -1,6 +1,6 @@
 # Catálogo
 
-Fonte do catálogo de produtos embarcado no app. Os arquivos ficam em CSV (UTF-8, separado por vírgula) para serem curados à mão e versionados no git. Processo de curadoria: [plano §3.5](../docs/plano-implementacao.md#35-curadoria-do-catálogo-e-dos-ícones).
+Fonte do catálogo de produtos embarcado no app. Os arquivos ficam em CSV (UTF-8, separado por vírgula) para serem curados à mão e versionados no git. Nomes e termos são em pt-BR; os `id` valem para todos os idiomas, e uma tradução futura ganha arquivos próprios com os mesmos `id` ([plano §4.2](../docs/plano-implementacao.md#42-arquitetura), traduções). Processo de curadoria: [plano §3.5](../docs/plano-implementacao.md#35-curadoria-do-catálogo-e-dos-ícones).
 
 ## `sections.csv` — seções do mercado
 
