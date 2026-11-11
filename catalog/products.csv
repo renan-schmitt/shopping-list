@@ -1,6 +1,128 @@
 id,name,section,order,icon,icon_fit,status,replaced_by,notes
-cassava,Mandioca,produce,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-tangerine,Mexerica,produce,20,fluent:Tangerine,exact,active,,
+banana,Banana,produce,10,fluent:Banana,exact,active,,
+plantain,Banana-da-terra,produce,20,fluent:Banana,approx,active,,Mesma banana do ícone; a da terra é maior
+apple,Maçã,produce,30,fluent:Red apple,exact,active,,
+green_apple,Maçã verde,produce,40,fluent:Green apple,exact,active,,
+orange,Laranja,produce,50,fluent:Tangerine,exact,active,,Mesmo ícone da mexerica
+tangerine,Mexerica,produce,60,fluent:Tangerine,exact,active,,
+lime,Limão,produce,70,fluent:Lime,exact,active,,
+lemon,Limão-siciliano,produce,80,fluent:Lemon,exact,active,,
+sweet_lime,Lima-da-pérsia,produce,90,fluent:Lime,approx,active,,Limão no lugar da lima
+grape,Uva,produce,100,fluent:Grapes,exact,active,,
+papaya,Mamão,produce,110,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+melon,Melão,produce,120,fluent:Melon,exact,active,,
+watermelon,Melancia,produce,130,fluent:Watermelon,exact,active,,
+pineapple,Abacaxi,produce,140,fluent:Pineapple,exact,active,,
+mango,Manga,produce,150,fluent:Mango,exact,active,,
+pear,Pera,produce,160,fluent:Pear,exact,active,,
+peach,Pêssego,produce,170,fluent:Peach,exact,active,,
+nectarine,Nectarina,produce,180,fluent:Peach,approx,active,,Pêssego no lugar da nectarina
+plum,Ameixa,produce,190,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+strawberry,Morango,produce,200,fluent:Strawberry,exact,active,,
+avocado,Abacate,produce,210,fluent:Avocado,exact,active,,
+guava,Goiaba,produce,220,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+passion_fruit,Maracujá,produce,230,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+kiwi,Kiwi,produce,240,fluent:Kiwi fruit,exact,active,,
+coconut,Coco,produce,250,fluent:Coconut,exact,active,,
+green_coconut,Coco verde,produce,260,fluent:Coconut,approx,active,,Coco seco no lugar do verde
+persimmon,Caqui,produce,270,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cherry,Cereja,produce,280,fluent:Cherries,exact,active,,
+blueberry,Mirtilo,produce,290,fluent:Blueberries,exact,active,,
+blackberry,Amora,produce,300,fluent:Blueberries,approx,active,,Mirtilo no lugar da amora
+raspberry,Framboesa,produce,310,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+fig,Figo,produce,320,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pomegranate,Romã,produce,330,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+lychee,Lichia,produce,340,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+physalis,Physalis,produce,350,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+starfruit,Carambola,produce,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pitaya,Pitaia,produce,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tamarind,Tamarindo,produce,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+jackfruit,Jaca,produce,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cashew_fruit,Caju,produce,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+acerola,Acerola,produce,410,fluent:Cherries,approx,active,,Cereja no lugar da acerola
+pitanga,Pitanga,produce,420,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+jabuticaba,Jabuticaba,produce,430,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+custard_apple,Fruta-do-conde,produce,440,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+soursop,Graviola,produce,450,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+acai,Açaí,produce,460,,,active,,Sem ícone Fluent; candidata ao complemento próprio; a polpa congelada fica em Congelados
+cupuacu,Cupuaçu,produce,470,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+caja,Cajá,produce,480,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+seriguela,Seriguela,produce,490,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+umbu,Umbu,produce,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pequi,Pequi,produce,510,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+bacuri,Bacuri,produce,520,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+mangaba,Mangaba,produce,530,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+buriti,Buriti,produce,540,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tucuma,Tucumã,produce,550,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+peach_palm,Pupunha,produce,560,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tomato,Tomate,produce,570,fluent:Tomato,exact,active,,
+cherry_tomato,Tomate-cereja,produce,580,fluent:Tomato,approx,active,,Tomate grande no lugar do pequeno
+potato,Batata,produce,590,fluent:Potato,exact,active,,
+sweet_potato,Batata-doce,produce,600,fluent:Roasted sweet potato,approx,active,,"Batata-doce assada, não crua"
+cassava,Mandioca,produce,610,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+arracacha,Mandioquinha,produce,620,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+taro,Inhame,produce,630,,,active,,Sem ícone Fluent; candidata ao complemento próprio; no Nordeste inhame é o cará do Sudeste
+yam,Cará,produce,640,,,active,,Sem ícone Fluent; candidata ao complemento próprio; no Nordeste é chamado de inhame
+carrot,Cenoura,produce,650,fluent:Carrot,exact,active,,
+beet,Beterraba,produce,660,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+radish,Rabanete,produce,670,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+turnip,Nabo,produce,680,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+onion,Cebola,produce,690,fluent:Onion,exact,active,,
+red_onion,Cebola roxa,produce,700,fluent:Onion,approx,active,,Cebola amarela no lugar da roxa
+garlic,Alho,produce,710,fluent:Garlic,exact,active,,
+leek,Alho-poró,produce,720,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+ginger,Gengibre,produce,730,fluent:Ginger root,exact,active,,
+bell_pepper,Pimentão,produce,740,fluent:Bell pepper,exact,active,,
+hot_pepper,Pimenta,produce,750,fluent:Hot pepper,exact,active,,Pimenta fresca; a moída fica em Mercearia
+aji_dulce,Pimenta-de-cheiro,produce,760,fluent:Hot pepper,approx,active,,Pimenta comprida no lugar da redonda
+cucumber,Pepino,produce,770,fluent:Cucumber,exact,active,,
+zucchini,Abobrinha,produce,780,fluent:Cucumber,approx,active,,Pepino no lugar da abobrinha
+pumpkin,Abóbora,produce,790,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+chayote,Chuchu,produce,800,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+okra,Quiabo,produce,810,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+eggplant,Berinjela,produce,820,fluent:Eggplant,exact,active,,
+scarlet_eggplant,Jiló,produce,830,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+gherkin,Maxixe,produce,840,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+green_bean,Vagem,produce,850,fluent:Pea pod,approx,active,,Ervilha no lugar da vagem
+snow_pea,Ervilha-torta,produce,860,fluent:Pea pod,exact,active,,
+fresh_bean,Feijão-verde,produce,870,fluent:Beans,approx,active,,Feijão seco no lugar do verde
+corn,Milho,produce,880,fluent:Ear of corn,exact,active,,
+broccoli,Brócolis,produce,890,fluent:Broccoli,exact,active,,
+cauliflower,Couve-flor,produce,900,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+brussels_sprout,Couve-de-bruxelas,produce,910,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cabbage,Repolho,produce,920,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+red_cabbage,Repolho roxo,produce,930,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+celery,Salsão,produce,940,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+fennel,Erva-doce,produce,950,,,active,,Sem ícone Fluent; candidata ao complemento próprio; a semente fica em Mercearia
+asparagus,Aspargo,produce,960,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+artichoke,Alcachofra,produce,970,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+mushroom,Cogumelo,produce,980,fluent:Brown mushroom,exact,active,,
+lettuce,Alface,produce,990,fluent:Leafy green,approx,active,,Folha genérica no lugar do pé de alface
+collard_greens,Couve,produce,1000,fluent:Leafy green,approx,active,,Folha genérica
+arugula,Rúcula,produce,1010,fluent:Leafy green,approx,active,,Folha genérica
+watercress,Agrião,produce,1020,fluent:Leafy green,approx,active,,Folha genérica
+spinach,Espinafre,produce,1030,fluent:Leafy green,approx,active,,Folha genérica
+chicory,Chicória,produce,1040,fluent:Leafy green,approx,active,,Folha genérica
+almeirao,Almeirão,produce,1050,fluent:Leafy green,approx,active,,Folha genérica
+napa_cabbage,Acelga,produce,1060,fluent:Leafy green,approx,active,,Folha genérica; no Brasil acelga é a couve-chinesa
+mustard_greens,Mostarda em folha,produce,1070,fluent:Leafy green,approx,active,,Folha genérica
+taioba,Taioba,produce,1080,fluent:Leafy green,approx,active,,Folha genérica
+ora_pro_nobis,Ora-pro-nóbis,produce,1090,fluent:Leafy green,approx,active,,Folha genérica
+roselle,Vinagreira,produce,1100,fluent:Leafy green,approx,active,,Folha genérica
+jambu,Jambu,produce,1110,fluent:Herb,approx,active,,Raminho genérico
+bean_sprout,Broto de feijão,produce,1120,fluent:Seedling,approx,active,,Muda no lugar do broto
+cheiro_verde,Cheiro-verde,produce,1130,fluent:Herb,approx,active,,Raminho genérico no lugar do maço
+parsley,Salsinha,produce,1140,fluent:Herb,approx,active,,Raminho genérico
+green_onion,Cebolinha,produce,1150,fluent:Herb,approx,active,,Raminho genérico
+cilantro,Coentro,produce,1160,fluent:Herb,approx,active,,Raminho genérico
+culantro,Chicória-do-pará,produce,1170,fluent:Herb,approx,active,,Raminho genérico
+basil,Manjericão,produce,1180,fluent:Herb,approx,active,,Raminho genérico
+mint,Hortelã,produce,1190,fluent:Herb,approx,active,,Raminho genérico
+rosemary,Alecrim,produce,1200,fluent:Herb,approx,active,,Raminho genérico
+thyme,Tomilho,produce,1210,fluent:Herb,approx,active,,Raminho genérico
+sage,Sálvia,produce,1220,fluent:Herb,approx,active,,Raminho genérico
+dill,Endro,produce,1230,fluent:Herb,approx,active,,Raminho genérico
+lemongrass,Capim-santo,produce,1240,fluent:Herb,approx,active,,Raminho genérico
 french_bread,Pão francês,bakery,10,fluent:Baguette bread,approx,active,,Baguete no lugar do pãozinho
 cooking_oil,Óleo,pantry,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 tapioca_starch,Goma de tapioca,pantry,20,,,active,,Sem ícone Fluent; candidata ao complemento próprio
