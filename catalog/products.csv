@@ -1,0 +1,6 @@
+id,name,section,order,icon,icon_fit,status,replaced_by,notes
+cassava,Mandioca,produce,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tangerine,Mexerica,produce,20,fluent:Tangerine,exact,active,,
+french_bread,Pão francês,bakery,10,fluent:Baguette bread,approx,active,,Baguete no lugar do pãozinho
+cooking_oil,Óleo,pantry,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tapioca_starch,Goma de tapioca,pantry,20,,,active,,Sem ícone Fluent; candidata ao complemento próprio

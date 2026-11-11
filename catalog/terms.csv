@@ -1,0 +1,11 @@
+product_id,term,regions,status,ambiguous,evidence,notes
+cassava,aipim,south;central_southeast,to_confirm,no,,
+cassava,macaxeira,north;northeast,to_confirm,no,,
+tangerine,tangerina,,confirmed,no,,
+tangerine,bergamota,south,to_confirm,yes,,Também é o nome de outra fruta cítrica
+french_bread,pão de sal,central_southeast,to_confirm,no,,
+french_bread,cacetinho,south,to_confirm,no,,
+french_bread,pão careca,north,to_confirm,no,,
+cooking_oil,óleo de soja,,confirmed,no,,
+tapioca_starch,goma,northeast,to_confirm,yes,,Também pode ser goma de passar roupa
+tapioca_starch,tapioca,,to_confirm,yes,,Também é a tapioca pronta

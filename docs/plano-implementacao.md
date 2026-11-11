@@ -156,6 +156,8 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 - Origem dos termos novos: no MVP, testes de usabilidade, avaliações na loja e comentários; na fase 2, termos desconhecidos agregados (seção 4.5, #101). Só os mais frequentes vão para revisão, pela mesma curadoria.
 - **O id de um produto do catálogo nunca muda nem é reaproveitado.** Produto retirado fica marcado como antigo. Dois produtos juntados viram um só, e o id antigo aponta para o novo.
 
+**Formato da planilha mestre (2026-11-11, #15):** CSV em `catalog/`, documentado em [catalog/README.md](../catalog/README.md). `products.csv` traz um produto por linha (seção, ordem, ícone, ativo/antigo, "substituído por"); `terms.csv` traz um sinônimo ou regionalismo por linha, com região, estado, evidência e marcação de ambíguo.
+
 ### 3.6 Compartilhamento em tempo real com a família
 - Exige backend. Proposta: login **anônimo** (Firebase/Supabase) + código ou link de pareamento — sem email.
 - A analisar: resolução de conflitos (duas pessoas editando), custo de infraestrutura, LGPD, o que acontece ao trocar de celular.
