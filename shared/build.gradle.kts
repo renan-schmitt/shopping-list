@@ -28,8 +28,13 @@ kotlin {
         commonMain {
             kotlin.srcDir(tasks.named<GenerateCatalogTask>("generateCatalog").flatMap { it.outputDir })
         }
+        commonMain.dependencies {
+            api(project.dependencies.platform(libs.koin.bom))
+            api(libs.koin.core)
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.koin.test)
         }
     }
 }

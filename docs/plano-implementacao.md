@@ -204,13 +204,15 @@ shopping-list/
 │   ├── catalog/            # Catálogo embarcado, sinônimos, ícones
 │   ├── normalization/      # Acentos, plural pt-BR, sinônimos, busca aproximada
 │   ├── prediction/         # Intervalo médio entre compras, sugestões
-│   └── data/               # Banco (Room KMP), repositórios
+│   ├── data/               # Banco (Room KMP), repositórios
+│   └── di/                 # Módulo Koin do shared
 ├── androidApp/             # Jetpack Compose, Material 3, integrações Android
 └── iosApp/                 # Fase 5
 ```
 
 - Padrão: camadas (UI → ViewModel → casos de uso → repositório), com estado exposto via `StateFlow`.
 - Integrações de plataforma (voz, notificações, localização) atrás de interfaces no `shared`, implementadas em cada plataforma.
+- **Injeção de dependências (2026-11-11, #7):** Koin. O `shared` expõe o `sharedModule` (pacote `di`: repositórios como `single`, casos de uso como `factory`); cada plataforma soma o seu módulo (no Android, `appModule` com os ViewModels) ao subir o app. Interfaces ficam no pacote de quem usa; implementações em `data` ou na plataforma.
 - **Idioma do código (2026-11-11, #119):** nomes em inglês (classes, funções, variáveis, parâmetros, arquivos, pastas, recursos e testes). Comentários, KDoc, commits e documentos em português; texto exibido segue o [guia de linguagem](guia-de-linguagem.md). O pacote e o applicationId continuam `br.com.mentealerta.listadecompras` (identidade do app na Play Store).
 - **Traduções (2026-11-11, #120):** o MVP é só pt-BR, mas o código fica pronto para outros idiomas:
   - Todo texto exibido fica em `androidApp/src/main/res/values/strings.xml` (`values/` é o pt-BR, declarado em `res/resources.properties`); nunca fixo no código. A lista de idiomas do app é gerada pelo Android (`generateLocaleConfig`).

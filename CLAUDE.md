@@ -34,6 +34,25 @@ Resumo do [plano §4](docs/plano-implementacao.md#4-tecnologia-decidido).
 - Integrações de plataforma atrás de interfaces no `shared`
 - Testes: `kotlin.test` + Turbine, Compose UI Test, Roborazzi (fonte 100/150/200%, claro e escuro), checks de acessibilidade; ktlint + detekt; CI no GitHub Actions
 
+### Estrutura de pacotes
+
+Tudo sob `br.com.mentealerta.listadecompras`.
+
+`shared/src/commonMain`:
+- `domain` — modelo e regras de negócio; casos de uso (`GetSectionsUseCase`), chamados pelos ViewModels
+- `catalog` — modelo do catálogo embarcado e a interface `CatalogRepository`
+- `normalization` — acentos, plural pt-BR, sinônimos, busca aproximada (criar com a issue que usar)
+- `prediction` — intervalo entre compras, sugestões (criar com a issue que usar)
+- `data` — implementações dos repositórios (catálogo embarcado, Room, DataStore), `internal` sempre que possível
+- `di` — `sharedModule` do Koin: repositórios como `single`, casos de uso como `factory`
+
+`androidApp/src/main`:
+- `ShoppingListApplication` — sobe o Koin com `sharedModule` + `appModule`
+- `di` — `appModule`: ViewModels (`viewModelOf`) e integrações Android
+- `ui/<tela>` — `XScreen` (pega o ViewModel com `koinViewModel()`) e `XViewModel` com `StateFlow<XUiState>`; `ui/theme` e `ui/components` são o tema e os componentes base
+
+Interfaces ficam no pacote de quem usa (ex.: `CatalogRepository` em `catalog`); a implementação fica em `data` ou na plataforma, ligada no módulo Koin. Testes do `androidApp` não sobem o Koin (`src/test/resources/robolectric.properties`): ViewModels são testados com fakes no construtor.
+
 ## Comandos
 
 Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git).
