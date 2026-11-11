@@ -1,6 +1,7 @@
 rootProject.name = "shopping-list"
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()

@@ -81,4 +81,16 @@ Regras:
 - Um termo pode aparecer em mais de uma linha (um termo ambíguo com produtos candidatos), mas só uma delas pode entrar no app.
 - Um termo nunca repete o `name` de um produto.
 
-A validação dessas regras e a geração do catálogo embarcado ficam no script da #21.
+## Geração do catálogo embarcado
+
+O build transforma estes CSV em código Kotlin (`EmbeddedCatalog`, no pacote `catalog` do `shared`) e valida todas as regras acima. Só entram no app as seções, os produtos `active` e os termos que entram pela tabela acima; os `retired` ficam só como `id` reservado e `replaced_by`.
+
+- Gerar e validar: `./gradlew :shared:generateCatalog` (também roda em toda compilação do `shared` e no `check`)
+- Código gerado em `shared/build/generated/catalog/`, fora do git: a mesma planilha gera sempre o mesmo arquivo
+- Se houver erro, o build falha e lista cada um com arquivo, linha e motivo
+- O script fica em `build-logic/` (plugin `listadecompras.catalog`), com testes em `build-logic/src/test/`
+
+### Ícones conferidos
+
+- `fluent-icons.txt`: pastas do [Fluent Emoji](https://github.com/microsoft/fluentui-emoji/tree/main/assets) com SVG da variação Color, num commit fixo (anotado no topo do arquivo). Assim a validação funciona sem internet. Atualizar só junto com o pipeline de ícones (#22).
+- `own-icons/`: SVG do complemento próprio; `own:<id>` exige o arquivo `own-icons/<id>.svg`.

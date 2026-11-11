@@ -1,6 +1,9 @@
+import br.com.mentealerta.listadecompras.buildlogic.catalog.GenerateCatalogTask
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
+    id("listadecompras.catalog")
 }
 
 kotlin {
@@ -21,8 +24,17 @@ kotlin {
     }
 
     sourceSets {
+        // Catálogo embarcado gerado (e validado) a partir de catalog/*.csv
+        commonMain {
+            kotlin.srcDir(tasks.named<GenerateCatalogTask>("generateCatalog").flatMap { it.outputDir })
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
     }
+}
+
+// A validação da planilha e os testes do gerador também rodam no check (e no build do CI)
+tasks.named("check") {
+    dependsOn("generateCatalog", gradle.includedBuild("build-logic").task(":test"))
 }
