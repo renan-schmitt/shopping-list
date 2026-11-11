@@ -1,6 +1,6 @@
 # Plano de Implementação — Lista de Compras 60+
 
-> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-10.
+> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-11.
 
 ## Princípios
 
@@ -87,7 +87,7 @@ Decisões que ainda precisam ser tomadas, mas não exigem pesquisa aprofundada.
 | 1 | ~~Stack principal~~ | **Decidido:** Kotlin Multiplatform + Jetpack Compose (ver seção 4) |
 | 2 | ~~Modelo de cobrança do premium~~ | **Decidido:** híbrido — compra única "Premium para sempre" (fase 2) + assinatura "Plano Família" (fase 3). Ver seção 5 |
 | 3 | Preço do premium | **Em discussão** — depende da evolução do app. Referência inicial: Premium para sempre ~R$ 19,90–29,90; Plano Família ~R$ 6,90/mês ou R$ 49,90/ano. Concorrentes: Bring! US$ 8,99/ano, AnyList US$ 9,99–14,99/ano, OurGroceries ~US$ 1/mês. Validar com experimentos de preço do Play Console |
-| 4 | ~~Abrangência regional do catálogo~~ | **Decidido:** Brasil inteiro desde o MVP, só pt-BR. Nome exibido é sempre o que a pessoa usou; preferência aprendida localmente, sem perguntar região. Curadoria na fase 0 com validação em 4 regiões. Portugal/outros países fora do escopo |
+| 4 | ~~Abrangência regional do catálogo~~ | **Decidido:** Brasil inteiro desde o MVP, só pt-BR. Nome exibido é sempre o que a pessoa usou; preferência aprendida localmente, sem perguntar região. Curadoria na fase 0 com validação em 4 regiões (processo na seção 3.5). Portugal/outros países fora do escopo |
 | 5 | ~~Nome e identidade visual~~ | **Decidido (2026-11-10, #1):** o app faz parte da família **Mente Alerta** (marca do app para 60+ sobre golpes e educação; publicado pela mesma conta da Play Store). Título na loja **"Lista de Compras: Mente Alerta"** (30 caracteres, o limite); nome embaixo do ícone **"Lista de Compras"** (diferente do app Mente Alerta; pode aparecer cortado em celulares de uma linha — conferir num Motorola nos testes da fase 0). Evitar "vó", "sênior", "melhor idade". Identidade visual: estilo quadrinhos com destaque verde-folha — ver seção 4.8. **Verificações:** "Anota Aí" descartado — conflita com a Anota AI (robô de pedidos ligado ao iFood, app com 1,2 mi+ instalações) e `anotaai.com.br`/`.com` estão ocupados; reservas Caderninho e Listinha descartadas (já existem); `mentealerta.com.br` pertence a terceiros (não bloqueia: política de privacidade pode ficar no GitHub Pages). **Pendente:** busca da marca "Mente Alerta" no INPI (classes 9 e 42) |
 | 6 | ~~Tom das mensagens~~ | **Decidido:** ver [guia-de-linguagem.md](guia-de-linguagem.md). Validar vocabulário nos testes da fase 0 |
 | 7 | ~~Quantidade e unidade~~ | **Decidido:** entrada livre com separação automática (quantidade, unidade, produto, detalhe); quantidade opcional; edição com botões − / +. Ver seções 1.1 e 1.2 |
@@ -125,9 +125,29 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 - Como explicar a sugestão de forma simples ("você costuma comprar a cada 10 dias").
 
 ### 3.5 Curadoria do catálogo e dos ícones
-- Fonte da lista inicial de produtos e sinônimos (montagem manual, Open Food Facts, geração assistida por IA + revisão).
-- Cobertura de ícones: quantos produtos terão ícone próprio × ícone de categoria.
-- Processo para aprender produtos novos digitados pelo usuário.
+
+**Decidido (2026-11-11, #13).** A cobertura de ícones foi decidida na seção 4.4.
+
+**Fonte da lista inicial:** rascunho gerado com IA, uma seção por vez, direto no formato da planilha mestre. Depois, cada linha passa por revisão humana.
+- **Conferência de cobertura:** fontes públicas servem só de checklist, sem copiar: lista de produtos da POF/IBGE (básicos e regionais), tabela TACO (alimentos) e cesta básica do DIEESE (o mínimo).
+- **Open Food Facts descartado:** cadastra produtos de marca com código de barras, não genéricos, e a licença ODbL obrigaria a publicar a base derivada com a mesma licença.
+
+**Validação dos regionalismos:** 4 grupos de regiões (Norte, Nordeste, Centro-Oeste + Sudeste, Sul).
+- Regionalismo vindo da IA entra como **"a confirmar"**. Vira **confirmado** com pelo menos uma evidência registrada na planilha: site de mercado da região ou dicionário que marque o termo como regional.
+- **Foco nos termos ambíguos** (ex.: "bergamota", "goma", "bolacha"): é aí que mora o risco de levar ao produto errado, com seção e ícone errados. Um sinônimo que ninguém usa não faz mal, porque o app mostra o nome que a pessoa usou.
+- Termo ambíguo só entra no catálogo depois de revisão humana: leva ao produto mais comum ou fica fora dos sinônimos (e vira produto desconhecido). Nunca é decidido só pela IA.
+- Regionalismo "a confirmar" e não ambíguo pode ir para o app.
+- Revisores conhecidos de cada região, quando houver, revisam só uma lista curta: os termos ambíguos e os "a confirmar" da sua região.
+
+**Produtos novos no celular (MVP):**
+- Produto desconhecido vira um **produto próprio da pessoa**: nome normalizado, seção e ícone da categoria. Entra no histórico e nas sugestões como qualquer outro. Fica só no celular.
+- A seção é adivinhada pela palavra principal ("queijo canastra" → Frios). Se não reconhecer nenhuma palavra, vai para a seção genérica (nome definido na #14). A pessoa pode mudar, e o app lembra (seção 1.4).
+- Se um catálogo novo trouxer o produto, o produto próprio passa a apontar para o do catálogo, sem perder o histórico.
+
+**Evolução do catálogo:**
+- O catálogo atualizado vai **junto com a atualização do app**, sem servidor.
+- Origem dos termos novos: no MVP, testes de usabilidade, avaliações na loja e comentários; na fase 2, termos desconhecidos agregados (seção 4.5, #101). Só os mais frequentes vão para revisão, pela mesma curadoria.
+- **O id de um produto do catálogo nunca muda nem é reaproveitado.** Produto retirado fica marcado como antigo. Dois produtos juntados viram um só, e o id antigo aponta para o novo.
 
 ### 3.6 Compartilhamento em tempo real com a família
 - Exige backend. Proposta: login **anônimo** (Firebase/Supabase) + código ou link de pareamento — sem email.
@@ -191,7 +211,7 @@ shopping-list/
 | UI Android | Jetpack Compose + Material 3 | Tema próprio com fontes grandes e alto contraste |
 | Banco local | Room (KMP) + `BundledSQLiteDriver` | Mesma versão do SQLite no Android e no iOS |
 | Busca e normalização | Código Kotlin próprio no `shared` | Coluna normalizada (sem acento, singular) + sinônimos + Levenshtein. O catálogo (~1.500 itens) cabe em memória — não precisa de FTS |
-| Catálogo | Arquivo JSON/SQLite embarcado, gerado por script a partir de uma planilha mestre | Facilita a curadoria |
+| Catálogo | Arquivo JSON/SQLite embarcado, gerado por script a partir de uma planilha mestre | Facilita a curadoria; processo na seção 3.5 |
 | Preferências | DataStore (KMP) | |
 | Assincronia | Coroutines + Flow | |
 | Injeção de dependências | Koin | Suporta KMP |
