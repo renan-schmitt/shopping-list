@@ -1,6 +1,8 @@
 [versions]
 kotlin = "2.4.21"
 agp = "9.5.1"
+# Ferramentas do Android (Svg2Vector) andam junto com o AGP: 9.x.y → 32.x.y
+android-tools = "32.5.1"
 compose-bom = "2026.09.00"
 activity-compose = "1.13.0"
 junit = "4.13.2"
@@ -29,6 +31,8 @@ roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = 
 roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
 roborazzi-junit-rule = { module = "io.github.takahirom.roborazzi:roborazzi-junit-rule", version.ref = "roborazzi" }
 compose-rules-ktlint = { module = "io.nlopez.compose.rules:ktlint", version.ref = "compose-rules" }
+android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
+android-tools-sdk-common = { module = "com.android.tools:sdk-common", version.ref = "android-tools" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 [plugins]

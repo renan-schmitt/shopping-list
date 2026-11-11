@@ -9,6 +9,10 @@ kotlin {
 }
 
 dependencies {
+    // API do AGP para ligar os ícones gerados às fontes do app; o AGP em si vem do projeto que aplica
+    compileOnly(libs.android.gradle.api)
+    // Svg2Vector: o conversor SVG → VectorDrawable do Vector Asset do Android Studio
+    implementation(libs.android.tools.sdk.common)
     testImplementation(kotlin("test-junit"))
 }
 
@@ -17,6 +21,10 @@ gradlePlugin {
         register("catalog") {
             id = "listadecompras.catalog"
             implementationClass = "br.com.mentealerta.listadecompras.buildlogic.catalog.CatalogPlugin"
+        }
+        register("catalogIcons") {
+            id = "listadecompras.catalog-icons"
+            implementationClass = "br.com.mentealerta.listadecompras.buildlogic.catalog.CatalogIconsPlugin"
         }
     }
 }

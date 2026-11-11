@@ -11,6 +11,8 @@ data class CatalogSource(
     val fluentIcons: Set<String>,
     /** `id` dos ícones do complemento próprio. */
     val ownIcons: Set<String>,
+    /** Pastas do Fluent Emoji com o SVG já baixado em `catalog/fluent-svg/`. */
+    val fluentSvgs: Set<String>,
 )
 
 data class Section(val id: String, val name: String, val order: Int, val fluentIcon: String)
@@ -52,9 +54,10 @@ private const val SECTIONS = "sections.csv"
 private const val PRODUCTS = "products.csv"
 private const val TERMS = "terms.csv"
 private const val OTHER_SECTION = "other"
+private const val DOWNLOAD_HINT = "rode ./gradlew :shared:downloadFluentIcons"
 
-private val SECTION_COLUMNS = listOf("id", "name", "order", "fluent_icon")
-private val PRODUCT_COLUMNS =
+internal val SECTION_COLUMNS = listOf("id", "name", "order", "fluent_icon")
+internal val PRODUCT_COLUMNS =
     listOf("id", "name", "section", "order", "icon", "icon_fit", "status", "replaced_by", "notes")
 private val TERM_COLUMNS = listOf("product_id", "term", "regions", "status", "ambiguous", "evidence", "notes")
 
@@ -76,7 +79,7 @@ fun validateCatalog(source: CatalogSource): ValidationResult {
     val productRows = parseCsv(PRODUCTS, source.productsCsv, PRODUCT_COLUMNS).also { errors += it.errors }.rows
     val termRows = parseCsv(TERMS, source.termsCsv, TERM_COLUMNS).also { errors += it.errors }.rows
 
-    val sections = validateSections(sectionRows, source.fluentIcons, errors)
+    val sections = validateSections(sectionRows, source, errors)
     val products = validateProducts(productRows, sections, source, errors)
     val terms = validateTerms(termRows, products, errors)
 
@@ -100,7 +103,7 @@ fun validateCatalog(source: CatalogSource): ValidationResult {
     )
 }
 
-private fun validateSections(rows: List<CsvRow>, fluentIcons: Set<String>, errors: MutableList<String>): List<Section> {
+private fun validateSections(rows: List<CsvRow>, source: CatalogSource, errors: MutableList<String>): List<Section> {
     val seenIds = mutableSetOf<String>()
     val seenOrders = mutableSetOf<Int>()
     val sections = rows.mapNotNull { row ->
@@ -116,7 +119,7 @@ private fun validateSections(rows: List<CsvRow>, fluentIcons: Set<String>, error
         } else if (!seenOrders.add(order)) {
             errors += "$where: order $order repetida em outra seção"
         }
-        if (icon !in fluentIcons) errors += "$where: ícone Fluent \"$icon\" não existe na variação Color"
+        checkFluentIcon(icon, where, source, errors)
         order?.let { Section(id, row["name"], it, icon) }
     }
     val other = sections.find { it.id == OTHER_SECTION }
@@ -159,6 +162,9 @@ private fun validateProducts(
         val icon = row["icon"].ifEmpty { null }
         val iconFit = row["icon_fit"].ifEmpty { null }
         checkProductIcon(icon, iconFit, where, source, errors)
+        if (status == "active" && icon != null && icon.startsWith(FLUENT_PREFIX)) {
+            checkFluentSvg(icon.removePrefix(FLUENT_PREFIX), where, source, errors)
+        }
         if (status !in PRODUCT_STATUSES) errors += "$where: status \"$status\" deve ser active ou retired"
         order?.let {
             val product = Product(id, row["name"], section, it, icon, iconFit)
@@ -208,13 +214,29 @@ private fun checkDuplicateNames(products: List<ProductRow>, errors: MutableList<
 
 private fun checkIcon(icon: String, where: String, source: CatalogSource, errors: MutableList<String>) {
     when {
-        icon.startsWith("fluent:") -> if (icon.removePrefix("fluent:") !in source.fluentIcons) {
-            errors += "$where: ícone Fluent \"${icon.removePrefix("fluent:")}\" não existe na variação Color"
+        icon.startsWith(FLUENT_PREFIX) -> if (icon.removePrefix(FLUENT_PREFIX) !in source.fluentIcons) {
+            errors += "$where: ícone Fluent \"${icon.removePrefix(FLUENT_PREFIX)}\" não existe na variação Color"
         }
-        icon.startsWith("own:") -> if (icon.removePrefix("own:") !in source.ownIcons) {
-            errors += "$where: ícone próprio \"${icon.removePrefix("own:")}\" não existe"
+        icon.startsWith(OWN_PREFIX) -> if (icon.removePrefix(OWN_PREFIX) !in source.ownIcons) {
+            errors += "$where: ícone próprio \"${icon.removePrefix(OWN_PREFIX)}\" não existe"
         }
         else -> errors += "$where: ícone \"$icon\" deve começar com fluent: ou own:"
+    }
+}
+
+/** Ícone de seção: precisa existir no Fluent e estar baixado. */
+private fun checkFluentIcon(icon: String, where: String, source: CatalogSource, errors: MutableList<String>) {
+    if (icon !in source.fluentIcons) {
+        errors += "$where: ícone Fluent \"$icon\" não existe na variação Color"
+    } else {
+        checkFluentSvg(icon, where, source, errors)
+    }
+}
+
+/** Ícone Fluent que vai para o app precisa do SVG em `catalog/fluent-svg/`. */
+private fun checkFluentSvg(icon: String, where: String, source: CatalogSource, errors: MutableList<String>) {
+    if (icon in source.fluentIcons && icon !in source.fluentSvgs) {
+        errors += "$where: falta o SVG do ícone Fluent \"$icon\" em fluent-svg/ ($DOWNLOAD_HINT)"
     }
 }
 

@@ -90,7 +90,12 @@ O build transforma estes CSV em código Kotlin (`EmbeddedCatalog`, no pacote `ca
 - Se houver erro, o build falha e lista cada um com arquivo, linha e motivo
 - O script fica em `build-logic/` (plugin `listadecompras.catalog`), com testes em `build-logic/src/test/`
 
-### Ícones conferidos
+### Ícones
 
-- `fluent-icons.txt`: pastas do [Fluent Emoji](https://github.com/microsoft/fluentui-emoji/tree/main/assets) com SVG da variação Color, num commit fixo (anotado no topo do arquivo). Assim a validação funciona sem internet. Atualizar só junto com o pipeline de ícones (#22).
-- `own-icons/`: SVG do complemento próprio; `own:<id>` exige o arquivo `own-icons/<id>.svg`.
+- `fluent-svg/`: SVG da variação Color dos ícones do [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (licença MIT, em [`docs/licencas/MIT-FluentEmoji.txt`](../docs/licencas/MIT-FluentEmoji.txt)) usados pelas seções e pelos produtos `active`. Ficam no git: o build não depende da internet, e os mesmos SVG servem para o iPhone.
+- `fluent-icons.txt`: todas as pastas do Fluent com SVG Color, para conferir nomes sem internet.
+- `own-icons/`: SVG do complemento próprio; `own:<id>` exige o arquivo `own-icons/<id>.svg` (ver [`own-icons/README.md`](own-icons/README.md)).
+- Usou um ícone Fluent novo na planilha? Rode `./gradlew :shared:downloadFluentIcons`. A tarefa baixa os SVG que faltam, apaga os que ninguém usa e regrava `fluent-icons.txt`, sempre do mesmo commit do Fluent (`FLUENT_COMMIT`, em `build-logic/.../catalog/FluentIcons.kt`). Ícone com tom de pele usa o tom padrão. Sem isso, o build falha dizendo qual SVG falta.
+- No build do app, cada SVG vira um VectorDrawable (`catalog_fluent_red_apple`, `catalog_own_<id>`), gerado em `androidApp/build/generated/`, fora do git. Os filtros do Fluent (desfoque e sombra) não existem no VectorDrawable e são descartados; a diferença no ícone é mínima.
+- No app, `CatalogProduct.iconRes(section)` devolve o ícone do produto ou, sem ícone próprio, o da seção.
+- Para conferir todos os ícones convertidos: screenshot `androidApp/src/test/screenshots/catalog_icons.png`.

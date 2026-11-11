@@ -8,6 +8,8 @@ import kotlin.test.fail
 
 private const val SECTIONS_HEADER = "id,name,order,fluent_icon"
 private const val PRODUCTS_HEADER = "id,name,section,order,icon,icon_fit,status,replaced_by,notes"
+private val FLUENT_ICONS =
+    setOf("Leafy green", "Bread", "Shopping cart", "Banana", "Red apple", "Baguette bread", "Cherries")
 private const val TERMS_HEADER = "product_id,term,regions,status,ambiguous,evidence,notes"
 
 class CatalogValidatorTest {
@@ -35,12 +37,14 @@ class CatalogValidatorTest {
         products: List<String> = this.products,
         terms: List<String> = this.terms,
         ownIcons: Set<String> = emptySet(),
+        fluentSvgs: Set<String> = FLUENT_ICONS,
     ) = CatalogSource(
         sectionsCsv = (listOf(SECTIONS_HEADER) + sections).joinToString("\n"),
         productsCsv = (listOf(PRODUCTS_HEADER) + products).joinToString("\n"),
         termsCsv = (listOf(TERMS_HEADER) + terms).joinToString("\n"),
-        fluentIcons = setOf("Leafy green", "Bread", "Shopping cart", "Banana", "Red apple", "Baguette bread"),
+        fluentIcons = FLUENT_ICONS,
         ownIcons = ownIcons,
+        fluentSvgs = fluentSvgs,
     )
 
     private fun errorsOf(source: CatalogSource): List<String> = when (val result = validateCatalog(source)) {
@@ -104,6 +108,19 @@ class CatalogValidatorTest {
     fun ownIconThatExistsIsAccepted() {
         val kiwi = "kiwi,Kiwi,produce,90,own:kiwi,exact,active,,"
         val result = validateCatalog(source(products = products + kiwi, ownIcons = setOf("kiwi")))
+        assertIs<ValidationResult.Valid>(result)
+    }
+
+    @Test
+    fun fluentIconWithoutDownloadedSvgIsAnError() {
+        assertError("falta o SVG do ícone Fluent \"Banana\"", source(fluentSvgs = FLUENT_ICONS - "Banana"))
+        assertError("falta o SVG do ícone Fluent \"Bread\"", source(fluentSvgs = FLUENT_ICONS - "Bread"))
+    }
+
+    @Test
+    fun retiredProductDoesNotNeedTheSvg() {
+        val retired = "cherry,Cereja,produce,90,fluent:Cherries,exact,retired,,"
+        val result = validateCatalog(source(products = products + retired, fluentSvgs = FLUENT_ICONS - "Cherries"))
         assertIs<ValidationResult.Valid>(result)
     }
 

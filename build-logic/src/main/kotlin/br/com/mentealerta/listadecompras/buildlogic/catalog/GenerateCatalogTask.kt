@@ -38,6 +38,11 @@ abstract class GenerateCatalogTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.NAME_ONLY)
     abstract val ownIcons: ConfigurableFileCollection
 
+    /** SVG do Fluent baixados (`catalog/fluent-svg/`); o nome do arquivo sem extensão é a pasta do ícone. */
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NAME_ONLY)
+    abstract val fluentSvgs: ConfigurableFileCollection
+
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
@@ -47,11 +52,9 @@ abstract class GenerateCatalogTask : DefaultTask() {
             sectionsCsv = sectionsFile.get().asFile.readText(),
             productsCsv = productsFile.get().asFile.readText(),
             termsCsv = termsFile.get().asFile.readText(),
-            fluentIcons = fluentIconsFile.get().asFile.readLines()
-                .map { it.trim() }
-                .filter { it.isNotEmpty() && !it.startsWith("#") }
-                .toSet(),
-            ownIcons = ownIcons.files.filter { it.extension == "svg" }.map { it.nameWithoutExtension }.toSet(),
+            fluentIcons = parseFluentIconsFile(fluentIconsFile.get().asFile.readLines()),
+            ownIcons = ownIcons.svgNames(),
+            fluentSvgs = fluentSvgs.svgNames(),
         )
         when (val result = validateCatalog(source)) {
             is ValidationResult.Invalid -> throw GradleException(
@@ -68,3 +71,7 @@ abstract class GenerateCatalogTask : DefaultTask() {
         }
     }
 }
+
+/** Nome (sem extensão) dos arquivos `.svg` da coleção. */
+internal fun ConfigurableFileCollection.svgNames(): Set<String> =
+    files.filter { it.extension == "svg" }.map { it.nameWithoutExtension }.toSet()

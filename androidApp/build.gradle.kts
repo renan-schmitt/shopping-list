@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.roborazzi)
+    // Ícones do catálogo: SVG de catalog/ → VectorDrawable (#22)
+    id("listadecompras.catalog-icons")
 }
 
 kotlin {
