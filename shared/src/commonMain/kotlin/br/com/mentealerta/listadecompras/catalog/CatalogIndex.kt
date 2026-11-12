@@ -1,14 +1,14 @@
 package br.com.mentealerta.listadecompras.catalog
 
-import br.com.mentealerta.listadecompras.normalization.normalize
+import br.com.mentealerta.listadecompras.normalization.searchKey
 
 /**
  * Índice em memória do [Catalog], montado uma vez (plano §4.3: o catálogo cabe em memória, sem FTS).
  *
- * [key] transforma nomes de produto, termos e o texto procurado na chave de busca. Por enquanto é a
- * [normalize] (minúsculas, sem acento); as próximas etapas (plural) entram nela sem mudar o índice.
+ * [key] transforma nomes de produto, termos e o texto procurado na chave de busca. O padrão é a
+ * [searchKey] (minúsculas, sem acento, singular); novas etapas entram nela sem mudar o índice.
  */
-class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = ::normalize) {
+class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = ::searchKey) {
     private val productsById = catalog.products.associateBy { it.id }
     private val sectionsById = catalog.sections.associateBy { it.id }
     private val productsBySection = catalog.products.groupBy { it.sectionId }

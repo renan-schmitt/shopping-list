@@ -1,5 +1,7 @@
 package br.com.mentealerta.listadecompras.catalog
 
+import br.com.mentealerta.listadecompras.normalization.normalize
+import br.com.mentealerta.listadecompras.normalization.searchKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -30,6 +32,29 @@ class CatalogIndexTest {
         assertEquals(listOf("cassava"), index.findByKey("aipim").map { it.id })
         assertEquals(listOf("cassava"), index.findByKey("Macaxeira").map { it.id })
         assertEquals(listOf("banana"), index.findByKey("banana-caturra").map { it.id })
+    }
+
+    @Test
+    fun findsByPlural() {
+        assertEquals(listOf("apple"), index.findByKey("Maçãs").map { it.id })
+        assertEquals(listOf("cassava"), index.findByKey("aipins").map { it.id })
+        assertEquals(index.findByKey("pão francês"), index.findByKey("pães franceses"))
+        assertTrue(index.findByKey("pães franceses").isNotEmpty())
+    }
+
+    @Test
+    fun singularDoesNotMixDifferentProductsOfTheRealCatalog() {
+        // Pares de produtos diferentes que caem na mesma chave; o singular não pode criar par novo.
+        fun collidingPairs(key: (String) -> String): Set<Set<String>> {
+            val catalog = index.catalog
+            val texts = catalog.products.map { it.name to it.id } + catalog.terms.map { it.term to it.productId }
+            return texts.groupBy({ key(it.first) }, { it.second })
+                .values
+                .map { it.distinct() }
+                .flatMap { ids -> ids.flatMap { a -> ids.filter { it != a }.map { b -> setOf(a, b) } } }
+                .toSet()
+        }
+        assertEquals(emptySet(), collidingPairs(::searchKey) - collidingPairs(::normalize))
     }
 
     @Test
