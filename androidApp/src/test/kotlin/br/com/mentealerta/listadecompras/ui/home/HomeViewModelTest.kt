@@ -3,6 +3,7 @@ package br.com.mentealerta.listadecompras.ui.home
 import app.cash.turbine.test
 import br.com.mentealerta.listadecompras.catalog.Catalog
 import br.com.mentealerta.listadecompras.catalog.CatalogIcon
+import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogRepository
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
@@ -24,6 +25,8 @@ class HomeViewModelTest {
             replacements = emptyMap(),
             retiredProductIds = emptySet(),
         )
+
+        override fun index() = CatalogIndex(catalog())
     }
 
     @Test
