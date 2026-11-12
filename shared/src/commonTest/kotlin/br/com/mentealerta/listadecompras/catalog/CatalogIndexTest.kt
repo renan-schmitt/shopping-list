@@ -20,6 +20,12 @@ class CatalogIndexTest {
     }
 
     @Test
+    fun findsByNameIgnoringAccents() {
+        assertEquals(listOf("apple"), index.findByKey("maca").map { it.id })
+        assertEquals(listOf("cassava"), index.findByKey("MANDIOCA").map { it.id })
+    }
+
+    @Test
     fun findsBySynonymsAndRegionalisms() {
         assertEquals(listOf("cassava"), index.findByKey("aipim").map { it.id })
         assertEquals(listOf("cassava"), index.findByKey("Macaxeira").map { it.id })

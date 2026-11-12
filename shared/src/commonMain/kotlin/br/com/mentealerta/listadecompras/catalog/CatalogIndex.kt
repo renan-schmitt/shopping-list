@@ -1,13 +1,14 @@
 package br.com.mentealerta.listadecompras.catalog
 
+import br.com.mentealerta.listadecompras.normalization.normalize
+
 /**
  * Índice em memória do [Catalog], montado uma vez (plano §4.3: o catálogo cabe em memória, sem FTS).
  *
- * [key] transforma nomes de produto, termos e o texto procurado na chave de busca. Por enquanto só
- * tira os espaços das pontas e passa para minúsculas; a normalização completa (acentos, plural)
- * entra no lugar dela sem mudar o índice.
+ * [key] transforma nomes de produto, termos e o texto procurado na chave de busca. Por enquanto é a
+ * [normalize] (minúsculas, sem acento); as próximas etapas (plural) entram nela sem mudar o índice.
  */
-class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = ::defaultKey) {
+class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = ::normalize) {
     private val productsById = catalog.products.associateBy { it.id }
     private val sectionsById = catalog.sections.associateBy { it.id }
     private val productsBySection = catalog.products.groupBy { it.sectionId }
@@ -36,10 +37,5 @@ class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = :
     private fun MutableMap<String, MutableList<CatalogProduct>>.addTo(text: String, product: CatalogProduct) {
         val products = getOrPut(key(text)) { mutableListOf() }
         if (product !in products) products += product
-    }
-
-    companion object {
-        /** Chave provisória: sem espaços nas pontas e em minúsculas. */
-        fun defaultKey(text: String): String = text.trim().lowercase()
     }
 }
