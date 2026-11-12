@@ -4,6 +4,7 @@ import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
+import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -29,6 +30,34 @@ internal interface ListItemDao {
     /** Adiciona ou atualiza vários itens de uma vez (ex.: "Ops, voltar" de "Jogar a lista fora"). */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(items: List<ListItemEntity>)
+
+    /** Edita o item sem mexer em [ListItemEntity.addedAt]. Devolve quantas linhas mudaram (0 ou 1). */
+    @Query(
+        """
+        UPDATE list_item
+        SET name = :name, product_id = :productId, section_id = :sectionId,
+            quantity_amount = :quantityAmount, quantity_unit = :quantityUnit, detail = :detail,
+            checked = :checked
+        WHERE id = :id
+        """,
+    )
+    suspend fun update(
+        id: String,
+        name: String,
+        productId: String?,
+        sectionId: String,
+        quantityAmount: Double?,
+        quantityUnit: QuantityUnit?,
+        detail: String?,
+        checked: Boolean,
+    ): Int
+
+    /** Risca ou tira o risco. Devolve quantas linhas mudaram (0 ou 1). */
+    @Query("UPDATE list_item SET checked = :checked WHERE id = :id")
+    suspend fun setChecked(id: String, checked: Boolean): Int
+
+    @Query("SELECT * FROM list_item ORDER BY added_at, id")
+    suspend fun getAll(): List<ListItemEntity>
 
     @Query("DELETE FROM list_item WHERE id = :id")
     suspend fun deleteById(id: String)

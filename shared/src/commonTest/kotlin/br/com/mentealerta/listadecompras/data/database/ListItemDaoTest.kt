@@ -82,6 +82,54 @@ class ListItemDaoTest {
     }
 
     @Test
+    fun updateChangesTheFieldsAndKeepsAddedAt() = runTest {
+        dao.upsert(milk.toEntity(at(1)))
+        val edited = milk.copy(name = "Leite integral", productId = null, sectionId = "other", quantity = null)
+
+        val changed = dao.update(
+            id = edited.id.value,
+            name = edited.name,
+            productId = edited.productId,
+            sectionId = edited.sectionId,
+            quantityAmount = null,
+            quantityUnit = null,
+            detail = edited.detail,
+            checked = true,
+        )
+
+        assertEquals(1, changed)
+        assertEquals(edited.check().toEntity(at(1)), dao.getById(milk.id.value))
+    }
+
+    @Test
+    fun setCheckedChecksAndUnchecksAndKeepsAddedAt() = runTest {
+        dao.upsert(milk.toEntity(at(1)))
+
+        assertEquals(1, dao.setChecked(milk.id.value, checked = true))
+        assertEquals(milk.check().toEntity(at(1)), dao.getById(milk.id.value))
+
+        assertEquals(1, dao.setChecked(milk.id.value, checked = false))
+        assertEquals(milk.toEntity(at(1)), dao.getById(milk.id.value))
+    }
+
+    @Test
+    fun updatesChangeNothingWhenTheItemDoesNotExist() = runTest {
+        assertEquals(0, dao.setChecked(milk.id.value, checked = true))
+        assertEquals(
+            0,
+            dao.update(milk.id.value, milk.name, milk.productId, milk.sectionId, null, null, null, checked = false),
+        )
+        assertEquals(emptyList(), dao.getAll())
+    }
+
+    @Test
+    fun getAllReturnsItemsInTheOrderTheyWereAdded() = runTest {
+        dao.upsertAll(listOf(cassava.toEntity(at(2)), milk.toEntity(at(1))))
+
+        assertEquals(listOf(milk.toEntity(at(1)), cassava.toEntity(at(2))), dao.getAll())
+    }
+
+    @Test
     fun deleteCheckedKeepsItemsNotChecked() = runTest {
         dao.upsertAll(listOf(milk.check().toEntity(at(1)), cassava.toEntity(at(2)), unknown.check().toEntity(at(3))))
 
