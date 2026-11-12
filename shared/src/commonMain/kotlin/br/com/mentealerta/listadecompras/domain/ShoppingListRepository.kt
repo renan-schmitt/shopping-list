@@ -20,12 +20,16 @@ interface ShoppingListRepository {
 
     /**
      * Grava a edição do item (nome, produto, seção, quantidade, detalhe e risco) sem mudar o lugar
-     * dele. Devolve `false` se o item não está mais na lista.
+     * dele. Devolve o item como estava antes, para o "Ops, voltar", ou `null` se o item não está mais
+     * na lista.
      */
-    suspend fun update(item: ListItem): Boolean
+    suspend fun update(item: ListItem): ListItem?
 
-    /** Risca ou tira o risco do item. Devolve `false` se o item não está mais na lista. */
-    suspend fun setChecked(id: ListItemId, checked: Boolean): Boolean
+    /**
+     * Risca ou tira o risco do item. Devolve o item como estava antes, para o "Ops, voltar", ou `null`
+     * se nada mudou: o item não está mais na lista ou já estava assim.
+     */
+    suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem?
 
     /** Tira o item da lista. O que volta serve para o "Ops, voltar" ([restore]). */
     suspend fun remove(id: ListItemId): RemovedItems

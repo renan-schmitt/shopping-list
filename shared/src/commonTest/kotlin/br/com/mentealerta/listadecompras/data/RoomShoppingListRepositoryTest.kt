@@ -13,10 +13,8 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 class RoomShoppingListRepositoryTest {
     private val database = createTestDatabase()
@@ -88,12 +86,21 @@ class RoomShoppingListRepositoryTest {
         repository.observeSections().test {
             assertEquals(listOf(milk, cheese), awaitItem().single().items)
 
-            assertTrue(repository.setChecked(milk.id, checked = true))
+            assertEquals(milk, repository.setChecked(milk.id, checked = true))
             assertEquals(listOf(milk.check(), cheese), awaitItem().single().items)
 
-            assertTrue(repository.setChecked(milk.id, checked = false))
+            assertEquals(milk.check(), repository.setChecked(milk.id, checked = false))
             assertEquals(listOf(milk, cheese), awaitItem().single().items)
         }
+    }
+
+    @Test
+    fun setCheckedReturnsNullWhenTheItemIsAlreadyThatWay() = runTest {
+        repository.add(milk)
+
+        assertNull(repository.setChecked(milk.id, checked = false))
+        repository.setChecked(milk.id, checked = true)
+        assertNull(repository.setChecked(milk.id, checked = true))
     }
 
     @Test
@@ -105,7 +112,7 @@ class RoomShoppingListRepositoryTest {
             detail = "sem lactose",
         )
 
-        assertTrue(repository.update(edited))
+        assertEquals(milk, repository.update(edited))
 
         repository.observeSections().test { assertEquals(listOf(edited, cheese), awaitItem().single().items) }
     }
@@ -115,7 +122,7 @@ class RoomShoppingListRepositoryTest {
         listOf(milk, cassava).forEach { repository.add(it) }
         val moved = milk.copy(sectionId = "pantry")
 
-        assertTrue(repository.update(moved))
+        assertEquals(milk, repository.update(moved))
 
         repository.observeSections().test {
             assertEquals(listOf("produce" to listOf(cassava), "pantry" to listOf(moved)), awaitItem().simplified())
@@ -123,9 +130,9 @@ class RoomShoppingListRepositoryTest {
     }
 
     @Test
-    fun updateAndSetCheckedReturnFalseWhenTheItemIsNotOnTheList() = runTest {
-        assertFalse(repository.update(milk))
-        assertFalse(repository.setChecked(milk.id, checked = true))
+    fun updateAndSetCheckedReturnNullWhenTheItemIsNotOnTheList() = runTest {
+        assertNull(repository.update(milk))
+        assertNull(repository.setChecked(milk.id, checked = true))
 
         repository.observeSections().test { assertEquals(emptyList(), awaitItem()) }
     }
@@ -186,11 +193,4 @@ class RoomShoppingListRepositoryTest {
     }
 
     private fun List<ListSection>.simplified() = map { it.section.id to it.items }
-
-    /** Relógio que anda um segundo a cada leitura: cada item entra depois do anterior. */
-    private class StepClock : Clock {
-        private var seconds = 0L
-
-        override fun now(): Instant = Instant.fromEpochSeconds(++seconds)
-    }
 }

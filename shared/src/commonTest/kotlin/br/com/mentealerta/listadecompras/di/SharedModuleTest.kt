@@ -2,6 +2,7 @@ package br.com.mentealerta.listadecompras.di
 
 import br.com.mentealerta.listadecompras.catalog.CatalogRepository
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
+import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
@@ -31,5 +32,10 @@ class SharedModuleTest : KoinTest {
     @Test
     fun catalogRepositoryIsSingle() {
         assertSame(get<CatalogRepository>(), get<CatalogRepository>())
+    }
+
+    @Test
+    fun undoStackIsSingle() {
+        assertSame(get<UndoStack>(), get<UndoStack>())
     }
 }

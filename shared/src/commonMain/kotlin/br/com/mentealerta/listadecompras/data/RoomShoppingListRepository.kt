@@ -34,18 +34,27 @@ internal class RoomShoppingListRepository(
         dao.upsert(item.toEntity(addedAt = clock.now()))
     }
 
-    override suspend fun update(item: ListItem): Boolean = dao.update(
-        id = item.id.value,
-        name = item.name,
-        productId = item.productId,
-        sectionId = item.sectionId,
-        quantityAmount = item.quantity?.amount,
-        quantityUnit = item.quantity?.unit,
-        detail = item.detail,
-        checked = item.checked,
-    ) > 0
+    override suspend fun update(item: ListItem): ListItem? = database.withWriteTransaction {
+        val previous = dao.getById(item.id.value) ?: return@withWriteTransaction null
+        dao.update(
+            id = item.id.value,
+            name = item.name,
+            productId = item.productId,
+            sectionId = item.sectionId,
+            quantityAmount = item.quantity?.amount,
+            quantityUnit = item.quantity?.unit,
+            detail = item.detail,
+            checked = item.checked,
+        )
+        previous.toDomain()
+    }
 
-    override suspend fun setChecked(id: ListItemId, checked: Boolean): Boolean = dao.setChecked(id.value, checked) > 0
+    override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? = database.withWriteTransaction {
+        val previous = dao.getById(id.value)
+        if (previous == null || previous.checked == checked) return@withWriteTransaction null
+        dao.setChecked(id.value, checked)
+        previous.toDomain()
+    }
 
     override suspend fun remove(id: ListItemId): RemovedItems = database.withWriteTransaction {
         val entity = dao.getById(id.value) ?: return@withWriteTransaction RemovedItems.NONE
