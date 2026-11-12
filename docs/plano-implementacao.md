@@ -231,7 +231,7 @@ shopping-list/
 |---|---|---|
 | Linguagem | Kotlin 2.x | |
 | UI Android | Jetpack Compose + Material 3 | Tema próprio com fontes grandes e alto contraste |
-| Banco local | Room (KMP) + `BundledSQLiteDriver` | Mesma versão do SQLite no Android e no iOS |
+| Banco local | Room 3 (KMP, `androidx.room3`) + `BundledSQLiteDriver` (2026-11-12, #37) | Mesma versão do SQLite no Android e no iOS. Room 3 em vez do 2.8: é a linha feita para KMP, só com coroutines, e evita migrar todos os imports depois. Schema de cada versão em `shared/schemas/` (no git); migration nunca apaga os dados da pessoa |
 | Busca e normalização | Código Kotlin próprio no `shared` | Coluna normalizada (sem acento, singular) + sinônimos + Levenshtein. O catálogo (~1.500 itens) cabe em memória — não precisa de FTS |
 | Catálogo | Código Kotlin gerado no build a partir da planilha mestre (2026-11-11, #21) | Facilita a curadoria; processo na seção 3.5. Sem leitura de arquivo nem parse ao abrir o app, igual no Android e no iOS. O build valida a planilha e falha se houver erro ([catalog/README.md](../catalog/README.md)). JSON e SQLite descartados: exigiriam leitura diferente por plataforma |
 | Preferências | DataStore (KMP) | |
