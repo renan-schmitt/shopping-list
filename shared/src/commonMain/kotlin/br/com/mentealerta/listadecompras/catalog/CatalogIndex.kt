@@ -14,10 +14,13 @@ class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = :
     private val productsBySection = catalog.products.groupBy { it.sectionId }
     private val termsByProduct = catalog.terms.groupBy { it.productId }
 
-    /** Chave → produtos com esse nome ou termo; mais de um quando textos diferentes caem na mesma chave. */
-    private val productsByKey: Map<String, List<CatalogProduct>> = buildMap<String, MutableList<CatalogProduct>> {
-        catalog.products.forEach { addTo(it.name, it) }
-        catalog.terms.forEach { term -> productsById[term.productId]?.let { addTo(term.term, it) } }
+    /**
+     * Chave → produtos com esse nome ou termo, um por produto; mais de um quando textos diferentes
+     * caem na mesma chave. Quem bate pelo nome vem antes.
+     */
+    private val matchesByKey: Map<String, List<ProductMatch>> = buildMap<String, MutableList<ProductMatch>> {
+        catalog.products.forEach { addTo(it.name, ProductMatch(it, term = null)) }
+        catalog.terms.forEach { term -> productsById[term.productId]?.let { addTo(term.term, ProductMatch(it, term)) } }
     }
 
     /** Produto pelo `id`; um `id` antigo devolve o produto que o absorveu. */
@@ -32,10 +35,24 @@ class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = :
     fun termsOf(productId: String): List<CatalogTerm> = termsByProduct[productId].orEmpty()
 
     /** Produtos cujo nome ou termo tem a mesma chave de [text], sem repetir; quem bate pelo nome vem antes. */
-    fun findByKey(text: String): List<CatalogProduct> = productsByKey[key(text)].orEmpty()
+    fun findByKey(text: String): List<CatalogProduct> = matchesByKey[key(text)].orEmpty().map { it.product }
 
-    private fun MutableMap<String, MutableList<CatalogProduct>>.addTo(text: String, product: CatalogProduct) {
-        val products = getOrPut(key(text)) { mutableListOf() }
-        if (product !in products) products += product
+    /**
+     * Produto canônico de [text] pelo nome ou por sinônimo/regionalismo ("Macaxeiras" → Mandioca, pelo
+     * termo "macaxeira"); `null` quando o catálogo não conhece o texto. Se a chave cair em mais de um
+     * produto, vale o primeiro de [findByKey].
+     */
+    fun resolve(text: String): ProductMatch? = matchesByKey[key(text)]?.firstOrNull()
+
+    private fun MutableMap<String, MutableList<ProductMatch>>.addTo(text: String, match: ProductMatch) {
+        val matches = getOrPut(key(text)) { mutableListOf() }
+        if (matches.none { it.product == match.product }) matches += match
     }
 }
+
+/** Produto do catálogo achado por um texto e por onde ele bateu. */
+data class ProductMatch(
+    val product: CatalogProduct,
+    /** Sinônimo ou regionalismo que bateu; `null` quando bateu pelo nome do produto. */
+    val term: CatalogTerm?,
+)
