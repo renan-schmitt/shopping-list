@@ -1,0 +1,985 @@
+<!doctype html>
+<!--
+  Protótipo navegável para o teste com pessoas 60+ (#31).
+
+  Como abrir no celular:
+    1. No computador, na raiz do repositório: python3 -m http.server 8000
+    2. Celular e computador no mesmo Wi-Fi. Descubra o IP do computador
+       (macOS: ipconfig getifaddr en0).
+    3. No Chrome do celular: http://IP:8000/docs/prototipos/prototipo-navegavel.html
+  O protótipo lê o catálogo real (catalog/*.csv) e os ícones Fluent (catalog/fluent-svg/),
+  por isso não abre direto pelo arquivo (file://). As fontes vêm do Google Fonts: o celular
+  precisa de internet.
+
+  Opções no endereço (para quem conduz o teste; nada aparece para o participante):
+    ?lista=vazia     começa com a lista vazia
+    ?lista=cheia     começa com uma lista pronta (12 produtos)
+    ?riscados=fim    variante da #32: produto riscado vai para o fim da seção
+  Exemplo: prototipo-navegavel.html?lista=cheia&riscados=fim
+  O estado fica guardado no navegador; recarregar a página mantém a lista.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2E6B3A">
+<title>Lista de Compras — protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Lexend+Deca:wght@700&display=swap">
+<style>
+  :root {
+    --papel: #FBF3DC;
+    --fundo: #F4E7C2;
+    --tinta: #141414;
+    --riscado: #66625A;
+    --linha: #E2D5B3;
+    --acento: #2E6B3A;
+    --titulo: Bangers, Impact, sans-serif;
+    --texto: 'Lexend Deca', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: var(--texto);
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--tinta);
+    background-color: var(--fundo);
+    background-image: radial-gradient(rgba(0,0,0,.13) 1.4px, transparent 1.6px);
+    background-size: 12px 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button { font: inherit; letter-spacing: inherit; color: inherit; cursor: pointer; }
+  .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .caixa-alta { text-transform: uppercase; }
+
+  .app {
+    max-width: 520px;
+    height: 100dvh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--papel);
+    border-left: 4px solid var(--tinta);
+    border-right: 4px solid var(--tinta);
+  }
+
+  /* Topo: rola junto com a lista, para sobrar espaço com fonte grande */
+  .rolagem { flex: 1 1 auto; overflow-y: auto; }
+  .topo {
+    padding: 10px 16px 12px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    border-bottom: 4px solid var(--tinta);
+    background: var(--acento);
+    color: #fff;
+  }
+  .familia {
+    display: block;
+    font-size: .95rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .logo {
+    margin: 0;
+    font-family: var(--titulo);
+    font-weight: 400;
+    font-size: 2.6rem;
+    letter-spacing: .05em;
+    line-height: 1;
+    -webkit-text-stroke: 2px var(--tinta);
+    paint-order: stroke fill;
+    text-shadow: 3px 3px 0 var(--tinta);
+    text-transform: uppercase;
+  }
+
+  /* Lista */
+  .folha { padding: 4px 14px 24px; }
+  .secao h2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 0 6px;
+    font-family: var(--titulo);
+    font-weight: 400;
+    font-size: 1.6rem;
+    letter-spacing: .06em;
+    padding: 4px 12px 2px;
+    background: var(--tinta);
+    color: var(--papel);
+    transform: rotate(-1.5deg);
+    text-transform: uppercase;
+  }
+  .secao ul { list-style: none; margin: 0; padding: 0; }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 76px;
+    width: 100%;
+    padding: 8px 2px;
+    border: none;
+    border-bottom: 2px dashed var(--linha);
+    background: var(--papel);
+    text-align: left;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .item.voltando { transition: transform .2s ease-out; }
+  .marca {
+    width: 44px; height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 3px solid var(--tinta);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .item.riscado .marca { background: var(--acento); box-shadow: 2px 2px 0 var(--tinta); }
+  .nome {
+    flex-grow: 1;
+    min-width: 0;
+    font-size: 1.75rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  .qtd {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 8px;
+    border: 2px solid currentColor;
+    border-radius: 10px;
+    font-size: 1.15rem;
+    vertical-align: .2em;
+    white-space: nowrap;
+  }
+  .icone { width: 48px; height: 48px; flex-shrink: 0; }
+  .item.riscado .nome {
+    color: var(--riscado);
+    text-decoration: line-through;
+    text-decoration-thickness: 4px;
+    text-decoration-color: var(--tinta);
+  }
+  .item.riscado .icone { opacity: .5; }
+
+  .vazia {
+    margin: 48px 8px;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .jogar-fora {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 64px;
+    margin-top: 36px;
+    padding: 8px 16px;
+    border: 3px solid var(--tinta);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 4px 4px 0 var(--tinta);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+  }
+  .jogar-fora img { width: 36px; height: 36px; }
+
+  /* Rodapé */
+  .rodape {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    border-top: 4px solid var(--tinta);
+    background-color: var(--papel);
+    background-image: radial-gradient(rgba(0,0,0,.09) 1.3px, transparent 1.5px);
+    background-size: 10px 10px;
+  }
+  .botao {
+    width: 100%;
+    border: 4px solid var(--tinta);
+    border-radius: 18px;
+    box-shadow: 5px 5px 0 var(--tinta);
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    padding: 6px 14px;
+  }
+  .botao:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--tinta); }
+  .principal {
+    min-height: 88px;
+    background: var(--acento);
+    color: #fff;
+  }
+  .principal .grande {
+    font-family: var(--titulo);
+    font-weight: 400;
+    font-size: 2.4rem;
+    letter-spacing: .05em;
+    line-height: 1;
+    -webkit-text-stroke: 1.5px var(--tinta);
+    paint-order: stroke fill;
+    text-shadow: 2px 2px 0 var(--tinta);
+    text-transform: uppercase;
+  }
+  .principal.terminei { flex-direction: column; gap: 2px; }
+  .principal .pequeno { font-size: 1.2rem; text-transform: uppercase; }
+  .secundario {
+    min-height: 64px;
+    background: #fff;
+    color: var(--acento);
+    font-size: 1.3rem;
+    text-transform: uppercase;
+  }
+
+  /* Aviso com "Ops, voltar" */
+  .aviso {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    width: min(500px, calc(100% - 32px));
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border: 4px solid var(--tinta);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 6px 6px 0 var(--tinta);
+    font-size: 1.3rem;
+    line-height: 1.35;
+    letter-spacing: .02em;
+    z-index: 30;
+  }
+  .aviso[hidden] { display: none; }
+  .aviso .botao { min-height: 64px; background: var(--papel); font-size: 1.3rem; text-transform: uppercase; }
+
+  /* Tela de adicionar */
+  .camada {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    background: rgba(20,20,20,.35);
+  }
+  .camada[hidden] { display: none; }
+  .adicionar-tela {
+    width: 100%;
+    max-width: 520px;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--papel);
+    border-left: 4px solid var(--tinta);
+    border-right: 4px solid var(--tinta);
+  }
+  .adicionar-topo {
+    flex-shrink: 0;
+    padding: 12px 16px 16px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    border-bottom: 4px solid var(--tinta);
+    background: var(--acento);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .voltar-lista {
+    align-self: flex-start;
+    min-height: 64px;
+    padding: 6px 18px;
+    border: 3px solid var(--tinta);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 3px 3px 0 var(--tinta);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+  }
+  .campo label {
+    display: block;
+    margin-bottom: 6px;
+    color: #fff;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+  }
+  .campo input {
+    width: 100%;
+    min-height: 68px;
+    padding: 8px 16px;
+    border: 4px solid var(--tinta);
+    border-radius: 16px;
+    background: #fff;
+    font: inherit;
+    font-size: 1.6rem;
+    color: var(--tinta);
+  }
+  .campo input:focus { outline: 4px solid #fff; outline-offset: 2px; }
+  .adicionar-corpo { flex: 1 1 auto; overflow-y: auto; padding: 8px 14px 24px; }
+  .adicionar-corpo h2 {
+    margin: 16px 0 8px;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+  }
+  .opcoes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .opcao {
+    width: 100%;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 3px solid var(--tinta);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 3px 3px 0 var(--tinta);
+    text-align: left;
+  }
+  .opcao:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--tinta); }
+  .opcao .mais { width: 36px; height: 36px; flex-shrink: 0; color: var(--acento); }
+  .opcao .rotulo {
+    flex-grow: 1;
+    min-width: 0;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+  .opcao.desconhecido .rotulo { text-transform: none; font-size: 1.35rem; }
+  .opcao .icone { width: 44px; height: 44px; }
+  .retorno {
+    margin: 12px 0 0;
+    min-height: 1.5em;
+    font-size: 1.3rem;
+    color: var(--acento);
+  }
+  .retorno:empty { min-height: 0; margin: 0; }
+  .pergunta {
+    margin-top: 12px;
+    padding: 14px;
+    border: 3px solid var(--tinta);
+    border-radius: 16px;
+    background: #fff;
+    font-size: 1.35rem;
+    line-height: 1.35;
+  }
+  .pergunta[hidden] { display: none; }
+  .pergunta .botoes { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  .pergunta .botao { min-height: 64px; font-size: 1.25rem; text-transform: uppercase; background: var(--papel); }
+  .pergunta .botao.sim { background: var(--acento); color: #fff; }
+
+  /* Confirmação de jogar fora */
+  .dialogo {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(20,20,20,.5);
+  }
+  .dialogo[hidden] { display: none; }
+  .dialogo-caixa {
+    width: min(480px, 100%);
+    padding: 20px;
+    border: 4px solid var(--tinta);
+    border-radius: 20px;
+    background: var(--papel);
+    box-shadow: 8px 8px 0 var(--tinta);
+  }
+  .dialogo-caixa h2 {
+    margin: 0 0 8px;
+    font-family: var(--titulo);
+    font-weight: 400;
+    font-size: 2rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .dialogo-caixa p { margin: 0 0 18px; font-size: 1.35rem; line-height: 1.35; }
+  .dialogo-caixa .botoes { display: flex; flex-direction: column; gap: 12px; }
+  .dialogo-caixa .botao { min-height: 72px; font-size: 1.3rem; text-transform: uppercase; background: #fff; }
+  .dialogo-caixa .botao.sim { background: var(--acento); color: #fff; }
+
+  .problema { margin: 32px 16px; font-size: 1.2rem; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="rolagem" id="rolagem">
+      <header class="topo">
+        <span class="familia">Mente Alerta</span>
+        <h1 class="logo">Lista de Compras</h1>
+      </header>
+      <main class="folha" id="folha" aria-label="Sua lista"></main>
+    </div>
+    <div class="rodape" id="rodape"></div>
+  </div>
+
+  <div class="camada" id="camada" hidden>
+    <div class="adicionar-tela" role="dialog" aria-modal="true" aria-labelledby="campo-rotulo">
+      <div class="adicionar-topo">
+        <button class="voltar-lista" id="voltar-lista" type="button">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          Voltar para a lista
+        </button>
+        <div class="campo">
+          <label for="campo" id="campo-rotulo">Procurar produto</label>
+          <input id="campo" type="text" autocomplete="off" autocapitalize="sentences" enterkeyhint="done">
+        </div>
+      </div>
+      <div class="adicionar-corpo">
+        <p class="retorno" id="retorno" aria-live="polite"></p>
+        <div class="pergunta" id="pergunta" hidden>
+          <p id="pergunta-texto" style="margin:0"></p>
+          <div class="botoes">
+            <button class="botao sim" id="pergunta-sim" type="button">Sim, mais um</button>
+            <button class="botao" id="pergunta-nao" type="button">Não</button>
+          </div>
+        </div>
+        <div id="resultados"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialogo" id="dialogo" hidden>
+    <div class="dialogo-caixa" role="alertdialog" aria-modal="true" aria-labelledby="dialogo-titulo" aria-describedby="dialogo-texto">
+      <h2 id="dialogo-titulo">Jogar a lista fora?</h2>
+      <p id="dialogo-texto"></p>
+      <div class="botoes">
+        <button class="botao sim" id="dialogo-sim" type="button">Sim, jogar fora</button>
+        <button class="botao" id="dialogo-nao" type="button">Não</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="aviso" id="aviso" role="status" aria-live="polite" hidden>
+    <span id="aviso-texto"></span>
+    <button class="botao" id="aviso-voltar" type="button">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>
+      Ops, voltar
+    </button>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const ICONS = '../../catalog/fluent-svg/';
+  const CATALOG = '../../catalog/';
+  const STORAGE_KEY = 'prototipo-lista-v1';
+  const params = new URLSearchParams(location.search);
+  const struckAtEnd = params.get('riscados') === 'fim';
+
+  // ---------- Textos (seguem o guia de linguagem) ----------
+  const plural = (n, one, many) => (n === 1 ? one : many).replace('%d', n);
+  const T = {
+    empty: 'Sua lista está vazia. Toque em <strong>Adicionar</strong> para começar.',
+    add: 'Adicionar',
+    done: 'Terminei',
+    left: n => n === 0 ? 'Não falta nada' : plural(n, 'Falta %d', 'Faltam %d'),
+    throwAway: 'Jogar a lista fora',
+    throwAwayQuestion: n => plural(n, 'O produto será tirado.', 'Os %d produtos serão tirados.'),
+    thrownAway: 'A lista foi jogada fora.',
+    finished: (bought, left) => 'Pronto! ' + plural(bought, '1 produto comprado.', '%d produtos comprados.') +
+      (left ? ' ' + plural(left, 'Ficou 1 na lista para a próxima vez.', 'Ficaram %d na lista para a próxima vez.') : ''),
+    added: name => `${name} entrou na lista.`,
+    moreOne: name => `${name} entrou de novo na lista.`,
+    alreadyThere: name => `${name} já está na lista. Quer mais um?`,
+    addUnknown: text => `Pôr “${text}” na lista`,
+    suggestions: 'Você costuma comprar',
+    found: 'Achei estes',
+    nothingFound: 'Não achei esse produto. Pode pôr assim mesmo:',
+    loadProblem: 'Não deu certo ler o catálogo. Abra o protótipo pelo servidor local (instruções no começo do arquivo).',
+  };
+
+  // ---------- Normalização (protótipo da busca aproximada) ----------
+  function normalize(text) {
+    return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim()
+      .split(' ').map(singular).join(' ');
+  }
+  function singular(w) {
+    if (w.length <= 3) return w;
+    if (w.endsWith('oes') || w.endsWith('aes')) return w.slice(0, -3) + 'ao';
+    if (w.endsWith('ais')) return w.slice(0, -2) + 'l';
+    if (w.endsWith('eis')) return w.slice(0, -3) + 'el';
+    if (w.endsWith('ns')) return w.slice(0, -2) + 'm';
+    if (w.endsWith('res') || w.endsWith('zes')) return w.slice(0, -2);
+    if (w.endsWith('s') && !w.endsWith('ss')) return w.slice(0, -1);
+    return w;
+  }
+  function levenshtein(a, b) {
+    if (Math.abs(a.length - b.length) > 2) return 3;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+
+  // ---------- Quantidade no começo do texto ("2 leite", "meio quilo de carne") ----------
+  const NUMBERS = { um: 1, uma: 1, dois: 2, duas: 2, tres: 3, quatro: 4, cinco: 5, seis: 6, sete: 7, oito: 8,
+    nove: 9, dez: 10, onze: 11, doze: 12, meio: .5, meia: .5 };
+  const UNITS = { kg: ['kg'], quilo: ['kg'], quilos: ['kg'], g: ['g'], grama: ['g'], gramas: ['g'],
+    l: ['litro', 'litros'], litro: ['litro', 'litros'], litros: ['litro', 'litros'],
+    duzia: ['dúzia', 'dúzias'], duzias: ['dúzia', 'dúzias'], pacote: ['pacote', 'pacotes'], pacotes: ['pacote', 'pacotes'],
+    caixa: ['caixa', 'caixas'], caixas: ['caixa', 'caixas'], lata: ['lata', 'latas'], latas: ['lata', 'latas'],
+    garrafa: ['garrafa', 'garrafas'], garrafas: ['garrafa', 'garrafas'], maco: ['maço', 'maços'], macos: ['maço', 'maços'],
+    bandeja: ['bandeja', 'bandejas'], bandejas: ['bandeja', 'bandejas'], pote: ['pote', 'potes'], potes: ['pote', 'potes'] };
+  const fold = w => w.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9,.]/g, '');
+
+  function parseQuantity(raw) {
+    const words = raw.trim().split(/\s+/);
+    let i = 0, n = null, unit = null;
+    const first = fold(words[0] || '');
+    if (/^\d+([.,]\d+)?$/.test(first)) { n = parseFloat(first.replace(',', '.')); i++; }
+    else if (first in NUMBERS && words.length > 1) { n = NUMBERS[first]; i++; }
+    const maybeUnit = fold(words[i] || '');
+    if (words.length > i + 1 && maybeUnit in UNITS) { unit = UNITS[maybeUnit]; i++; if (n === null) n = 1; }
+    if (n === null) return { qty: '', rest: raw.trim() };
+    if (fold(words[i] || '') === 'de' && words.length > i + 1) i++;
+    const shown = n === .5 ? '½' : String(n).replace('.', ',');
+    const unitText = unit ? ' ' + (n > 1 && unit[1] ? unit[1] : unit[0]) : '';
+    return { qty: shown + unitText, rest: words.slice(i).join(' ') };
+  }
+
+  // ---------- Catálogo ----------
+  function parseCsv(text) {
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quoted) {
+        if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+        else if (c === '"') quoted = false;
+        else field += c;
+      } else if (c === '"') quoted = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c !== '\r') field += c;
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    const [head, ...body] = rows;
+    return body.filter(r => r.length === head.length).map(r => Object.fromEntries(head.map((h, i) => [h, r[i]])));
+  }
+
+  const sections = new Map();   // id -> { name, order, icon }
+  const products = new Map();   // id -> { id, name, section, order, icon }
+  let entries = [];             // { key, label, productId, isName }
+  const exactKey = new Map();   // key -> entry
+
+  async function loadCatalog() {
+    const [s, p, t] = await Promise.all(['sections', 'products', 'terms'].map(name =>
+      fetch(CATALOG + name + '.csv').then(r => { if (!r.ok) throw new Error(name); return r.text(); })));
+    for (const r of parseCsv(s)) sections.set(r.id, { name: r.name, order: +r.order, icon: r.fluent_icon });
+    for (const r of parseCsv(p)) {
+      if (r.status !== 'active') continue;
+      const icon = r.icon.startsWith('fluent:') ? r.icon.slice(7) : '';
+      products.set(r.id, { id: r.id, name: r.name, section: r.section, order: +r.order, icon });
+      entries.push({ key: normalize(r.name), label: r.name, productId: r.id, isName: true });
+    }
+    for (const r of parseCsv(t)) {
+      // Termo ambíguo só vale depois da revisão humana (plano §3.5).
+      if (!products.has(r.product_id) || (r.ambiguous === 'yes' && r.status !== 'confirmed')) continue;
+      const label = r.term.charAt(0).toUpperCase() + r.term.slice(1);
+      entries.push({ key: normalize(r.term), label, productId: r.product_id, isName: false });
+    }
+    for (const e of entries) if (!exactKey.has(e.key) || e.isName) exactKey.set(e.key, e);
+  }
+
+  function search(query) {
+    const q = normalize(query);
+    if (!q) return [];
+    const scored = [];
+    for (const e of entries) {
+      let score = null;
+      if (e.key === q) score = 0;
+      else if (e.key.startsWith(q)) score = 1;
+      else if (e.key.split(' ').some(w => w.startsWith(q))) score = 2;
+      else if (q.length >= 4) {
+        const d = levenshtein(q, e.key);
+        if (d === 1 || (d === 2 && q.length >= 7)) score = 3;
+        else if (q.length >= 4 && e.key.split(' ').some(w => levenshtein(q, w) === 1)) score = 4;
+      }
+      if (score !== null) scored.push({ e, score });
+    }
+    scored.sort((a, b) => a.score - b.score || (b.e.isName - a.e.isName) || a.e.key.length - b.e.key.length);
+    const seen = new Set();
+    const out = [];
+    for (const { e } of scored) {
+      if (seen.has(e.productId)) continue;
+      seen.add(e.productId);
+      out.push(e);
+      if (out.length === 6) break;
+    }
+    return out;
+  }
+
+  // "leite de soja da marca X": produto do começo do texto + detalhe livre
+  function productAtStart(query) {
+    const words = normalize(query).split(' ');
+    for (let i = words.length - 1; i >= 1; i--) {
+      const e = exactKey.get(words.slice(0, i).join(' '));
+      if (e) return e;
+    }
+    return null;
+  }
+
+  function guessSection(text) {
+    for (const w of normalize(text).split(' ')) {
+      const e = exactKey.get(w);
+      if (e) return products.get(e.productId).section;
+    }
+    return 'other';
+  }
+
+  const iconUrl = name => ICONS + encodeURIComponent(name) + '.svg';
+  function iconFor(item) {
+    const p = item.productId && products.get(item.productId);
+    return iconUrl(p && p.icon ? p.icon : sections.get(item.section).icon);
+  }
+  const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const escapeHtml = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // ---------- Estado ----------
+  let items = [];
+  let nextUid = 1;
+
+  function makeItem(productId, label, qty) {
+    const p = productId ? products.get(productId) : null;
+    return {
+      uid: nextUid++,
+      productId: p ? p.id : null,
+      label: capitalize(label),
+      qty: qty || '',
+      section: p ? p.section : guessSection(label),
+      order: p ? p.order : 100000 + nextUid,
+      struck: false,
+    };
+  }
+
+  function fullList() {
+    const spec = [
+      ['banana', 'Banana', '6'], ['tomato', 'Tomate'], ['lettuce', 'Alface'], ['cassava', 'Aipim'],
+      ['french_bread', 'Pão francês', '10'], ['ground_beef', 'Carne moída', '½ kg'], ['skim_milk', 'Leite desnatado', '2'],
+      ['minas_cheese', 'Queijo minas'], ['rice', 'Arroz', '5 kg'], ['coffee', 'Café'], ['dish_detergent', 'Detergente'],
+      [null, 'Vela de aniversário com o número oitenta'],
+    ];
+    return spec.filter(([id]) => !id || products.has(id)).map(([id, label, qty]) => makeItem(id, label, qty));
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, nextUid })); } catch (_) { /* sem armazenamento */ }
+  }
+  function restore() {
+    const scenario = params.get('lista');
+    if (scenario) {
+      items = scenario === 'cheia' ? fullList() : [];
+      params.delete('lista');
+      const rest = params.toString();
+      history.replaceState(null, '', location.pathname + (rest ? '?' + rest : ''));
+      save();
+      return;
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved) { items = saved.items.filter(i => sections.has(i.section)); nextUid = saved.nextUid; }
+    } catch (_) { items = []; }
+  }
+
+  const shopping = () => items.some(i => i.struck);
+
+  // ---------- Desenho da lista ----------
+  const folha = document.getElementById('folha');
+  const rodape = document.getElementById('rodape');
+  const CHECK = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
+  const PLUS = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg>';
+
+  function render(focusUid) {
+    if (!items.length) {
+      folha.innerHTML = `<p class="vazia">${T.empty}</p>`;
+    } else {
+      const groups = [...sections.entries()].sort((a, b) => a[1].order - b[1].order)
+        .map(([id, s]) => ({ s, list: items.filter(i => i.section === id) }))
+        .filter(g => g.list.length);
+      folha.innerHTML = groups.map(({ s, list }) => {
+        list.sort((a, b) => (struckAtEnd ? a.struck - b.struck : 0) || a.order - b.order);
+        return `<section class="secao">
+          <h2>${escapeHtml(s.name)}</h2>
+          <ul>${list.map(i => `<li>
+            <button class="item${i.struck ? ' riscado' : ''}" type="button" data-uid="${i.uid}" aria-pressed="${i.struck}">
+              <span class="marca">${i.struck ? CHECK : ''}</span>
+              <span class="nome">${escapeHtml(i.label)}${i.qty ? `<span class="vh">,</span> <span class="qtd">${escapeHtml(i.qty)}</span>` : ''}</span>
+              <img class="icone" src="${iconFor(i)}" alt="" onerror="this.style.visibility='hidden'">
+            </button></li>`).join('')}</ul>
+        </section>`;
+      }).join('') + `<button class="jogar-fora" id="jogar-fora" type="button">
+          <img src="${iconUrl('Wastebasket')}" alt="">${T.throwAway}</button>`;
+    }
+
+    const left = items.filter(i => !i.struck).length;
+    rodape.innerHTML = shopping()
+      ? `<button class="botao secundario" type="button" data-acao="adicionar">${PLUS}${T.add}</button>
+         <button class="botao principal terminei" type="button" data-acao="terminei">
+           <span class="grande">${T.done}</span><span class="pequeno">${T.left(left)}</span></button>`
+      : `<button class="botao principal" type="button" data-acao="adicionar">${PLUS}<span class="grande">${T.add}</span></button>`;
+
+    if (focusUid) folha.querySelector(`[data-uid="${focusUid}"]`)?.focus();
+  }
+
+  // ---------- Riscar: tocar ou passar o dedo para a direita ----------
+  let wakeLock = null;
+  function toggle(uid) {
+    const item = items.find(i => i.uid === uid);
+    if (!item) return;
+    item.struck = !item.struck;
+    if (navigator.vibrate) navigator.vibrate(item.struck ? 40 : 15);
+    if (shopping() && !wakeLock && navigator.wakeLock) {
+      navigator.wakeLock.request('screen').then(l => { wakeLock = l; l.addEventListener('release', () => { wakeLock = null; }); })
+        .catch(() => { /* só funciona em https ou localhost */ });
+    }
+    save();
+    render(uid);
+  }
+
+  let drag = null;
+  let suppressClick = false;
+  folha.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.item');
+    if (!el || e.button > 0) return;
+    drag = { el, id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, moving: false };
+  });
+  folha.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moving) {
+      if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
+      if (Math.abs(dx) > 12) { drag.moving = true; drag.el.setPointerCapture(e.pointerId); }
+    }
+    if (drag.moving) {
+      drag.dx = Math.max(0, dx);
+      drag.el.style.transform = `translateX(${Math.min(drag.dx, 160)}px)`;
+    }
+  });
+  function endDrag(e, cancelled) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const { el, dx, moving } = drag;
+    drag = null;
+    if (!moving) return;
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 50);
+    if (!cancelled && dx > 90) { toggle(+el.dataset.uid); return; }
+    el.classList.add('voltando');
+    el.style.transform = '';
+    el.addEventListener('transitionend', () => el.classList.remove('voltando'), { once: true });
+  }
+  folha.addEventListener('pointerup', e => endDrag(e, false));
+  folha.addEventListener('pointercancel', e => endDrag(e, true));
+
+  folha.addEventListener('click', e => {
+    if (suppressClick) return;
+    const el = e.target.closest('.item');
+    if (el) { toggle(+el.dataset.uid); return; }
+    if (e.target.closest('#jogar-fora')) askThrowAway();
+  });
+
+  rodape.addEventListener('click', e => {
+    const acao = e.target.closest('[data-acao]')?.dataset.acao;
+    if (acao === 'adicionar') openAdd();
+    if (acao === 'terminei') finish();
+  });
+
+  // ---------- Aviso com "Ops, voltar" ----------
+  const aviso = document.getElementById('aviso');
+  const avisoTexto = document.getElementById('aviso-texto');
+  let undoSnapshot = null, avisoTimer = null;
+  function showUndo(text, snapshot) {
+    undoSnapshot = snapshot;
+    avisoTexto.textContent = text;
+    aviso.hidden = false;
+    clearTimeout(avisoTimer);
+    avisoTimer = setTimeout(hideUndo, 10000);
+  }
+  function hideUndo() { aviso.hidden = true; undoSnapshot = null; }
+  document.getElementById('aviso-voltar').addEventListener('click', () => {
+    if (undoSnapshot) { items = undoSnapshot; save(); render(); }
+    hideUndo();
+  });
+  const snapshot = () => items.map(i => ({ ...i }));
+
+  // ---------- Terminei ----------
+  function finish() {
+    const before = snapshot();
+    const bought = items.filter(i => i.struck).length;
+    items = items.filter(i => !i.struck);
+    if (wakeLock) wakeLock.release();
+    save();
+    render();
+    showUndo(T.finished(bought, items.length), before);
+  }
+
+  // ---------- Jogar a lista fora ----------
+  const dialogo = document.getElementById('dialogo');
+  let dialogoReturn = null;
+  function askThrowAway() {
+    dialogoReturn = document.activeElement;
+    document.getElementById('dialogo-texto').textContent = T.throwAwayQuestion(items.length);
+    dialogo.hidden = false;
+    document.getElementById('dialogo-nao').focus();
+  }
+  function closeDialog() { dialogo.hidden = true; dialogoReturn?.focus?.(); }
+  document.getElementById('dialogo-nao').addEventListener('click', closeDialog);
+  document.getElementById('dialogo-sim').addEventListener('click', () => {
+    const before = snapshot();
+    items = [];
+    if (wakeLock) wakeLock.release();
+    dialogo.hidden = true;
+    save();
+    render();
+    showUndo(T.thrownAway, before);
+  });
+
+  // ---------- Adicionar ----------
+  const camada = document.getElementById('camada');
+  const campo = document.getElementById('campo');
+  const resultados = document.getElementById('resultados');
+  const retorno = document.getElementById('retorno');
+  const pergunta = document.getElementById('pergunta');
+  let pendingRepeat = null;
+  let currentOptions = [];
+
+  const SUGGESTED = ['rice', 'beans', 'milk', 'coffee', 'french_bread', 'egg', 'sugar', 'banana', 'cooking_oil', 'tomato', 'toilet_paper', 'dish_detergent'];
+
+  function openAdd() {
+    hideUndo();
+    campo.value = '';
+    retorno.textContent = '';
+    pergunta.hidden = true;
+    camada.hidden = false;
+    renderOptions();
+    campo.focus();
+  }
+  function closeAdd() {
+    camada.hidden = true;
+    render();
+    rodape.querySelector('[data-acao="adicionar"]')?.focus();
+  }
+  document.getElementById('voltar-lista').addEventListener('click', closeAdd);
+
+  function optionButton(opt, index) {
+    const icon = opt.productId ? iconFor({ productId: opt.productId, section: products.get(opt.productId).section })
+      : iconUrl(sections.get(guessSection(opt.label)).icon);
+    const text = opt.unknown ? escapeHtml(T.addUnknown(opt.label)) : escapeHtml(opt.label) +
+      (opt.qty ? `<span class="vh">,</span> <span class="qtd">${escapeHtml(opt.qty)}</span>` : '');
+    return `<li><button class="opcao${opt.unknown ? ' desconhecido' : ''}" type="button" data-opcao="${index}">
+      <svg class="mais" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg>
+      <span class="rotulo">${text}</span>
+      <img class="icone" src="${icon}" alt="" onerror="this.style.visibility='hidden'">
+    </button></li>`;
+  }
+
+  function renderOptions() {
+    const raw = campo.value.trim();
+    if (!raw) {
+      const onList = new Set(items.map(i => i.productId));
+      currentOptions = SUGGESTED.filter(id => products.has(id) && !onList.has(id)).slice(0, 8)
+        .map(id => ({ productId: id, label: products.get(id).name, qty: '' }));
+      resultados.innerHTML = currentOptions.length
+        ? `<h2>${T.suggestions}</h2><ul class="opcoes">${currentOptions.map(optionButton).join('')}</ul>` : '';
+      return;
+    }
+    const { qty, rest } = parseQuantity(raw);
+    const text = rest || raw;
+    const options = [];
+    const start = productAtStart(text);
+    if (start && !exactKey.has(normalize(text))) options.push({ productId: start.productId, label: capitalize(text), qty });
+    for (const e of search(text)) {
+      if (!options.some(o => o.productId === e.productId)) options.push({ productId: e.productId, label: e.label, qty });
+    }
+    const exact = exactKey.has(normalize(text)) || options.some(o => normalize(o.label) === normalize(text));
+    if (!exact) options.push({ productId: null, label: capitalize(text), qty, unknown: true });
+    currentOptions = options;
+    const found = options.filter(o => !o.unknown);
+    const unknown = options.find(o => o.unknown);
+    resultados.innerHTML =
+      (found.length ? `<h2>${T.found}</h2><ul class="opcoes">${found.map(o => optionButton(o, options.indexOf(o))).join('')}</ul>` : '') +
+      (unknown ? `${found.length ? '' : `<h2>${T.nothingFound}</h2>`}<ul class="opcoes">${optionButton(unknown, options.indexOf(unknown))}</ul>` : '');
+  }
+
+  function addOption(opt) {
+    const same = items.find(i => opt.productId ? i.productId === opt.productId : (!i.productId && normalize(i.label) === normalize(opt.label)));
+    if (same) {
+      pendingRepeat = same;
+      document.getElementById('pergunta-texto').textContent = T.alreadyThere(same.label);
+      pergunta.hidden = false;
+      retorno.textContent = '';
+      document.getElementById('pergunta-sim').focus();
+      return;
+    }
+    items.push(makeItem(opt.productId, opt.label, opt.qty));
+    save();
+    retorno.textContent = T.added(capitalize(opt.label));
+    pergunta.hidden = true;
+    campo.value = '';
+    renderOptions();
+  }
+
+  document.getElementById('pergunta-sim').addEventListener('click', () => {
+    const item = pendingRepeat;
+    if (item) {
+      if (!item.qty) item.qty = '2';
+      else if (/^\d+$/.test(item.qty)) item.qty = String(+item.qty + 1);
+      save();
+      retorno.textContent = T.moreOne(item.label);
+    }
+    pendingRepeat = null;
+    pergunta.hidden = true;
+    campo.value = '';
+    renderOptions();
+    campo.focus();
+  });
+  document.getElementById('pergunta-nao').addEventListener('click', () => {
+    pendingRepeat = null;
+    pergunta.hidden = true;
+    campo.value = '';
+    renderOptions();
+    campo.focus();
+  });
+
+  campo.addEventListener('input', () => { pergunta.hidden = true; retorno.textContent = ''; renderOptions(); });
+  campo.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && campo.value.trim() && currentOptions.length) { e.preventDefault(); addOption(currentOptions[0]); }
+  });
+  resultados.addEventListener('click', e => {
+    const b = e.target.closest('[data-opcao]');
+    if (b) addOption(currentOptions[+b.dataset.opcao]);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (!dialogo.hidden) closeDialog();
+    else if (!camada.hidden) closeAdd();
+  });
+
+  // ---------- Início ----------
+  loadCatalog().then(() => { restore(); render(); }).catch(() => {
+    folha.innerHTML = `<p class="problema">${T.loadProblem}</p>`;
+  });
+})();
+</script>
+</body>
+</html>
