@@ -14,6 +14,10 @@ orange,laranja-lima,,to_confirm,no,,
 tangerine,tangerina,,confirmed,no,,
 tangerine,bergamota,south,to_confirm,yes,,Também é o nome de outra fruta cítrica
 tangerine,ponkan,,to_confirm,no,,
+tangerine,poncã,,to_confirm,no,,Grafia de ponkan
+tangerine,mimosa,south,to_confirm,no,,
+tangerine,mixirica,central_southeast,to_confirm,no,,
+tangerine,laranja-cravo,central_southeast,to_confirm,no,,
 lime,limão-taiti,,to_confirm,no,,
 lime,limão-galego,,to_confirm,no,,
 sweet_lime,lima,,to_confirm,yes,,Também pode ser a laranja-lima
@@ -85,6 +89,8 @@ lemongrass,capim-cidreira,,to_confirm,yes,,Pode ser confundido com erva-cidreira
 french_bread,pão de sal,central_southeast,to_confirm,no,,
 french_bread,cacetinho,south,to_confirm,no,,
 french_bread,pão careca,north,to_confirm,no,,
+french_bread,pão carioca,northeast,to_confirm,no,,Confiança baixa; conferir com revisores
+french_bread,pão jacó,northeast,to_confirm,no,,Confiança baixa; conferir com revisores
 sliced_bread,pão de sanduíche,,to_confirm,no,,
 whole_wheat_bread,pão de forma integral,,to_confirm,no,,
 italian_bread,filão,,to_confirm,yes,,Também é o pão francês comprido
@@ -112,6 +118,7 @@ esfiha,esfiha aberta,,to_confirm,no,,
 sandwich,lanche natural,,to_confirm,no,,
 savory_pie,quiche,,to_confirm,no,,
 ground_beef,carne picada,,to_confirm,yes,,Também é carne em cubos
+ground_beef,guisado,south,to_confirm,yes,,No resto do país é o prato de carne ensopada
 beef_steak,bife de boi,,to_confirm,no,,
 sirloin_steak,contra-filé,,to_confirm,no,,Grafia comum
 sirloin_steak,bife de chorizo,south,to_confirm,no,,
@@ -214,6 +221,9 @@ laundry_bar_soap,sabão em pedra,,to_confirm,no,,
 fabric_softener,amaciante de roupa,,to_confirm,no,,
 bleach,hipoclorito,,to_confirm,no,,
 bleach,alvejante,,to_confirm,yes,,Também pode ser o alvejante sem cloro
+bleach,cândida,central_southeast;south,to_confirm,no,,Nome de marca usado como nome do produto
+bleach,qboa,central_southeast,to_confirm,no,,Nome de marca usado como nome do produto
+bleach,quiboa,northeast,to_confirm,no,,Nome de marca usado como nome do produto
 ironing_aid,facilitador de passar roupa,,to_confirm,no,,
 ironing_aid,goma,,to_confirm,yes,,Também é a goma de tapioca
 dish_detergent,detergente de louça,,to_confirm,no,,
@@ -244,6 +254,7 @@ rat_poison,veneno de rato,,to_confirm,no,,
 steel_wool,lã de aço,,to_confirm,no,,
 scrub_brush,escova de lavar roupa,,to_confirm,no,,
 floor_cloth,pano de limpeza,,to_confirm,yes,,Também pode ser o pano multiuso
+floor_cloth,saco de chão,northeast,to_confirm,no,,
 dish_towel,pano de copa,,to_confirm,no,,
 dish_towel,pano de cozinha,,to_confirm,no,,
 cleaning_wipe,pano descartável,,to_confirm,no,,
@@ -255,6 +266,7 @@ trash_bag,saquinho de lixo,,to_confirm,no,,
 trash_can,cesto de lixo,,to_confirm,no,,
 clothespin,pregador de roupa,,to_confirm,no,,
 clothespin,pregador,,to_confirm,no,,
+clothespin,grampo de roupa,south,to_confirm,no,,
 paper_towel,toalha de papel,,to_confirm,no,,
 napkin,guardanapo de papel,,to_confirm,no,,
 aluminum_foil,papel laminado,,to_confirm,no,,
@@ -359,7 +371,7 @@ cooking_gas,botijão,,to_confirm,no,,
 cooking_gas,bujão,,to_confirm,no,,
 cooking_gas,gás,,to_confirm,yes,,Também pode ser água com gás
 extension_cord,extensão elétrica,,to_confirm,no,,
-plug_adapter,benjamim,,to_confirm,no,,
+plug_adapter,benjamim,central_southeast,to_confirm,no,,
 adhesive_tape,fita,,to_confirm,yes,,"Pode ser fita de glicemia, de cetim etc."
 adhesive_tape,fita crepe,,to_confirm,no,,
 glue,cola branca,,to_confirm,no,,
@@ -415,6 +427,7 @@ wheat_flour,trigo,,to_confirm,no,,
 wheat_flour,farinha,,to_confirm,yes,,"No Norte e no Nordeste, farinha é a de mandioca"
 cassava_flour,farinha de mesa,,to_confirm,no,,
 cassava_flour,farinha,north;northeast,to_confirm,yes,,"Em outras regiões, farinha é a de trigo"
+cassava_flour,farinha de copioba,northeast,to_confirm,no,,Farinha fina da Bahia
 farinha_dagua,farinha de água,north,to_confirm,no,,
 farofa_mix,farofa,,to_confirm,no,,
 cornmeal,fubá mimoso,,to_confirm,no,,
@@ -541,6 +554,7 @@ wafer,bolacha wafer,central_southeast;south,to_confirm,no,,
 whole_wheat_cookie,bolacha integral,central_southeast;south,to_confirm,no,,
 polvilho_biscuit,biscoito de vento,,to_confirm,no,,
 polvilho_biscuit,peta,central_southeast,to_confirm,no,,
+polvilho_biscuit,biscoito de goma,northeast,to_confirm,no,,
 rosquinha,rosquinha de coco,,to_confirm,no,,
 rosquinha,rosquinha de leite,,to_confirm,no,,
 rice_cracker,bolacha de arroz,central_southeast;south,to_confirm,no,,
@@ -554,6 +568,7 @@ bonbon,caixa de bombom,,to_confirm,no,,
 candy,balinha,,to_confirm,no,,
 candy,bala de goma,,to_confirm,no,,
 candy,bala de hortelã,,to_confirm,no,,
+candy,queimado,northeast,to_confirm,no,,Confiança baixa; conferir com revisores
 chewing_gum,goma de mascar,,to_confirm,no,,
 chewing_gum,chicle,,to_confirm,no,,
 sprinkles,chocolate granulado,,to_confirm,no,,
@@ -583,6 +598,7 @@ soda,refri,,to_confirm,no,,
 soda,refrigerante zero,,to_confirm,no,,
 soda,refrigerante diet,,to_confirm,no,,
 soda,tubaína,central_southeast,to_confirm,no,,
+soda,gasosa,northeast;south,to_confirm,yes,,Também pode ser água com gás
 guarana,refrigerante de guaraná,,to_confirm,no,,
 juice,suco de caixinha,,to_confirm,no,,
 juice,suco de laranja,,to_confirm,no,,
@@ -660,3 +676,9 @@ frozen_vegetables,seleta congelada,,to_confirm,no,,
 frozen_cassava,aipim congelado,,to_confirm,no,,
 frozen_cassava,macaxeira congelada,,to_confirm,no,,
 frozen_fish,filé de peixe congelado,,to_confirm,no,,
+jam,chimia,south,to_confirm,no,,
+jam,schmier,south,to_confirm,no,,
+cane_syrup,mel de engenho,northeast,to_confirm,no,,
+cane_syrup,melado de cana,,to_confirm,no,,
+massa_puba,puba,north;northeast,to_confirm,no,,
+massa_puba,carimã,northeast,to_confirm,no,,

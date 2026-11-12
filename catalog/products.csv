@@ -49,12 +49,15 @@ cupuacu,Cupuaçu,produce,470,,,active,,Sem ícone Fluent; candidata ao complemen
 caja,Cajá,produce,480,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 seriguela,Seriguela,produce,490,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 umbu,Umbu,produce,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pitomba,Pitomba,produce,505,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
 pequi,Pequi,produce,510,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 bacuri,Bacuri,produce,520,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 mangaba,Mangaba,produce,530,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sapodilla,Sapoti,produce,535,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
 buriti,Buriti,produce,540,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 tucuma,Tucumã,produce,550,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 peach_palm,Pupunha,produce,560,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pinhao,Pinhão,produce,565,fluent:Chestnut,approx,active,,Castanha no lugar do pinhão; regional do Sul
 tomato,Tomate,produce,570,fluent:Tomato,exact,active,,
 cherry_tomato,Tomate-cereja,produce,580,fluent:Tomato,approx,active,,Tomate grande no lugar do pequeno
 potato,Batata,produce,590,fluent:Potato,exact,active,,
@@ -150,6 +153,7 @@ cornmeal_cake,Bolo de fubá,bakery,240,fluent:Shortcake,approx,active,,Fatia de 
 carrot_cake,Bolo de cenoura,bakery,250,fluent:Shortcake,approx,active,,Fatia de bolo genérica
 chocolate_cake,Bolo de chocolate,bakery,260,fluent:Shortcake,approx,active,,Fatia de bolo genérica
 corn_cake,Bolo de milho,bakery,270,fluent:Shortcake,approx,active,,Fatia de bolo genérica
+pamonha,Pamonha,bakery,275,fluent:Ear of corn,approx,active,,Espiga no lugar da pamonha
 cassava_cake,Bolo de mandioca,bakery,280,fluent:Shortcake,approx,active,,Fatia de bolo genérica
 birthday_cake,Bolo de aniversário,bakery,290,fluent:Birthday cake,exact,active,,
 honey_cake,Pão de mel,bakery,300,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -199,6 +203,7 @@ pork_ear,Orelha de porco,meat,350,,,active,,Sem ícone Fluent; candidata ao comp
 feijoada_kit,Kit feijoada,meat,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 sausage,Linguiça,meat,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 tuscan_sausage,Linguiça toscana,meat,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+salsichao,Salsichão,meat,385,,,active,,Sem ícone Fluent; candidata ao complemento próprio; linguiça grossa do Sul
 calabrese_sausage,Linguiça calabresa,meat,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 chicken_sausage,Linguiça de frango,meat,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 paio,Paio,meat,410,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -230,6 +235,7 @@ snook,Robalo,meat,660,fluent:Fish,exact,active,,
 tambaqui,Tambaqui,meat,670,fluent:Fish,exact,active,,Regional do Norte
 pirarucu,Pirarucu,meat,680,fluent:Fish,approx,active,,Peixe genérico; regional do Norte
 pintado,Pintado,meat,690,fluent:Fish,exact,active,,
+mullet,Tainha,meat,695,fluent:Fish,exact,active,,Regional do Sul e do Sudeste
 peacock_bass,Tucunaré,meat,700,fluent:Fish,exact,active,,
 shrimp,Camarão,meat,710,fluent:Shrimp,exact,active,,
 squid,Lula,meat,720,fluent:Squid,exact,active,,
@@ -262,6 +268,7 @@ prato_cheese,Queijo prato,deli_dairy,200,fluent:Cheese wedge,exact,active,,
 minas_cheese,Queijo minas,deli_dairy,210,fluent:Cheese wedge,approx,active,,Queijo amarelo no lugar do branco
 cured_minas_cheese,Queijo minas padrão,deli_dairy,220,fluent:Cheese wedge,exact,active,,
 coalho_cheese,Queijo coalho,deli_dairy,230,fluent:Cheese wedge,approx,active,,Queijo amarelo no lugar do branco
+colonial_cheese,Queijo colonial,deli_dairy,235,fluent:Cheese wedge,exact,active,,Regional do Sul
 parmesan,Parmesão,deli_dairy,240,fluent:Cheese wedge,exact,active,,
 grated_cheese,Queijo ralado,deli_dairy,250,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 provolone,Provolone,deli_dairy,260,fluent:Cheese wedge,approx,active,,Queijo genérico
@@ -280,6 +287,7 @@ ham,Presunto,deli_dairy,380,,,active,,Sem ícone Fluent; candidata ao complement
 ham_product,Apresuntado,deli_dairy,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 mortadella,Mortadela,deli_dairy,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 salami,Salame,deli_dairy,410,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+colonial_salami,Salame colonial,deli_dairy,415,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Sul
 turkey_breast,Peito de peru,deli_dairy,420,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 hot_dog_sausage,Salsicha,deli_dairy,430,fluent:Hot dog,approx,active,,Cachorro-quente no lugar da salsicha
 bacon,Bacon,deli_dairy,440,fluent:Bacon,exact,active,,
@@ -291,6 +299,7 @@ fresh_pasta,Macarrão fresco,deli_dairy,490,,,active,,Sem ícone Fluent; candida
 tofu,Tofu,deli_dairy,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 cooking_oil,Óleo,pantry,620,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 tapioca_starch,Goma de tapioca,pantry,340,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+massa_puba,Massa puba,pantry,345,,,active,,Sem ícone Fluent; candidata ao complemento próprio; mandioca fermentada do Norte e do Nordeste
 laundry_powder,Sabão em pó,cleaning,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 liquid_laundry_detergent,Sabão líquido,cleaning,20,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 laundry_bar_soap,Sabão em barra,cleaning,30,fluent:Soap,exact,active,,
@@ -520,6 +529,7 @@ worcestershire_sauce,Molho inglês,pantry,580,,,active,,Sem ícone Fluent; candi
 vinegar,Vinagre,pantry,590,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 olive_oil,Azeite,pantry,600,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 palm_oil,Azeite de dendê,pantry,610,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tucupi,Tucupi,pantry,615,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Norte
 lard,Banha,pantry,630,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 coconut_milk,Leite de coco,pantry,640,fluent:Coconut,approx,active,,Coco no lugar do vidrinho
 grated_coconut,Coco ralado,pantry,650,fluent:Coconut,approx,active,,Coco no lugar do pacote
@@ -533,6 +543,7 @@ brown_sugar,Açúcar mascavo,pantry,720,,,active,,Sem ícone Fluent; candidata a
 demerara_sugar,Açúcar demerara,pantry,730,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 sweetener,Adoçante,pantry,740,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 honey,Mel,pantry,750,fluent:Honey pot,exact,active,,
+cane_syrup,Melado,pantry,755,fluent:Honey pot,approx,active,,Pote de mel no lugar do melado de cana
 rapadura,Rapadura,pantry,760,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 black_pepper,Pimenta-do-reino,pantry,770,,,active,,Sem ícone Fluent; candidata ao complemento próprio; a pimenta fresca fica no Hortifrúti
 seasoning_mix,Tempero pronto,pantry,780,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -611,6 +622,7 @@ tonic_water,Água tônica,beverages,40,,,active,,Sem ícone Fluent; candidata ao
 coconut_water,Água de coco,beverages,50,fluent:Coconut,approx,active,,Coco no lugar da caixinha
 soda,Refrigerante,beverages,60,fluent:Cup with straw,approx,active,,"Copo genérico, não a garrafa"
 guarana,Guaraná,beverages,70,fluent:Cup with straw,approx,active,,"Copo genérico, não a garrafa"
+cajuina,Cajuína,beverages,75,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
 juice,Suco,beverages,80,fluent:Beverage box,exact,active,,Suco de caixinha
 juice_concentrate,Suco concentrado,beverages,90,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 powdered_drink,Suco em pó,beverages,100,,,active,,Sem ícone Fluent; candidata ao complemento próprio

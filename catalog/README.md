@@ -80,6 +80,7 @@ Regras:
 - `rejected` fica no arquivo, para ninguém cadastrar o termo de novo.
 - Um termo pode aparecer em mais de uma linha (um termo ambíguo com produtos candidatos), mas só uma delas pode entrar no app.
 - Um termo nunca repete o `name` de um produto.
+- Os ambíguos e os regionalismos `to_confirm` de cada região vão para os revisores pela lista [`revisao-regional.md`](revisao-regional.md).
 
 ## Geração do catálogo embarcado
 
