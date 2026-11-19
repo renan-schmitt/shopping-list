@@ -44,9 +44,27 @@ class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = :
      */
     fun resolve(text: String): ProductMatch? = matchesByKey[key(text)]?.firstOrNull()
 
+    private val catalogSearch by lazy { CatalogSearch(catalog.products, catalog.terms, productsById, key) }
+
+    /**
+     * Busca enquanto a pessoa digita, tolerando texto incompleto e erro de digitação ("maca" → Maçã,
+     * "fejao" → Feijão). Ordem: da batida exata à aproximada ([MatchKind]), depois menos erros e
+     * depois os mais comprados, por [purchaseCounts] (`id` do produto → quantas vezes foi comprado).
+     * Cada produto aparece uma vez; texto vazio não acha nada.
+     */
+    fun search(
+        text: String,
+        purchaseCounts: Map<String, Int> = emptyMap(),
+        limit: Int = DEFAULT_SEARCH_LIMIT,
+    ): List<SearchResult> = catalogSearch.search(text, purchaseCounts, limit)
+
     private fun MutableMap<String, MutableList<ProductMatch>>.addTo(text: String, match: ProductMatch) {
         val matches = getOrPut(key(text)) { mutableListOf() }
         if (matches.none { it.product == match.product }) matches += match
+    }
+
+    companion object {
+        const val DEFAULT_SEARCH_LIMIT = 20
     }
 }
 
