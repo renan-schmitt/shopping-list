@@ -8,6 +8,7 @@ import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
@@ -29,12 +30,14 @@ val sharedModule = module {
 
     single<Clock> { Clock.System }
     singleOf(::EmbeddedCatalogRepository) bind CatalogRepository::class
+    single { get<CatalogRepository>().index() }
     singleOf(::RoomShoppingListRepository) bind ShoppingListRepository::class
     single { get<AppDatabase>().listItemDao() }
     single { get<AppDatabase>().purchaseDao() }
     single { get<AppDatabase>().learnedPreferenceDao() }
     single { UndoStack() }
     factoryOf(::GetSectionsUseCase)
+    factoryOf(::ObserveListUseCase)
     factoryOf(::AddItemsUseCase)
     factoryOf(::SetItemCheckedUseCase)
     factoryOf(::EditItemUseCase)

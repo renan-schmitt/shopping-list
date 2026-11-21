@@ -1,5 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lista de Compras</string>
-    <string name="hello">Olá</string>
+
+    <!-- Tela da lista (#50) -->
+    <!-- Em HTML escapado, para o negrito chegar ao Compose (AnnotatedString.fromHtml) -->
+    <string name="list_empty">Sua lista está vazia. Toque em &lt;b>Adicionar&lt;/b> para começar.</string>
+    <!-- Estado lido pelo TalkBack num produto riscado -->
+    <string name="list_item_checked">Comprado</string>
+    <!-- Produto com detalhe: "Leite" + "desnatado" -->
+    <string name="list_item_name_with_detail">%1$s %2$s</string>
+    <!-- Produto com quantidade, como o TalkBack lê: "Leite desnatado, 2 litros" -->
+    <string name="list_item_with_quantity">%1$s, %2$s</string>
+
+    <!--
+        Quantidade do produto. %1$s é o número já formatado ("2", "1,5", "½").
+        Na tela, ½ aparece como símbolo; o TalkBack lê a versão com "meio" / "meia".
+    -->
+    <string name="quantity_half">½</string>
+    <plurals name="quantity_unit">
+        <item quantity="one">%1$s</item>
+        <item quantity="many">%1$s</item>
+        <item quantity="other">%1$s</item>
+    </plurals>
+    <plurals name="quantity_kilogram">
+        <item quantity="one">%1$s kg</item>
+        <item quantity="many">%1$s kg</item>
+        <item quantity="other">%1$s kg</item>
+    </plurals>
+    <plurals name="quantity_gram">
+        <item quantity="one">%1$s g</item>
+        <item quantity="many">%1$s g</item>
+        <item quantity="other">%1$s g</item>
+    </plurals>
+    <plurals name="quantity_liter">
+        <item quantity="one">%1$s litro</item>
+        <item quantity="many">%1$s litros</item>
+        <item quantity="other">%1$s litros</item>
+    </plurals>
+    <plurals name="quantity_dozen">
+        <item quantity="one">%1$s dúzia</item>
+        <item quantity="many">%1$s dúzias</item>
+        <item quantity="other">%1$s dúzias</item>
+    </plurals>
+    <!-- Uma meia dúzia aparece sem o número -->
+    <string name="quantity_one_half_dozen">meia dúzia</string>
+    <plurals name="quantity_half_dozen">
+        <item quantity="one">%1$s meia dúzia</item>
+        <item quantity="many">%1$s meias dúzias</item>
+        <item quantity="other">%1$s meias dúzias</item>
+    </plurals>
+    <plurals name="quantity_package">
+        <item quantity="one">%1$s pacote</item>
+        <item quantity="many">%1$s pacotes</item>
+        <item quantity="other">%1$s pacotes</item>
+    </plurals>
+    <plurals name="quantity_box">
+        <item quantity="one">%1$s caixa</item>
+        <item quantity="many">%1$s caixas</item>
+        <item quantity="other">%1$s caixas</item>
+    </plurals>
+    <plurals name="quantity_can">
+        <item quantity="one">%1$s lata</item>
+        <item quantity="many">%1$s latas</item>
+        <item quantity="other">%1$s latas</item>
+    </plurals>
+    <plurals name="quantity_bottle">
+        <item quantity="one">%1$s garrafa</item>
+        <item quantity="many">%1$s garrafas</item>
+        <item quantity="other">%1$s garrafas</item>
+    </plurals>
+    <plurals name="quantity_bunch">
+        <item quantity="one">%1$s maço</item>
+        <item quantity="many">%1$s maços</item>
+        <item quantity="other">%1$s maços</item>
+    </plurals>
+    <plurals name="quantity_tray">
+        <item quantity="one">%1$s bandeja</item>
+        <item quantity="many">%1$s bandejas</item>
+        <item quantity="other">%1$s bandejas</item>
+    </plurals>
+    <plurals name="quantity_jar">
+        <item quantity="one">%1$s pote</item>
+        <item quantity="many">%1$s potes</item>
+        <item quantity="other">%1$s potes</item>
+    </plurals>
+
+    <!-- Meia unidade lida pelo TalkBack (na tela fica "½ kg") -->
+    <string name="quantity_half_unit">meia unidade</string>
+    <string name="quantity_half_kilogram">meio quilo</string>
+    <string name="quantity_half_gram">meio grama</string>
+    <string name="quantity_half_liter">meio litro</string>
+    <string name="quantity_half_of_dozen">meia dúzia</string>
+    <string name="quantity_half_package">meio pacote</string>
+    <string name="quantity_half_box">meia caixa</string>
+    <string name="quantity_half_can">meia lata</string>
+    <string name="quantity_half_bottle">meia garrafa</string>
+    <string name="quantity_half_bunch">meio maço</string>
+    <string name="quantity_half_tray">meia bandeja</string>
+    <string name="quantity_half_jar">meio pote</string>
 </resources>
