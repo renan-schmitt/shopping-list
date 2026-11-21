@@ -13,6 +13,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,18 +29,33 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.ListItemId
+import br.com.mentealerta.listadecompras.ui.add.AddScreen
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.halftone
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
 
-/** Tela principal: a lista de compras numa folha de papel, agrupada por seção (#50). */
+/**
+ * Tela principal: a lista de compras numa folha de papel, agrupada por seção (#50). "Adicionar" abre
+ * a tela de adicionar (#53) por cima da lista, sem biblioteca de navegação; ela continua aberta numa
+ * rotação de tela.
+ */
 @Composable
 fun ListScreen(modifier: Modifier = Modifier, viewModel: ListViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    // Adicionar (#53) e Terminei (#57) ganham ação nas tarefas deles.
-    ListContent(uiState = uiState, onToggleCheck = viewModel::onToggleCheck, modifier = modifier)
+    var adding by rememberSaveable { mutableStateOf(false) }
+    if (adding) {
+        AddScreen(onClose = { adding = false }, modifier = modifier)
+    } else {
+        // Terminei (#57) ganha ação na tarefa dele.
+        ListContent(
+            uiState = uiState,
+            onToggleCheck = viewModel::onToggleCheck,
+            onAdd = { adding = true },
+            modifier = modifier,
+        )
+    }
 }
 
 /**

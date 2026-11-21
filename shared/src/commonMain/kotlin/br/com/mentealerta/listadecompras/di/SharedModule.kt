@@ -10,10 +10,12 @@ import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
+import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
+import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -36,9 +38,11 @@ val sharedModule = module {
     single { get<AppDatabase>().purchaseDao() }
     single { get<AppDatabase>().learnedPreferenceDao() }
     single { UndoStack() }
+    singleOf(::ItemTextParser)
     factoryOf(::GetSectionsUseCase)
     factoryOf(::ObserveListUseCase)
     factoryOf(::AddItemsUseCase)
+    factoryOf(::SearchProductsUseCase)
     factoryOf(::SetItemCheckedUseCase)
     factoryOf(::EditItemUseCase)
     factoryOf(::RemoveItemUseCase)

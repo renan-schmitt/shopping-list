@@ -27,6 +27,19 @@
     <!-- Produto com quantidade, como o TalkBack lê: "Leite desnatado, 2 litros" -->
     <string name="list_item_with_quantity">%1$s, %2$s</string>
 
+    <!-- Tela de adicionar (#53) -->
+    <string name="add_back_to_list">Voltar para a lista</string>
+    <!-- Rótulo do campo; o guia troca "buscar" por "procurar" -->
+    <string name="add_search_label">Procurar produto</string>
+    <!-- Título acima dos produtos achados pela busca -->
+    <string name="add_found">Achei estes</string>
+    <!-- Sem nenhum produto achado, acima da opção de pôr o texto como está -->
+    <string name="add_nothing_found">Não achei esse produto. Pode pôr assim mesmo:</string>
+    <!-- Opção do produto que o app não conhece, com o texto digitado -->
+    <string name="add_unknown">Pôr “%1$s” na lista</string>
+    <!-- Aviso depois de pôr o produto na lista, lido também pelo TalkBack -->
+    <string name="add_added">%1$s entrou na lista.</string>
+
     <!--
         Quantidade do produto. %1$s é o número já formatado ("2", "1,5", "½").
         Na tela, ½ aparece como símbolo; o TalkBack lê a versão com "meio" / "meia".

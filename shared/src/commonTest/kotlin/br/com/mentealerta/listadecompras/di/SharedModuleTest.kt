@@ -2,6 +2,7 @@ package br.com.mentealerta.listadecompras.di
 
 import br.com.mentealerta.listadecompras.catalog.CatalogRepository
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
+import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -37,5 +38,10 @@ class SharedModuleTest : KoinTest {
     @Test
     fun undoStackIsSingle() {
         assertSame(get<UndoStack>(), get<UndoStack>())
+    }
+
+    @Test
+    fun searchProductsUseCaseFindsInTheCatalog() {
+        assertTrue(get<SearchProductsUseCase>()("maca").found.isNotEmpty())
     }
 }

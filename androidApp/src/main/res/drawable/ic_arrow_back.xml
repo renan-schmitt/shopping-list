@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Seta do botão "Voltar para a lista" (protótipo prototipo-navegavel.html). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="30dp"
+    android:height="30dp"
+    android:autoMirrored="true"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M15,5l-7,7 7,7"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FF141414"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
