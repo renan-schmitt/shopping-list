@@ -23,7 +23,15 @@ sealed interface ListUiState {
 
     data object Empty : ListUiState
 
-    data class Content(val sections: List<SectionUi>) : ListUiState
+    /**
+     * Lista com produtos. A tela se adapta sozinha (#52), sem "modo No mercado" guardado: riscar o
+     * primeiro produto já é "estou comprando" ([isShopping]), e o "Terminei" mostra quantos faltam
+     * ([remaining]).
+     */
+    data class Content(val sections: List<SectionUi>) : ListUiState {
+        val isShopping: Boolean = sections.any { section -> section.rows.any { it.checked } }
+        val remaining: Int = sections.sumOf { section -> section.rows.count { !it.checked } }
+    }
 }
 
 /** Seção com título e os produtos dela, na ordem em que entraram. */

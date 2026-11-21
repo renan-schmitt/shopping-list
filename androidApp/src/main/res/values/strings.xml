@@ -11,6 +11,17 @@
     <string name="list_item_mark_bought">Marcar como comprado</string>
     <!-- Ação do TalkBack para desriscar o produto (#51) -->
     <string name="list_item_unmark">Tirar o risco</string>
+    <!-- Rodapé da lista (#52): "Adicionar" sempre; "Terminei" depois do primeiro risco -->
+    <string name="list_add">Adicionar</string>
+    <string name="list_finish">Terminei</string>
+    <!-- Abaixo do "Terminei": quantos produtos ainda não foram riscados -->
+    <plurals name="list_remaining">
+        <item quantity="one">Falta %d</item>
+        <item quantity="many">Faltam %d</item>
+        <item quantity="other">Faltam %d</item>
+    </plurals>
+    <!-- Abaixo do "Terminei", com todos os produtos riscados -->
+    <string name="list_nothing_remaining">Não falta nada</string>
     <!-- Produto com detalhe: "Leite" + "desnatado" -->
     <string name="list_item_name_with_detail">%1$s %2$s</string>
     <!-- Produto com quantidade, como o TalkBack lê: "Leite desnatado, 2 litros" -->

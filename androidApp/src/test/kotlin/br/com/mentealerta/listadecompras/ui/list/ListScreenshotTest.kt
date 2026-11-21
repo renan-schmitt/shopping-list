@@ -14,7 +14,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Screenshots da tela da lista com a fonte do sistema em 100%, 150% e 200%, no modo claro e no
- * escuro (plano §4.6), e da lista vazia.
+ * escuro (plano §4.6), comprando (com riscados, rodapé com "Terminei") e antes de riscar (só o
+ * "Adicionar" grande, #52), e da lista vazia.
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -50,6 +51,22 @@ class ListScreenshotTest {
     @Test
     @Config(qualifiers = "+night", fontScale = 2.0f)
     fun dark_font200() = capture("dark_font200")
+
+    @Test
+    @Config(fontScale = 1.0f)
+    fun notShopping_light_font100() = capture("not_shopping_light_font100", SampleListStateNotShopping)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun notShopping_light_font200() = capture("not_shopping_light_font200", SampleListStateNotShopping)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun notShopping_dark_font100() = capture("not_shopping_dark_font100", SampleListStateNotShopping)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 2.0f)
+    fun notShopping_dark_font200() = capture("not_shopping_dark_font200", SampleListStateNotShopping)
 
     @Test
     @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.0f)

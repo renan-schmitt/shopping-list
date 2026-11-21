@@ -169,6 +169,25 @@ class ListViewModelTest {
     }
 
     @Test
+    fun shoppingStartsWithTheFirstCheckAndCountsWhatIsLeft() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
+        val kale = ListItem(ListItemId("2"), "Couve", null, "produce")
+        viewModel().uiState.test {
+            skipItems(1)
+            sections.emit(listOf(ListSection(produce, listOf(tomato, kale))))
+            with(awaitItem() as ListUiState.Content) {
+                assertEquals(false, isShopping)
+                assertEquals(2, remaining)
+            }
+            sections.emit(listOf(ListSection(produce, listOf(tomato.check(), kale))))
+            with(awaitItem() as ListUiState.Content) {
+                assertEquals(true, isShopping)
+                assertEquals(1, remaining)
+            }
+        }
+    }
+
+    @Test
     fun togglingChecksAnUncheckedItemAndUnchecksACheckedOne() = runTest {
         val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
         stored[tomato.id] = tomato

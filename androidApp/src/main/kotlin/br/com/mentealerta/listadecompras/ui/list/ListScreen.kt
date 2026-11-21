@@ -1,5 +1,6 @@
 package br.com.mentealerta.listadecompras.ui.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -34,25 +36,46 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ListScreen(modifier: Modifier = Modifier, viewModel: ListViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    // Adicionar (#53) e Terminei (#57) ganham ação nas tarefas deles.
     ListContent(uiState = uiState, onToggleCheck = viewModel::onToggleCheck, modifier = modifier)
 }
 
 /**
- * Fundo com retícula e, por cima, a folha da lista (plano §4.8). [onToggleCheck] recebe o produto
- * e o estado atual dele, para riscar ou tirar o risco.
+ * Fundo com retícula, a folha da lista (plano §4.8) e o rodapé que se adapta (#52). [onToggleCheck]
+ * recebe o produto e o estado atual dele, para riscar ou tirar o risco. Comprando, a tela não apaga.
  */
 @Composable
 fun ListContent(
     uiState: ListUiState,
     modifier: Modifier = Modifier,
     onToggleCheck: (ListItemId, Boolean) -> Unit = { _, _ -> },
+    onAdd: () -> Unit = {},
+    onFinish: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
-    Scaffold(modifier = modifier, containerColor = colors.background) { padding ->
+    val content = uiState as? ListUiState.Content
+    val isShopping = content?.isShopping == true
+    if (isShopping) KeepScreenOn()
+    Scaffold(
+        // A retícula cobre a tela toda, por trás da folha e do rodapé.
+        modifier = modifier
+            .background(colors.background)
+            .halftone(colors.outline, ComicTheme.tokens.halftoneSpacing),
+        containerColor = Color.Transparent,
+        bottomBar = {
+            if (uiState != ListUiState.Loading) {
+                ListFooter(
+                    isShopping = isShopping,
+                    remaining = content?.remaining ?: 0,
+                    onAdd = onAdd,
+                    onFinish = onFinish,
+                )
+            }
+        },
+    ) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .halftone(colors.outline, ComicTheme.tokens.halftoneSpacing)
                 .padding(padding)
                 .padding(horizontal = 8.dp, vertical = 12.dp),
         ) {

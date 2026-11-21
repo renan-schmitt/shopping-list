@@ -67,6 +67,11 @@ val SampleListState = ListUiState.Content(
     ),
 )
 
+/** A mesma lista antes de riscar o primeiro produto: rodapé só com o "Adicionar" grande (#52). */
+val SampleListStateNotShopping = ListUiState.Content(
+    SampleListState.sections.map { section -> section.copy(rows = section.rows.map { it.copy(checked = false) }) },
+)
+
 private fun row(
     id: String,
     name: String,
@@ -92,6 +97,12 @@ private fun ListDarkPreview() {
 @Composable
 private fun ListFont200Preview() {
     ShoppingListTheme(darkTheme = false) { ListContent(SampleListState) }
+}
+
+@Preview(name = "Lista — antes de riscar", widthDp = 411, heightDp = 1400)
+@Composable
+private fun ListNotShoppingPreview() {
+    ShoppingListTheme(darkTheme = false) { ListContent(SampleListStateNotShopping) }
 }
 
 @Preview(name = "Lista vazia", widthDp = 411, heightDp = 800)
