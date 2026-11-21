@@ -15,7 +15,11 @@ import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import br.com.mentealerta.listadecompras.domain.RemovedItems
+import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
+import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
+import br.com.mentealerta.listadecompras.domain.undo.UndoStack
+import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,6 +29,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
@@ -46,6 +51,11 @@ class ListViewModelTest {
 
     private val sections = MutableSharedFlow<List<ListSection>>()
 
+    /** Itens que o repositório falso conhece, para riscar e tirar o risco. */
+    private val stored = mutableMapOf<ListItemId, ListItem>()
+    private val checkedCalls = mutableListOf<Pair<ListItemId, Boolean>>()
+    private val undoStack = UndoStack()
+
     private val repository = object : ShoppingListRepository {
         override fun observeSections() = sections
 
@@ -53,7 +63,12 @@ class ListViewModelTest {
 
         override suspend fun update(item: ListItem): ListItem? = null
 
-        override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? = null
+        override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? {
+            checkedCalls += id to checked
+            val previous = stored[id]?.takeIf { it.checked != checked } ?: return null
+            stored[id] = previous.copy(checked = checked)
+            return previous
+        }
 
         override suspend fun remove(id: ListItemId) = RemovedItems.NONE
 
@@ -68,7 +83,8 @@ class ListViewModelTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun viewModel() = ListViewModel(ObserveListUseCase(repository), index)
+    private fun viewModel() =
+        ListViewModel(ObserveListUseCase(repository), index, SetItemCheckedUseCase(repository, undoStack))
 
     @Test
     fun startsLoadingUntilTheListArrives() = runTest {
@@ -150,5 +166,31 @@ class ListViewModelTest {
             sections.emit(emptyList())
             assertEquals(ListUiState.Empty, awaitItem())
         }
+    }
+
+    @Test
+    fun togglingChecksAnUncheckedItemAndUnchecksACheckedOne() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
+        stored[tomato.id] = tomato
+        val viewModel = viewModel()
+
+        viewModel.onToggleCheck(tomato.id, checked = false)
+        assertEquals(true, stored.getValue(tomato.id).checked)
+        viewModel.onToggleCheck(tomato.id, checked = true)
+        assertEquals(false, stored.getValue(tomato.id).checked)
+        assertEquals(listOf(tomato.id to true, tomato.id to false), checkedCalls)
+    }
+
+    @Test
+    fun checkingCanBeUndoneWithOpsVoltar() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
+        stored[tomato.id] = tomato
+
+        viewModel().onToggleCheck(tomato.id, checked = false)
+        assertEquals(UndoableAction.ItemChecked(tomato), undoStack.lastAction.value)
+
+        UndoLastActionUseCase(repository, undoStack)()
+        assertEquals(false, stored.getValue(tomato.id).checked)
+        assertNull(undoStack.lastAction.value)
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
+import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.halftone
@@ -33,12 +34,19 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ListScreen(modifier: Modifier = Modifier, viewModel: ListViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    ListContent(uiState = uiState, modifier = modifier)
+    ListContent(uiState = uiState, onToggleCheck = viewModel::onToggleCheck, modifier = modifier)
 }
 
-/** Fundo com retícula e, por cima, a folha da lista (plano §4.8). */
+/**
+ * Fundo com retícula e, por cima, a folha da lista (plano §4.8). [onToggleCheck] recebe o produto
+ * e o estado atual dele, para riscar ou tirar o risco.
+ */
 @Composable
-fun ListContent(uiState: ListUiState, modifier: Modifier = Modifier) {
+fun ListContent(
+    uiState: ListUiState,
+    modifier: Modifier = Modifier,
+    onToggleCheck: (ListItemId, Boolean) -> Unit = { _, _ -> },
+) {
     val colors = MaterialTheme.colorScheme
     Scaffold(modifier = modifier, containerColor = colors.background) { padding ->
         Box(
@@ -52,7 +60,7 @@ fun ListContent(uiState: ListUiState, modifier: Modifier = Modifier) {
                 when (uiState) {
                     ListUiState.Loading -> Unit
                     ListUiState.Empty -> EmptyList()
-                    is ListUiState.Content -> Sheet(uiState.sections)
+                    is ListUiState.Content -> Sheet(uiState.sections, onToggleCheck)
                 }
             }
         }
@@ -60,7 +68,7 @@ fun ListContent(uiState: ListUiState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun Sheet(sections: List<SectionUi>) {
+private fun Sheet(sections: List<SectionUi>, onToggleCheck: (ListItemId, Boolean) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 16.dp),
@@ -70,7 +78,7 @@ private fun Sheet(sections: List<SectionUi>) {
                 SectionTitle(text = section.name, modifier = Modifier.padding(top = 16.dp, bottom = 6.dp))
             }
             items(section.rows, key = { it.id.value }, contentType = { "row" }) { row ->
-                ListItemRow(row = row)
+                ListItemRow(row = row, onToggleCheck = { onToggleCheck(row.id, row.checked) })
             }
         }
     }

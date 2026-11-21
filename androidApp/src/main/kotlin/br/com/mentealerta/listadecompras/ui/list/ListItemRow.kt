@@ -1,15 +1,22 @@
 package br.com.mentealerta.listadecompras.ui.list
 
+import androidx.compose.animation.core.animate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -17,31 +24,43 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /** Altura mínima da linha (plano §1.7); cresce se o nome quebrar a linha. */
 private val RowMinHeight = 72.dp
@@ -50,6 +69,15 @@ private val IconSize = 48.dp
 private val StrikeWidth = 4.dp
 private val DividerWidth = 2.dp
 private val DividerDash = 8.dp
+
+/** Área de toque da marca, maior que o desenho dela (plano §1.7). */
+private val MarkTouchSize = 56.dp
+
+/** Passar o dedo risca quando a linha anda pelo menos isto… */
+private val SwipeMinDistance = 72.dp
+
+/** …ou esta fração da largura, o que for maior. Menos que isso volta sem riscar. */
+private const val SWIPE_WIDTH_FRACTION = 0.25f
 
 /** Ícone de produto riscado fica mais apagado, como no protótipo. */
 private const val CHECKED_ICON_ALPHA = 0.5f
@@ -60,15 +88,33 @@ private const val CHECKED_ICON_ALPHA = 0.5f
  * Riscado = marca verde com ✓ + traço grosso por cima do nome + texto cinza; o estado nunca fica só
  * na cor. Para o TalkBack a linha é um item só, lido em caixa normal ("Leite desnatado, 2 litros"),
  * com o estado "Comprado" quando riscada.
+ *
+ * Riscar e tirar o risco (#51): tocando na marca ou passando o dedo na linha, para qualquer lado. A
+ * linha acompanha o dedo e volta ao lugar; o celular vibra e não aparece mensagem (guia de
+ * linguagem). No TalkBack, tocar duas vezes na linha faz o mesmo ("Marcar como comprado" /
+ * "Tirar o risco").
  */
 @Composable
-fun ListItemRow(row: ListRowUi, modifier: Modifier = Modifier) {
+fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val name = row.detail?.let { stringResource(R.string.list_item_name_with_detail, row.name, it) } ?: row.name
     val quantity = row.quantity?.format(LocalContext.current.resources)
     val label = quantity?.let { stringResource(R.string.list_item_with_quantity, name, it.spoken) } ?: name
     val checkedDescription = stringResource(R.string.list_item_checked)
+    val toggleLabel = stringResource(if (row.checked) R.string.list_item_unmark else R.string.list_item_mark_bought)
     val dividerColor = colors.outlineVariant
+
+    val haptic = LocalHapticFeedback.current
+    val toggle by rememberUpdatedState {
+        haptic.performHapticFeedback(if (row.checked) HapticFeedbackType.ToggleOff else HapticFeedbackType.ToggleOn)
+        onToggleCheck()
+    }
+    var width by remember { mutableIntStateOf(0) }
+    var dragOffset by remember { mutableFloatStateOf(0f) }
+    val swipeMinDistance = with(LocalDensity.current) { SwipeMinDistance.toPx() }
+    val dragState = rememberDraggableState { delta ->
+        dragOffset = (dragOffset + delta).coerceIn(-width.toFloat(), width.toFloat())
+    }
 
     Row(
         modifier = modifier
@@ -85,15 +131,30 @@ fun ListItemRow(row: ListRowUi, modifier: Modifier = Modifier) {
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(dash, dash / 2)),
                 )
             }
+            .onSizeChanged { width = it.width }
+            .draggable(
+                state = dragState,
+                orientation = Orientation.Horizontal,
+                onDragStopped = {
+                    if (abs(dragOffset) >= maxOf(swipeMinDistance, width * SWIPE_WIDTH_FRACTION)) toggle()
+                    animate(dragOffset, 0f) { value, _ -> dragOffset = value }
+                },
+            )
             .clearAndSetSemantics {
                 text = AnnotatedString(label)
                 if (row.checked) stateDescription = checkedDescription
+                onClick(label = toggleLabel) {
+                    toggle()
+                    true
+                }
             }
+            // O conteúdo acompanha o dedo; o pontilhado de baixo fica parado.
+            .offset { IntOffset(dragOffset.roundToInt(), 0) }
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CheckMark(checked = row.checked)
+        CheckMark(checked = row.checked, onClick = { toggle() })
         FlowRow(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -113,9 +174,25 @@ fun ListItemRow(row: ListRowUi, modifier: Modifier = Modifier) {
     }
 }
 
-/** Marca redonda: vazia antes de riscar; verde com ✓ e sombra depois. */
+/**
+ * Marca redonda: vazia antes de riscar; verde com ✓ e sombra depois. A área de toque é maior que a
+ * marca, para acertar com folga.
+ */
 @Composable
-private fun CheckMark(checked: Boolean) {
+private fun CheckMark(checked: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .sizeIn(minWidth = MarkTouchSize, minHeight = MarkTouchSize)
+            .clip(CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        CheckMarkShape(checked)
+    }
+}
+
+@Composable
+private fun CheckMarkShape(checked: Boolean) {
     val colors = MaterialTheme.colorScheme
     val tokens = ComicTheme.tokens
     val shadow = if (checked) tokens.smallShadow else 0.dp

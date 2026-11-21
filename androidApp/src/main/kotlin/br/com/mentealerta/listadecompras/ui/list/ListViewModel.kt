@@ -8,11 +8,13 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
+import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.ui.catalog.iconRes
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /** Estado da tela da lista. */
 sealed interface ListUiState {
@@ -37,8 +39,15 @@ data class ListRowUi(
     @DrawableRes val icon: Int,
 )
 
-/** Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. */
-class ListViewModel(observeList: ObserveListUseCase, catalogIndex: CatalogIndex) : ViewModel() {
+/**
+ * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. Riscar e tirar
+ * o risco (#51) entram na pilha do "Ops, voltar".
+ */
+class ListViewModel(
+    observeList: ObserveListUseCase,
+    catalogIndex: CatalogIndex,
+    private val setItemChecked: SetItemCheckedUseCase,
+) : ViewModel() {
     val uiState: StateFlow<ListUiState> = observeList()
         .map { sections ->
             if (sections.isEmpty()) {
@@ -52,6 +61,11 @@ class ListViewModel(observeList: ObserveListUseCase, catalogIndex: CatalogIndex)
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), ListUiState.Loading)
+
+    /** Risca o produto que não estava riscado, ou tira o risco de quem estava ([checked] é o estado atual). */
+    fun onToggleCheck(id: ListItemId, checked: Boolean) {
+        viewModelScope.launch { setItemChecked(id, !checked) }
+    }
 
     private companion object {
         /** Mantém a coleta numa rotação de tela, sem reabrir a consulta. */
