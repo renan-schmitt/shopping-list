@@ -122,9 +122,37 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 - Gatilhos: lista grande, produto atrasado em relação ao padrão, lembrete de compra.
 
 ### 3.3 Reconhecimento de voz
-- Qualidade do reconhecimento offline em pt-BR em aparelhos de entrada.
-- Separar vários itens numa frase ("arroz feijão e leite" sem pausas).
-- Interpretar quantidades ("dois litros de leite", "uma dúzia de ovos").
+
+**Decidido (2026-11-21, #29).** A interpretação de quantidades já foi feita (#45, #46, #47).
+
+**Reconhecedor:** `SpeechRecognizer` com o serviço de voz padrão do celular (quase sempre o do Google), pedindo offline com `EXTRA_PREFER_OFFLINE`. Sem o pacote pt-BR baixado, usa a internet.
+- Pede até 5 alternativas e fica com a que mais bate com o catálogo.
+- Mostra o texto aparecendo enquanto a pessoa fala (resultados parciais).
+- A escuta não acaba numa pausa curta: o app reabre o microfone sozinho até a pessoa tocar em "Terminei" ou ficar uns 8 s em silêncio (valor provisório).
+- Android 13+ sem o pacote pt-BR offline: oferecer o download uma vez, nas configurações ("Baixar a voz para usar sem internet"), sem insistir.
+- Descartados: só o reconhecedor do aparelho (`createOnDeviceSpeechRecognizer`, Android 12+), que deixaria muita gente sem voz; motor próprio embarcado (Vosk, Whisper), que pesa dezenas de MB e é lento em aparelho de entrada. O motor próprio fica como plano para depois, se a privacidade ou a qualidade virarem problema.
+
+**Vários itens numa frase:** fronteiras pelo catálogo, no `shared` (funciona offline e no iOS). O produto é sempre o nome mais longo que o catálogo conhece, então nomes com "e" ou "de" ficam inteiros ("biscoito água e sal", "pão de queijo").
+- Separa em: pausa (cada resultado da voz é separado por conta própria), vírgula, ponto-e-vírgula, quebra de linha, a palavra "e" fora de um nome do catálogo, início de um produto conhecido, início de uma quantidade.
+- Só nome ou sinônimo exato (sem acento, singular) gera fronteira. A busca aproximada fica de fora, para palavras soltas não virarem produto por engano.
+- Palavra de ligação ("com", "sem", "de") antes de um produto não separa: "frango com batata" é um item, com detalhe "com batata".
+- Produto desconhecido vai até a próxima fronteira. Palavras sem fronteira depois de um produto viram detalhe dele.
+- Antes de entrar na lista, a pessoa vê os itens entendidos, um por linha, e pode tirar algum. A tela fica para a issue da tela de voz.
+- Limite conhecido: dois produtos desconhecidos seguidos, sem pausa e sem "e", viram um item só. A pessoa corrige na conferência.
+- Descartados: exigir pausa ou "e" entre os itens, que joga o trabalho na pessoa; IA para separar, que mandaria a lista para fora do celular.
+
+**Sem internet e privacidade:**
+- Sem internet e sem pacote offline: "Sem internet, não consigo ouvir agora. Você pode escrever.", com a opção de escrever logo ali.
+- Aviso uma vez, junto da explicação antes de pedir o microfone: "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." Depois fica na tela de privacidade das configurações.
+- O texto reconhecido nunca vai para logs, crashes ou analytics. Só o evento `item_adicionado { origem: voz }` (seção 4.5).
+
+**Prova de conceito:** não haverá uma separada. A primeira issue da tela de voz começa medindo num celular de entrada:
+- se a escuta reabre sem bipe nem atraso incômodo;
+- se ~8 s de silêncio é um bom limite;
+- quanto o offline erra;
+- se as alternativas vêm também no offline.
+
+Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 
 ### 3.4 Modelos de padrão de compra
 - Quantas compras são necessárias até a sugestão ser confiável?
@@ -292,7 +320,7 @@ shopping-list/
 **Obrigações:**
 - Política de privacidade publicada (exigência da Play Store).
 - Formulário de Segurança dos Dados da Play Store preenchido conforme as camadas acima.
-- Informar que o reconhecimento de voz pode enviar áudio ao Google quando o modo offline não estiver disponível.
+- Informar que o reconhecimento de voz pode enviar áudio ao Google quando o modo offline não estiver disponível. É a única exceção à promessa (o app em si nunca envia a lista). O aviso aparece antes do primeiro uso, junto da explicação do microfone (seção 3.3, 2026-11-21, #29).
 - Nomes de produtos podem revelar saúde (dado sensível pela LGPD) — por isso o conteúdo da lista nunca é enviado.
 
 ### 4.6 Qualidade e testes

@@ -52,5 +52,8 @@
 | Jogar a lista fora | "Jogar a lista fora? Os 12 produtos serão tirados." · **Sim, jogar fora** · **Não** |
 | Terminei | "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |
+| Voz sem internet (e sem a voz baixada) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
+| Antes de pedir o microfone (uma vez) | "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." |
+| Voz para usar sem internet (configurações, Android 13+) | **Baixar a voz para usar sem internet** |
 | Sugestão | "Faz 12 dias que você comprou café. Está faltando?" · **Sim, pôr na lista** · **Não** |
 | Lembrete | "Sua lista já tem 20 produtos. Que tal ir ao mercado?" |
