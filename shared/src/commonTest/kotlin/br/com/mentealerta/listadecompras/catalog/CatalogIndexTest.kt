@@ -110,5 +110,34 @@ class CatalogIndexTest {
 
     private val section = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
 
+    @Test
+    fun itemIconIsTheProductIconOrItsSectionIcon() {
+        assertEquals(CatalogIcon.Fluent("Banana"), index.icon(productId = "banana", sectionId = "produce"))
+        assertEquals(CatalogIcon.Fluent("Leafy green"), index.icon(productId = "papaya", sectionId = "produce"))
+    }
+
+    @Test
+    fun productMovedToAnotherSectionKeepsItsIcon() {
+        assertEquals(CatalogIcon.Fluent("Leafy green"), index.icon(productId = "papaya", sectionId = "pantry"))
+    }
+
+    @Test
+    fun unknownProductUsesTheIconOfTheItemSection() {
+        assertEquals(
+            CatalogIcon.Fluent("Shopping cart"),
+            index.icon(productId = null, sectionId = CatalogSection.OTHER_ID),
+        )
+        assertEquals(CatalogIcon.Fluent("Cheese wedge"), index.icon(productId = null, sectionId = "deli_dairy"))
+        assertEquals(
+            CatalogIcon.Fluent("Cheese wedge"),
+            index.icon(productId = "not_in_catalog", sectionId = "deli_dairy"),
+        )
+    }
+
+    @Test
+    fun sectionTheCatalogDoesNotHaveUsesTheGenericIcon() {
+        assertEquals(CatalogIcon.Fluent("Shopping cart"), index.icon(productId = null, sectionId = "old_section"))
+    }
+
     private fun product(id: String, name: String) = CatalogProduct(id, name, "produce", 1, null, null)
 }

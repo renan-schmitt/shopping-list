@@ -177,6 +177,7 @@ Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 **Produtos novos no celular (MVP):**
 - Produto desconhecido vira um **produto próprio da pessoa**: nome normalizado, seção e ícone da categoria. Entra no histórico e nas sugestões como qualquer outro. Fica só no celular.
 - A seção é adivinhada pela palavra principal ("queijo canastra" → Frios). Se não reconhecer nenhuma palavra, vai para a seção **Outros** (seção 1.4). A pessoa pode mudar, e o app lembra (seção 1.4).
+- A palavra principal é o começo do nome que o catálogo reconhece: "café da marca X" entra como Café, com o detalhe "da marca X", já em Mercearia. O que não começa com produto conhecido vai para **Outros**, sem procurar produto no meio do nome ("sabão de coco" não vai para Hortifrúti). No ícone, o produto desconhecido usa o da seção em que está; em Outros, o carrinho é o ícone genérico (2026-11-21, #49).
 - Se um catálogo novo trouxer o produto, o produto próprio passa a apontar para o do catálogo, sem perder o histórico.
 
 **Evolução do catálogo:**

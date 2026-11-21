@@ -4,6 +4,7 @@ import br.com.mentealerta.listadecompras.catalog.CatalogRepository
 import br.com.mentealerta.listadecompras.data.EmbeddedCatalogRepository
 import br.com.mentealerta.listadecompras.data.RoomShoppingListRepository
 import br.com.mentealerta.listadecompras.data.database.AppDatabase
+import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
@@ -34,6 +35,7 @@ val sharedModule = module {
     single { get<AppDatabase>().learnedPreferenceDao() }
     single { UndoStack() }
     factoryOf(::GetSectionsUseCase)
+    factoryOf(::AddItemsUseCase)
     factoryOf(::SetItemCheckedUseCase)
     factoryOf(::EditItemUseCase)
     factoryOf(::RemoveItemUseCase)

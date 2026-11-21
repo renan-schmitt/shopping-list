@@ -192,5 +192,20 @@ class RoomShoppingListRepositoryTest {
         repository.observeSections().test { assertEquals(listOf(milk), awaitItem().single().items) }
     }
 
+    @Test
+    fun unknownProductMovedToAnotherSectionStaysWithoutProduct() = runTest {
+        val unknown = ListItem.create(name = "Bergamota", productId = null, sectionId = CatalogSection.OTHER_ID)
+        repository.add(unknown)
+        val moved = unknown.copy(sectionId = "produce")
+
+        assertEquals(unknown, repository.update(moved))
+
+        repository.observeSections().test {
+            val section = awaitItem().single()
+            assertEquals("produce", section.section.id)
+            assertNull(section.items.single().productId)
+        }
+    }
+
     private fun List<ListSection>.simplified() = map { it.section.id to it.items }
 }

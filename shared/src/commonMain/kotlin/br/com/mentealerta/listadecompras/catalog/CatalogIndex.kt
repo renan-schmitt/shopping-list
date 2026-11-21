@@ -31,6 +31,17 @@ class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = :
 
     fun section(id: String): CatalogSection? = sectionsById[id]
 
+    /**
+     * Ícone de um item da lista (plano §4.4): o do produto ou, sem ícone próprio, o da seção do
+     * produto. Produto desconhecido ([productId] `null` ou fora do catálogo) usa o ícone da seção do
+     * item, [sectionId]; em "Outros" é o ícone genérico. Seção que o catálogo não tem vale "Outros".
+     */
+    fun icon(productId: String?, sectionId: String): CatalogIcon {
+        val product = productId?.let(::product)
+        val section = sectionsById[product?.sectionId ?: sectionId] ?: sectionsById.getValue(CatalogSection.OTHER_ID)
+        return product?.icon ?: section.icon
+    }
+
     /** Produtos da seção, na ordem dentro dela. */
     fun productsIn(sectionId: String): List<CatalogProduct> = productsBySection[sectionId].orEmpty()
 
