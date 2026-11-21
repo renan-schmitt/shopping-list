@@ -23,6 +23,9 @@ class CatalogIndex(val catalog: Catalog, private val key: (String) -> String = :
         catalog.terms.forEach { term -> productsById[term.productId]?.let { addTo(term.term, ProductMatch(it, term)) } }
     }
 
+    /** Maior número de palavras de um nome ou termo, já como chave; nenhum texto mais longo bate em [resolve]. */
+    val longestKeyWords: Int = matchesByKey.keys.maxOfOrNull { it.split(' ').size } ?: 0
+
     /** Produto pelo `id`; um `id` antigo devolve o produto que o absorveu. */
     fun product(id: String): CatalogProduct? = productsById[catalog.replacements[id] ?: id]
 

@@ -133,7 +133,7 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 - Descartados: só o reconhecedor do aparelho (`createOnDeviceSpeechRecognizer`, Android 12+), que deixaria muita gente sem voz; motor próprio embarcado (Vosk, Whisper), que pesa dezenas de MB e é lento em aparelho de entrada. O motor próprio fica como plano para depois, se a privacidade ou a qualidade virarem problema.
 
 **Vários itens numa frase:** fronteiras pelo catálogo, no `shared` (funciona offline e no iOS). O produto é sempre o nome mais longo que o catálogo conhece, então nomes com "e" ou "de" ficam inteiros ("biscoito água e sal", "pão de queijo").
-- Separa em: pausa (cada resultado da voz é separado por conta própria), vírgula, ponto-e-vírgula, quebra de linha, a palavra "e" fora de um nome do catálogo, início de um produto conhecido, início de uma quantidade.
+- Separa em: pausa (cada resultado da voz é separado por conta própria), vírgula, ponto, ponto-e-vírgula, quebra de linha, a palavra "e" fora de um nome do catálogo, início de um produto conhecido, início de uma quantidade seguida de produto conhecido. Vírgula e ponto entre dígitos não separam ("1,5 kg") (2026-11-21, #48).
 - Só nome ou sinônimo exato (sem acento, singular) gera fronteira. A busca aproximada fica de fora, para palavras soltas não virarem produto por engano.
 - Palavra de ligação ("com", "sem", "de") antes de um produto não separa: "frango com batata" é um item, com detalhe "com batata".
 - Produto desconhecido vai até a próxima fronteira. Palavras sem fronteira depois de um produto viram detalhe dele.
