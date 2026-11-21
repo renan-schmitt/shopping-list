@@ -10,5 +10,5 @@ import org.koin.dsl.module
 val appModule = module {
     viewModelOf(::ListViewModel)
     // Sem o despachante da busca: fica o padrão do construtor.
-    viewModel { AddViewModel(get(), get(), get()) }
+    viewModel { AddViewModel(get(), get(), get(), get(), get()) }
 }

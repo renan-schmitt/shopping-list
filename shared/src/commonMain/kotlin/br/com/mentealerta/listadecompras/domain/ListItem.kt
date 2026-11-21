@@ -38,6 +38,17 @@ data class ListItem(
     /** Tira o risco do item. */
     fun uncheck(): ListItem = copy(checked = false)
 
+    /**
+     * "Sim, mais um" (#54): soma na quantidade o que a pessoa pediu de novo ([more]). Sem quantidade,
+     * o item conta como 1 unidade. Se [more] está em outra unidade (ou não veio), soma 1 na unidade
+     * do item: "leite" → 2 leites; "2 pacotes" + "3 pacotes" → 5 pacotes; "1 kg" + "2 latas" → 2 kg.
+     */
+    fun addMore(more: Quantity?): ListItem {
+        val current = quantity ?: Quantity(1.0)
+        val added = more?.takeIf { it.unit == current.unit }?.amount ?: 1.0
+        return copy(quantity = Quantity(current.amount + added, current.unit))
+    }
+
     /** Cópia do item para gravar no histórico. */
     fun toPurchasedItem(): PurchasedItem = PurchasedItem(productId = productId, name = name, quantity = quantity)
 

@@ -24,13 +24,19 @@ val SampleAddState = AddUiState(
         ),
     ),
     unknown = option("lei", R.drawable.catalog_fluent_shopping_cart, Quantity(2.0, QuantityUnit.LITER)),
-    lastAdded = "Banana",
+    lastAdded = AddedUi("Banana"),
 )
 
 /** Nada achado: só a opção de pôr o texto como está. */
 val SampleAddNothingFoundState = AddUiState(
     query = "bergamota",
     unknown = option("bergamota", R.drawable.catalog_fluent_shopping_cart),
+)
+
+/** Produto repetido (#54): a pergunta "Leite já está na lista. Quer mais um?". */
+val SampleAddRepeatedState = AddUiState(
+    query = "leite",
+    repeated = RepeatedUi("leite", option("Leite", R.drawable.catalog_fluent_glass_of_milk)),
 )
 
 private fun option(name: String, icon: Int, quantity: Quantity? = null) = AddOptionUi(

@@ -14,7 +14,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Screenshots da tela de adicionar (#53) com fonte em 100% e 200%, no modo claro e no escuro
- * (plano §4.6): produtos achados com quantidade e nome longo, e nada achado.
+ * (plano §4.6): produtos achados com quantidade e nome longo, nada achado e a pergunta do produto
+ * repetido (#54).
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -46,6 +47,18 @@ class AddScreenshotTest {
     @Test
     @Config(fontScale = 1.0f)
     fun nothingFound_light_font100() = capture("nothing_found_light_font100", SampleAddNothingFoundState)
+
+    @Test
+    @Config(fontScale = 1.0f)
+    fun repeated_light_font100() = capture("repeated_light_font100", SampleAddRepeatedState)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun repeated_light_font200() = capture("repeated_light_font200", SampleAddRepeatedState)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun repeated_dark_font100() = capture("repeated_dark_font100", SampleAddRepeatedState)
 
     private fun capture(name: String, state: AddUiState = SampleAddState) {
         compose.setContent { ShoppingListTheme { AddContent(state) } }

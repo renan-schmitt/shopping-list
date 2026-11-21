@@ -87,4 +87,34 @@ class ListItemTest {
         )
         assertEquals(expected, item.toPurchasedItem())
     }
+
+    @Test
+    fun addMoreWithoutQuantityMakesTwo() {
+        assertEquals(Quantity(2.0), cassava.addMore(null).quantity)
+    }
+
+    @Test
+    fun addMoreSumsTheSameUnit() {
+        val packages = cassava.copy(quantity = Quantity(2.0, QuantityUnit.PACKAGE))
+        assertEquals(
+            Quantity(5.0, QuantityUnit.PACKAGE),
+            packages.addMore(Quantity(3.0, QuantityUnit.PACKAGE)).quantity,
+        )
+        assertEquals(Quantity(4.0), cassava.addMore(Quantity(3.0)).quantity)
+    }
+
+    @Test
+    fun addMoreInAnotherUnitAddsOneOfTheItemUnit() {
+        val half = cassava.copy(quantity = Quantity(0.5, QuantityUnit.KILOGRAM))
+        assertEquals(Quantity(1.5, QuantityUnit.KILOGRAM), half.addMore(Quantity(2.0, QuantityUnit.CAN)).quantity)
+        assertEquals(Quantity(1.5, QuantityUnit.KILOGRAM), half.addMore(null).quantity)
+        assertEquals(Quantity(2.0), cassava.addMore(Quantity(2.0, QuantityUnit.LITER)).quantity)
+    }
+
+    @Test
+    fun addMoreKeepsEverythingElse() {
+        val item = cassava.copy(detail = "descascado")
+        val more = item.addMore(null)
+        assertEquals(item.copy(quantity = Quantity(2.0)), more)
+    }
 }

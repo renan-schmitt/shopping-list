@@ -3,6 +3,7 @@ package br.com.mentealerta.listadecompras.ui.add
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
+import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -66,7 +67,7 @@ class AddViewModelTest {
         assertEquals("banana", added.productId)
         assertEquals("Banana", added.name)
         assertEquals(Quantity(2.0), added.quantity)
-        assertEquals(AddUiState(lastAdded = "Banana"), viewModel.uiState.value)
+        assertEquals(AddUiState(lastAdded = AddedUi("Banana")), viewModel.uiState.value)
     }
 
     @Test
@@ -117,5 +118,96 @@ class AddViewModelTest {
         viewModel.onClose()
 
         assertEquals(AddUiState(), viewModel.uiState.value)
+    }
+
+    @Test
+    fun repeatedProductAsksBeforeAdding() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+
+        viewModel.onQueryChange("2 bananas")
+        val option = viewModel.uiState.value.found.first()
+        viewModel.onAdd(option)
+
+        val state = viewModel.uiState.value
+        assertEquals(RepeatedUi("Banana", option), state.repeated)
+        assertEquals("2 bananas", state.query)
+        assertEquals(1, fixture.items.size)
+    }
+
+    @Test
+    fun addMoreSumsOnTheItemAlreadyThereAndCanBeUndone() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        val before = fixture.items.single()
+
+        viewModel.onQueryChange("2 bananas")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        viewModel.onAddMore()
+
+        val item = fixture.items.single()
+        assertEquals(before.id, item.id)
+        assertEquals(Quantity(3.0), item.quantity)
+        assertEquals(AddUiState(lastAdded = AddedUi("Banana", again = true)), viewModel.uiState.value)
+        assertEquals(UndoableAction.ItemEdited(before), fixture.undoStack.lastAction.value)
+    }
+
+    @Test
+    fun keepAsIsChangesNothingAndClearsTheField() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        val before = fixture.items.toList()
+
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        viewModel.onKeepAsIs()
+
+        assertEquals(before, fixture.items)
+        assertEquals(AddUiState(), viewModel.uiState.value)
+        assertNull(fixture.undoStack.lastAction.value)
+    }
+
+    @Test
+    fun typingAgainDropsTheQuestion() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+
+        viewModel.onQueryChange("banan")
+        assertNull(viewModel.uiState.value.repeated)
+        viewModel.onAddMore()
+        assertEquals(null, fixture.items.single().quantity)
+    }
+
+    @Test
+    fun doneKeyWaitsForTheAnswer() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onSubmit()
+        viewModel.onQueryChange("banana")
+        viewModel.onSubmit()
+
+        viewModel.onSubmit()
+        assertEquals(1, fixture.items.size)
+        assertEquals("Banana", viewModel.uiState.value.repeated?.name)
+    }
+
+    @Test
+    fun checkedItemIsNotAskedAndGetsANewLine() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onSubmit()
+        fixture.items[0] = fixture.items[0].check()
+
+        viewModel.onQueryChange("banana")
+        viewModel.onSubmit()
+
+        assertNull(viewModel.uiState.value.repeated)
+        assertEquals(2, fixture.items.size)
     }
 }

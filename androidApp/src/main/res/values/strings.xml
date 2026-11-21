@@ -39,6 +39,12 @@
     <string name="add_unknown">Pôr “%1$s” na lista</string>
     <!-- Aviso depois de pôr o produto na lista, lido também pelo TalkBack -->
     <string name="add_added">%1$s entrou na lista.</string>
+    <!-- Produto repetido (#54): pergunta quando o produto já está na lista, lida também pelo TalkBack -->
+    <string name="add_already_there">%1$s já está na lista. Quer mais um?</string>
+    <string name="add_more_one">Sim, mais um</string>
+    <string name="add_keep_as_is">Não</string>
+    <!-- Aviso depois do "Sim, mais um" -->
+    <string name="add_added_again">%1$s entrou de novo na lista.</string>
 
     <!--
         Quantidade do produto. %1$s é o número já formatado ("2", "1,5", "½").

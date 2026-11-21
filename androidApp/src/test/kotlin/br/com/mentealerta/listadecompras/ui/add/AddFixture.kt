@@ -7,21 +7,24 @@ import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
+import br.com.mentealerta.listadecompras.domain.EditItemUseCase
+import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
+import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 
 /**
  * Catálogo pequeno e repositório falso para os testes da tela de adicionar: guarda o que entrou na
- * lista em [added].
+ * lista em [added] e a lista como está em [items]. O "Ops, voltar" fica na [undoStack].
  */
 class AddFixture {
     private val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -41,17 +44,26 @@ class AddFixture {
     )
 
     val added = mutableListOf<ListItem>()
+    val items = mutableListOf<ListItem>()
+    val undoStack = UndoStack()
 
     private val repository = object : ShoppingListRepository {
-        override fun observeSections(): Flow<List<ListSection>> = emptyFlow()
+        override fun observeSections(): Flow<List<ListSection>> = flow {
+            emit(listOf(ListSection(other, items.toList())))
+        }
 
         override suspend fun add(item: ListItem) {
             added += item
+            items += item
         }
 
-        override suspend fun update(item: ListItem): ListItem? = null
+        override suspend fun update(item: ListItem): ListItem? {
+            val index = items.indexOfFirst { it.id == item.id }.takeIf { it >= 0 } ?: return null
+            return items[index].also { items[index] = item }
+        }
 
-        override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? = null
+        override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? =
+            items.find { it.id == id }?.let { update(it.copy(checked = checked)) }
 
         override suspend fun remove(id: ListItemId) = RemovedItems.NONE
 
@@ -64,6 +76,8 @@ class AddFixture {
         SearchProductsUseCase(index, ItemTextParser(index)),
         index,
         AddItemsUseCase(repository),
+        FindSameItemUseCase(repository),
+        EditItemUseCase(repository, undoStack),
         searchDispatcher,
     )
 }

@@ -7,6 +7,7 @@ import br.com.mentealerta.listadecompras.data.database.AppDatabase
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
+import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
@@ -42,6 +43,7 @@ val sharedModule = module {
     factoryOf(::GetSectionsUseCase)
     factoryOf(::ObserveListUseCase)
     factoryOf(::AddItemsUseCase)
+    factoryOf(::FindSameItemUseCase)
     factoryOf(::SearchProductsUseCase)
     factoryOf(::SetItemCheckedUseCase)
     factoryOf(::EditItemUseCase)

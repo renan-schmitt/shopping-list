@@ -32,8 +32,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Fluxo de adicionar digitando (#53): digitar, ver os achados, tocar e ver o aviso; a tecla "pronto";
- * o produto desconhecido; voltar para a lista. E a acessibilidade da tela: rótulo do campo, botões
- * de 72dp lidos em caixa normal, títulos e o aviso lido pelo TalkBack.
+ * o produto desconhecido; o produto repetido (#54); voltar para a lista. E a acessibilidade da tela:
+ * rótulo do campo, botões de 72dp lidos em caixa normal, títulos e os avisos lidos pelo TalkBack.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -102,6 +102,49 @@ class AddFlowTest {
         assertEquals("bergamota", item.name)
         assertEquals(null, item.productId)
         compose.onNodeWithText("Bergamota entrou na lista.").assertExists()
+    }
+
+    private fun addBananaTwice() {
+        field.performTextInput("banana")
+        field.performImeAction()
+        field.performTextInput("2 bananas")
+        field.performImeAction()
+    }
+
+    @Test
+    fun repeatedProductAsksAndMoreOneSumsTheQuantity() {
+        show()
+        addBananaTwice()
+
+        compose.onNodeWithText("Banana já está na lista. Quer mais um?")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+        compose.onAllNodesWithText("Achei estes").assertCountEquals(0)
+        compose.onNode(hasText("Sim, mais um") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
+
+        assertEquals(Quantity(3.0), fixture.items.single().quantity)
+        compose.onNodeWithText("Banana entrou de novo na lista.")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+        field.assert(hasText(""))
+    }
+
+    @Test
+    fun repeatedProductAnsweredNoLeavesTheList() {
+        show()
+        addBananaTwice()
+
+        compose.onNode(hasText("Não") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
+
+        assertEquals(null, fixture.items.single().quantity)
+        compose.onAllNodesWithText("Banana já está na lista. Quer mais um?").assertCountEquals(0)
+        field.assert(hasText(""))
+    }
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun repeatedQuestionButtonsWrapWithLargeFont() {
+        compose.setContent { ShoppingListTheme(darkTheme = false) { AddContent(SampleAddRepeatedState) } }
+        compose.onNode(hasText("Sim, mais um") and hasClickAction()).assertHeightIsAtLeast(64.dp)
+        compose.onNode(hasText("Não") and hasClickAction()).assertHeightIsAtLeast(64.dp)
     }
 
     @Test
