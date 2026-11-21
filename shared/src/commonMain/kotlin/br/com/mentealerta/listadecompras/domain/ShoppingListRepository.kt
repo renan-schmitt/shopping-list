@@ -57,5 +57,12 @@ class RemovedItems internal constructor(internal val entries: List<Entry>) {
     companion object {
         /** Nada foi tirado (ex.: o item já não estava na lista). */
         val NONE = RemovedItems(emptyList())
+
+        /**
+         * Para implementações fora de `data` (ex.: o repositório falso dos testes da UI): cada item
+         * com o momento em que entrou na lista.
+         */
+        fun of(entries: List<Pair<ListItem, Instant>>): RemovedItems =
+            RemovedItems(entries.map { (item, addedAt) -> Entry(item, addedAt) })
     }
 }

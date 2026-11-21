@@ -49,6 +49,30 @@ data class ListItem(
         return copy(quantity = Quantity(current.amount + added, current.unit))
     }
 
+    /** O botão "−" da edição (#55) tem efeito: sem quantidade, o item conta como 1 e não diminui. */
+    val canDecreaseQuantity: Boolean get() = (quantity?.amount ?: 1.0) > 1.0
+
+    /**
+     * Botão "+" da edição (#55): soma 1 na unidade do item; sem quantidade, o item conta como 1 e vai
+     * a 2. Menos de 1 (ex.: ½ kg) sobe para 1.
+     */
+    fun increaseQuantity(): ListItem {
+        val current = quantity ?: Quantity(1.0)
+        val amount = if (current.amount < 1.0) 1.0 else current.amount + 1.0
+        return copy(quantity = Quantity(amount, current.unit))
+    }
+
+    /**
+     * Botão "−" da edição (#55): tira 1, só acima de 1 ([canDecreaseQuantity]). Voltar a 1 numa
+     * contagem simples apaga a quantidade, porque o "1" sozinho não aparece na lista; "2 kg" vai a "1 kg".
+     */
+    fun decreaseQuantity(): ListItem {
+        val current = quantity?.takeIf { canDecreaseQuantity } ?: return this
+        val amount = current.amount - 1.0
+        val single = amount == 1.0 && current.unit == QuantityUnit.UNIT
+        return copy(quantity = if (single) null else Quantity(amount, current.unit))
+    }
+
     /** Cópia do item para gravar no histórico. */
     fun toPurchasedItem(): PurchasedItem = PurchasedItem(productId = productId, name = name, quantity = quantity)
 

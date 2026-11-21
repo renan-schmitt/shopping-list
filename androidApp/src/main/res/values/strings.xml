@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lista de Compras</string>
+    <!-- Botão no topo das telas que abrem por cima da lista (adicionar, editar) -->
+    <string name="back_to_list">Voltar para a lista</string>
+    <!-- Botão do aviso que desfaz a última ação (guia de linguagem) -->
+    <string name="undo">Ops, voltar</string>
 
     <!-- Tela da lista (#50) -->
     <!-- Em HTML escapado, para o negrito chegar ao Compose (AnnotatedString.fromHtml) -->
@@ -22,13 +26,16 @@
     </plurals>
     <!-- Abaixo do "Terminei", com todos os produtos riscados -->
     <string name="list_nothing_remaining">Não falta nada</string>
+    <!-- Ação do TalkBack para abrir a edição do produto (#55) -->
+    <string name="list_item_edit">Editar</string>
+    <!-- Aviso depois de tirar o produto da lista, com o botão "Ops, voltar" -->
+    <string name="list_item_removed">%1$s saiu da lista.</string>
     <!-- Produto com detalhe: "Leite" + "desnatado" -->
     <string name="list_item_name_with_detail">%1$s %2$s</string>
     <!-- Produto com quantidade, como o TalkBack lê: "Leite desnatado, 2 litros" -->
     <string name="list_item_with_quantity">%1$s, %2$s</string>
 
     <!-- Tela de adicionar (#53) -->
-    <string name="add_back_to_list">Voltar para a lista</string>
     <!-- Rótulo do campo; o guia troca "buscar" por "procurar" -->
     <string name="add_search_label">Procurar produto</string>
     <!-- Título acima dos produtos achados pela busca -->
@@ -45,6 +52,16 @@
     <string name="add_keep_as_is">Não</string>
     <!-- Aviso depois do "Sim, mais um" -->
     <string name="add_added_again">%1$s entrou de novo na lista.</string>
+
+    <!-- Edição do produto (#55): tudo é salvo sozinho, não existe "Salvar" -->
+    <string name="edit_name_label">Nome</string>
+    <string name="edit_quantity_label">Quantidade</string>
+    <string name="edit_less">Menos</string>
+    <string name="edit_more">Mais</string>
+    <string name="edit_detail_label">Detalhe</string>
+    <!-- Aparece no campo vazio; o TalkBack lê só o rótulo -->
+    <string name="edit_detail_hint">Ex.: desnatado, da marca X</string>
+    <string name="edit_remove">Tirar da lista</string>
 
     <!--
         Quantidade do produto. %1$s é o número já formatado ("2", "1,5", "½").

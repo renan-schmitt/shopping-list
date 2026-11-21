@@ -9,6 +9,7 @@ import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
+import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.ui.catalog.iconRes
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -49,12 +50,13 @@ data class ListRowUi(
 
 /**
  * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. Riscar e tirar
- * o risco (#51) entram na pilha do "Ops, voltar".
+ * o risco (#51) entram na pilha do "Ops, voltar"; [onUndo] desfaz a última ação.
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
     catalogIndex: CatalogIndex,
     private val setItemChecked: SetItemCheckedUseCase,
+    private val undoLastAction: UndoLastActionUseCase,
 ) : ViewModel() {
     val uiState: StateFlow<ListUiState> = observeList()
         .map { sections ->
@@ -73,6 +75,11 @@ class ListViewModel(
     /** Risca o produto que não estava riscado, ou tira o risco de quem estava ([checked] é o estado atual). */
     fun onToggleCheck(id: ListItemId, checked: Boolean) {
         viewModelScope.launch { setItemChecked(id, !checked) }
+    }
+
+    /** "Ops, voltar" do aviso (ex.: "Feijão saiu da lista."): desfaz a última ação. */
+    fun onUndo() {
+        viewModelScope.launch { undoLastAction() }
     }
 
     private companion object {

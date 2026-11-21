@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.Role
@@ -27,6 +28,9 @@ import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 
 /** Tamanho dos ícones dentro dos botões (protótipo: 30px). */
 private val IconSize = 30.dp
+
+/** Botão desativado fica apagado, sem mudar de cor. */
+private const val DISABLED_ALPHA = 0.4f
 
 /**
  * Botão principal: verde-folha, letra Bangers em caixa alta, ~88dp de altura
@@ -70,7 +74,8 @@ fun PrimaryButton(
  * "Adicionar" ao lado do "Terminei", ou "Ops, voltar" no aviso.
  *
  * Altura mínima de 64dp (área de toque, plano §1.7); [minHeight] permite
- * igualar ao botão principal quando os dois ficam lado a lado.
+ * igualar ao botão principal quando os dois ficam lado a lado. Desativado
+ * ([enabled] falso), fica apagado e o TalkBack anuncia "desativado".
  */
 @Composable
 fun SecondaryButton(
@@ -79,10 +84,12 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     icon: Painter? = null,
     minHeight: Dp = ComicTheme.tokens.minTouchTarget,
+    enabled: Boolean = true,
 ) {
     val colors = MaterialTheme.colorScheme
     ComicButton(
         onClick = onClick,
+        enabled = enabled,
         background = colors.surface,
         shadow = ComicTheme.tokens.mediumShadow,
         minHeight = minHeight,
@@ -105,6 +112,7 @@ private fun ComicButton(
     shadow: Dp,
     minHeight: Dp,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val tokens = ComicTheme.tokens
@@ -114,7 +122,14 @@ private fun ComicButton(
 
     Column(
         modifier = modifier
-            .clickable(interactionSource = interactionSource, indication = null, role = Role.Button, onClick = onClick)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .comicStyle(
                 shape = MaterialTheme.shapes.medium,
                 background = background,

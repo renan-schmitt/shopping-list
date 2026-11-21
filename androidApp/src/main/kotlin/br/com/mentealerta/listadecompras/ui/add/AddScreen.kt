@@ -26,9 +26,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,15 +36,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.onClick
@@ -55,14 +49,13 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
+import br.com.mentealerta.listadecompras.ui.components.LabeledTextField
 import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
@@ -71,7 +64,6 @@ import br.com.mentealerta.listadecompras.ui.list.format
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
 
-private val FieldMinHeight = 68.dp
 private val PlusSize = 36.dp
 private val OptionIconSize = 44.dp
 
@@ -126,7 +118,7 @@ fun AddContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SecondaryButton(
-                text = stringResource(R.string.add_back_to_list),
+                text = stringResource(R.string.back_to_list),
                 onClick = onClose,
                 icon = painterResource(R.drawable.ic_arrow_back),
             )
@@ -169,46 +161,19 @@ private fun LazyListScope.options(uiState: AddUiState, onAdd: (AddOptionUi) -> U
     }
 }
 
-/**
- * Campo grande com o rótulo em cima, em caixa alta. O TalkBack ouve o rótulo pelo próprio campo, em
- * caixa normal. Tecla "pronto" põe a primeira opção na lista.
- */
+/** Campo "Procurar produto", que abre com o teclado. Tecla "pronto" põe a primeira opção na lista. */
 @Composable
 private fun SearchField(query: String, onQueryChange: (String) -> Unit, onSubmit: () -> Unit) {
-    val colors = MaterialTheme.colorScheme
-    val tokens = ComicTheme.tokens
-    val label = stringResource(R.string.add_search_label)
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(
-            text = label.toUpperCase(LocaleList.current),
-            style = MaterialTheme.typography.labelLarge,
-            color = colors.onPrimary,
-            modifier = Modifier.clearAndSetSemantics {},
-        )
-        BasicTextField(
-            value = query,
-            onValueChange = onQueryChange,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = colors.onSurface),
-            cursorBrush = SolidColor(colors.onSurface),
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences,
-                autoCorrectEnabled = false,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(onDone = { onSubmit() }),
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester)
-                .semantics { contentDescription = label }
-                .border(tokens.thickOutline, colors.outline, MaterialTheme.shapes.medium)
-                .background(colors.surface, MaterialTheme.shapes.medium)
-                .heightIn(min = FieldMinHeight)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            decorationBox = { inner -> Box(contentAlignment = Alignment.CenterStart) { inner() } },
-        )
-    }
+    LabeledTextField(
+        label = stringResource(R.string.add_search_label),
+        value = query,
+        onValueChange = onQueryChange,
+        labelColor = MaterialTheme.colorScheme.onPrimary,
+        onImeAction = onSubmit,
+        focusRequester = focusRequester,
+    )
 }
 
 /**

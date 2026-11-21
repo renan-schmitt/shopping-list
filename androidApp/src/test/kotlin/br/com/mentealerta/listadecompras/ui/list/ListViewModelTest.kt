@@ -83,8 +83,12 @@ class ListViewModelTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun viewModel() =
-        ListViewModel(ObserveListUseCase(repository), index, SetItemCheckedUseCase(repository, undoStack))
+    private fun viewModel() = ListViewModel(
+        ObserveListUseCase(repository),
+        index,
+        SetItemCheckedUseCase(repository, undoStack),
+        UndoLastActionUseCase(repository, undoStack),
+    )
 
     @Test
     fun startsLoadingUntilTheListArrives() = runTest {
@@ -208,7 +212,7 @@ class ListViewModelTest {
         viewModel().onToggleCheck(tomato.id, checked = false)
         assertEquals(UndoableAction.ItemChecked(tomato), undoStack.lastAction.value)
 
-        UndoLastActionUseCase(repository, undoStack)()
+        viewModel().onUndo()
         assertEquals(false, stored.getValue(tomato.id).checked)
         assertNull(undoStack.lastAction.value)
     }

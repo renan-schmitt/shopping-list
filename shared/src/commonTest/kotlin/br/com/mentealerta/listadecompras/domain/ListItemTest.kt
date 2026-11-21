@@ -117,4 +117,52 @@ class ListItemTest {
         val more = item.addMore(null)
         assertEquals(item.copy(quantity = Quantity(2.0)), more)
     }
+
+    @Test
+    fun plusTurnsNoQuantityIntoTwo() {
+        assertEquals(Quantity(2.0), cassava.increaseQuantity().quantity)
+    }
+
+    @Test
+    fun plusAddsOneInTheSameUnit() {
+        val kilos = cassava.copy(quantity = Quantity(1.5, QuantityUnit.KILOGRAM))
+        assertEquals(Quantity(2.5, QuantityUnit.KILOGRAM), kilos.increaseQuantity().quantity)
+    }
+
+    @Test
+    fun plusTakesHalfToOne() {
+        val half = cassava.copy(quantity = Quantity(0.5, QuantityUnit.KILOGRAM))
+        assertEquals(Quantity(1.0, QuantityUnit.KILOGRAM), half.increaseQuantity().quantity)
+    }
+
+    @Test
+    fun minusTakesOneAway() {
+        val kilos = cassava.copy(quantity = Quantity(2.5, QuantityUnit.KILOGRAM))
+        assertEquals(Quantity(1.5, QuantityUnit.KILOGRAM), kilos.decreaseQuantity().quantity)
+        assertEquals(Quantity(0.5, QuantityUnit.KILOGRAM), kilos.decreaseQuantity().decreaseQuantity().quantity)
+    }
+
+    @Test
+    fun minusBackToOneUnitClearsTheQuantity() {
+        val two = cassava.copy(quantity = Quantity(2.0))
+        assertNull(two.decreaseQuantity().quantity)
+    }
+
+    @Test
+    fun minusBackToOneKeepsOtherUnits() {
+        val two = cassava.copy(quantity = Quantity(2.0, QuantityUnit.KILOGRAM))
+        assertEquals(Quantity(1.0, QuantityUnit.KILOGRAM), two.decreaseQuantity().quantity)
+    }
+
+    @Test
+    fun minusDoesNothingAtOneOrLess() {
+        assertFalse(cassava.canDecreaseQuantity)
+        assertEquals(cassava, cassava.decreaseQuantity())
+        val oneKilo = cassava.copy(quantity = Quantity(1.0, QuantityUnit.KILOGRAM))
+        assertFalse(oneKilo.canDecreaseQuantity)
+        assertEquals(oneKilo, oneKilo.decreaseQuantity())
+        val half = cassava.copy(quantity = Quantity(0.5, QuantityUnit.KILOGRAM))
+        assertEquals(half, half.decreaseQuantity())
+        assertTrue(cassava.increaseQuantity().canDecreaseQuantity)
+    }
 }

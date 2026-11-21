@@ -46,7 +46,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.text
@@ -93,15 +95,19 @@ private const val CHECKED_ICON_ALPHA = 0.5f
  * linha acompanha o dedo e volta ao lugar; o celular vibra e não aparece mensagem (guia de
  * linguagem). No TalkBack, tocar duas vezes na linha faz o mesmo ("Marcar como comprado" /
  * "Tirar o risco").
+ *
+ * Tocar no resto da linha abre a edição (#55, [onEdit]); no TalkBack, é a ação "Editar" da linha.
  */
 @Composable
-fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, modifier: Modifier = Modifier) {
+fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, onEdit: () -> Unit, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val name = row.detail?.let { stringResource(R.string.list_item_name_with_detail, row.name, it) } ?: row.name
     val quantity = row.quantity?.format(LocalContext.current.resources)
     val label = quantity?.let { stringResource(R.string.list_item_with_quantity, name, it.spoken) } ?: name
     val checkedDescription = stringResource(R.string.list_item_checked)
     val toggleLabel = stringResource(if (row.checked) R.string.list_item_unmark else R.string.list_item_mark_bought)
+    val editLabel = stringResource(R.string.list_item_edit)
+    val edit by rememberUpdatedState(onEdit)
     val dividerColor = colors.outlineVariant
 
     val haptic = LocalHapticFeedback.current
@@ -147,7 +153,15 @@ fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, modifier: Modifier = 
                     toggle()
                     true
                 }
+                customActions = listOf(
+                    CustomAccessibilityAction(editLabel) {
+                        edit()
+                        true
+                    },
+                )
             }
+            // Depois do clearAndSetSemantics, para o TalkBack ficar só com as ações acima.
+            .clickable(onClick = { edit() })
             // O conteúdo acompanha o dedo; o pontilhado de baixo fica parado.
             .offset { IntOffset(dragOffset.roundToInt(), 0) }
             .padding(vertical = 8.dp),
