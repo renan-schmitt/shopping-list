@@ -6,6 +6,7 @@ import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
+import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.FinishedShopping
@@ -30,9 +31,9 @@ import kotlinx.coroutines.flow.update
 import kotlin.time.Instant
 
 /**
- * Catálogo pequeno e repositório falso, com estado, para os testes da edição (#55) e do "Terminei"
- * (#57): a lista em [items], na ordem em que os itens entraram, e o histórico em [purchases]; tirar e
- * o "Ops, voltar" devolvem o item ao lugar.
+ * Catálogo pequeno e repositório falso, com estado, para os testes da edição (#55), do "Terminei"
+ * (#57) e do "Jogar a lista fora" (#58): a lista em [items], na ordem em que os itens entraram, e o
+ * histórico em [purchases]; tirar e o "Ops, voltar" devolvem o item ao lugar.
  */
 class EditFixture {
     val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -98,7 +99,11 @@ class EditFixture {
             return removedItemsOf(listOf(item))
         }
 
-        override suspend fun clear(): RemovedItems = RemovedItems.NONE
+        override suspend fun clear(): RemovedItems {
+            val all = state.value.takeIf { it.isNotEmpty() } ?: return RemovedItems.NONE
+            state.value = emptyList()
+            return removedItemsOf(all)
+        }
 
         override suspend fun restore(removed: RemovedItems) {
             state.update { list -> (list + removed.items).sortedBy { order.getValue(it.id) } }
@@ -134,6 +139,7 @@ class EditFixture {
         index,
         SetItemCheckedUseCase(repository, undoStack),
         FinishShoppingUseCase(repository, undoStack),
+        ClearListUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
     )
 }

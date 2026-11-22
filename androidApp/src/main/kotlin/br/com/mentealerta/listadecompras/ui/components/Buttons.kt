@@ -75,7 +75,9 @@ fun PrimaryButton(
  *
  * Altura mínima de 64dp (área de toque, plano §1.7); [minHeight] permite
  * igualar ao botão principal quando os dois ficam lado a lado. Desativado
- * ([enabled] falso), fica apagado e o TalkBack anuncia "desativado".
+ * ([enabled] falso), fica apagado e o TalkBack anuncia "desativado". Com
+ * [tintIcon] falso, o ícone mantém as cores dele (ex.: o cesto de lixo do
+ * "Jogar a lista fora", que é colorido).
  */
 @Composable
 fun SecondaryButton(
@@ -83,6 +85,7 @@ fun SecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: Painter? = null,
+    tintIcon: Boolean = true,
     minHeight: Dp = ComicTheme.tokens.minTouchTarget,
     enabled: Boolean = true,
 ) {
@@ -95,7 +98,7 @@ fun SecondaryButton(
         minHeight = minHeight,
         modifier = modifier,
     ) {
-        if (icon != null) ButtonIcon(icon, colors.primary)
+        if (icon != null) ButtonIcon(icon, if (tintIcon) colors.primary else Color.Unspecified)
         UppercaseText(text = text, style = MaterialTheme.typography.labelLarge, color = colors.primary)
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -39,6 +40,7 @@ import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.ui.add.AddScreen
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
+import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.UndoNotice
 import br.com.mentealerta.listadecompras.ui.components.halftone
@@ -52,7 +54,8 @@ import org.koin.compose.viewmodel.koinViewModel
  * biblioteca de navegação; elas continuam abertas numa rotação de tela.
  *
  * Produto tirado da lista na edição mostra o aviso "Feijão saiu da lista." com **Ops, voltar**; o
- * "Terminei" (#57), "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez.".
+ * "Terminei" (#57), "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez.". "Jogar a
+ * lista fora" (#58) pergunta antes e, depois, mostra "A lista foi jogada fora." com **Ops, voltar**.
  * [editScreen] é a tela de edição; os testes trocam por uma com o ViewModel deles.
  */
 @Composable
@@ -68,6 +71,7 @@ fun ListScreen(
     var adding by rememberSaveable { mutableStateOf(false) }
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var removedName by rememberSaveable { mutableStateOf<String?>(null) }
+    var askingToClear by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalContext.current.resources
 
@@ -108,12 +112,26 @@ fun ListScreen(
             onEdit = { editingId = it.value },
             onAdd = { adding = true },
             onFinish = viewModel::onFinish,
+            onClear = { askingToClear = true },
             snackbarHost = {
                 SnackbarHost(snackbarHostState) {
                     UndoNotice(it, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
                 }
             },
             modifier = modifier,
+        )
+    }
+
+    // Se a lista esvaziar com a pergunta aberta, ela some sozinha.
+    val total = (uiState as? ListUiState.Content)?.total ?: 0
+    if (askingToClear && total > 0) {
+        ClearListDialog(
+            total = total,
+            onConfirm = {
+                askingToClear = false
+                viewModel.onClearList()
+            },
+            onDismiss = { askingToClear = false },
         )
     }
 }
@@ -123,6 +141,7 @@ fun ListScreen(
  * na lista, só a primeira frase.
  */
 private fun noticeMessage(resources: Resources, notice: ListNotice): String = when (notice) {
+    ListNotice.Cleared -> resources.getString(R.string.list_cleared)
     is ListNotice.Finished -> {
         val bought = resources.getQuantityString(R.plurals.list_finished_bought, notice.bought, notice.bought)
         if (notice.remaining == 0) {
@@ -141,7 +160,8 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
 /**
  * Fundo com retícula, a folha da lista (plano §4.8) e o rodapé que se adapta (#52). [onToggleCheck]
  * recebe o produto e o estado atual dele, para riscar ou tirar o risco; [onEdit], o produto tocado.
- * [snackbarHost] mostra os avisos com "Ops, voltar" acima do rodapé. Comprando, a tela não apaga.
+ * [onClear] é o "Jogar a lista fora", no fim da folha. [snackbarHost] mostra os avisos com "Ops,
+ * voltar" acima do rodapé. Comprando, a tela não apaga.
  */
 @Composable
 fun ListContent(
@@ -151,6 +171,7 @@ fun ListContent(
     onEdit: (ListItemId) -> Unit = {},
     onAdd: () -> Unit = {},
     onFinish: () -> Unit = {},
+    onClear: () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
@@ -185,7 +206,7 @@ fun ListContent(
                 when (uiState) {
                     ListUiState.Loading -> Unit
                     ListUiState.Empty -> EmptyList()
-                    is ListUiState.Content -> Sheet(uiState.sections, onToggleCheck, onEdit)
+                    is ListUiState.Content -> Sheet(uiState.sections, onToggleCheck, onEdit, onClear)
                 }
             }
         }
@@ -197,6 +218,7 @@ private fun Sheet(
     sections: List<SectionUi>,
     onToggleCheck: (ListItemId, Boolean) -> Unit,
     onEdit: (ListItemId) -> Unit,
+    onClear: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -213,6 +235,17 @@ private fun Sheet(
                     onEdit = { onEdit(row.id) },
                 )
             }
+        }
+        // Longe do polegar, no fim da folha, como no protótipo: jogar fora é raro.
+        item(key = "clear", contentType = "clear") {
+            SecondaryButton(
+                text = stringResource(R.string.list_clear),
+                onClick = onClear,
+                // O mesmo cesto de lixo do produto "Lixeira" do catálogo, colorido.
+                icon = painterResource(R.drawable.catalog_fluent_wastebasket),
+                tintIcon = false,
+                modifier = Modifier.fillMaxWidth().padding(top = 36.dp, end = 4.dp, bottom = 4.dp),
+            )
         }
     }
 }

@@ -8,6 +8,7 @@ import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
+import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
@@ -33,6 +34,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import kotlin.time.Instant
@@ -76,7 +78,11 @@ class ListViewModelTest {
 
         override suspend fun remove(id: ListItemId) = RemovedItems.NONE
 
-        override suspend fun clear() = RemovedItems.NONE
+        override suspend fun clear(): RemovedItems {
+            val all = stored.values.toList().takeIf { it.isNotEmpty() } ?: return RemovedItems.NONE
+            stored.clear()
+            return RemovedItems.of(all.map { it to Instant.fromEpochSeconds(0) })
+        }
 
         override suspend fun restore(removed: RemovedItems) {
             removed.items.forEach { stored[it.id] = it }
@@ -106,6 +112,7 @@ class ListViewModelTest {
         index,
         SetItemCheckedUseCase(repository, undoStack),
         FinishShoppingUseCase(repository, undoStack),
+        ClearListUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
     )
 
@@ -262,5 +269,54 @@ class ListViewModelTest {
 
         assertNull(viewModel.notice.value)
         assertNull(undoStack.lastAction.value)
+    }
+
+    @Test
+    fun clearingTakesEverythingOutAndShowsTheNotice() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce", checked = true)
+        val beans = ListItem(ListItemId("2"), "Feijão", null, "produce")
+        listOf(tomato, beans).forEach { stored[it.id] = it }
+        val viewModel = viewModel()
+
+        viewModel.onClearList()
+
+        assertEquals(ListNotice.Cleared, viewModel.notice.value)
+        assertTrue(stored.isEmpty())
+        viewModel.onUndo()
+        assertEquals(setOf(tomato, beans), stored.values.toSet())
+    }
+
+    @Test
+    fun clearingAnEmptyListShowsNothing() = runTest {
+        val viewModel = viewModel()
+
+        viewModel.onClearList()
+
+        assertNull(viewModel.notice.value)
+        assertNull(undoStack.lastAction.value)
+    }
+
+    @Test
+    fun totalCountsCheckedAndUncheckedItems() {
+        val state = ListUiState.Content(
+            listOf(
+                SectionUi(
+                    "produce",
+                    "Hortifrúti",
+                    listOf(
+                        ListRowUi(ListItemId("1"), "Tomate", checked = true, icon = R.drawable.ic_add),
+                        ListRowUi(ListItemId("2"), "Couve", icon = R.drawable.ic_add),
+                    ),
+                ),
+                SectionUi(
+                    "pantry",
+                    "Mercearia",
+                    listOf(ListRowUi(ListItemId("3"), "Feijão", icon = R.drawable.ic_add)),
+                ),
+            ),
+        )
+
+        assertEquals(3, state.total)
+        assertEquals(2, state.remaining)
     }
 }

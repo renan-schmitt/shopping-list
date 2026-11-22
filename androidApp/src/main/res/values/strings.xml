@@ -40,6 +40,20 @@
     </plurals>
     <!-- Junta as duas frases do aviso do "Terminei": "Pronto! 8 produtos comprados." + "Ficaram 3…" -->
     <string name="list_finished">%1$s %2$s</string>
+    <!-- Botão no fim da folha (#58): a única ação que pede confirmação (guia de linguagem) -->
+    <string name="list_clear">Jogar a lista fora</string>
+    <!-- Título da confirmação de jogar a lista fora -->
+    <string name="list_clear_question">Jogar a lista fora?</string>
+    <!-- Abaixo do título da confirmação: quantos produtos saem, riscados ou não -->
+    <plurals name="list_clear_count">
+        <item quantity="one">O produto será tirado.</item>
+        <item quantity="many">Os %d produtos serão tirados.</item>
+        <item quantity="other">Os %d produtos serão tirados.</item>
+    </plurals>
+    <string name="list_clear_yes">Sim, jogar fora</string>
+    <string name="list_clear_no">Não</string>
+    <!-- Aviso depois de jogar a lista fora, com o botão "Ops, voltar" -->
+    <string name="list_cleared">A lista foi jogada fora.</string>
     <!-- Ação do TalkBack para abrir a edição do produto (#55) -->
     <string name="list_item_edit">Editar</string>
     <!-- Aviso depois de tirar o produto da lista, com o botão "Ops, voltar" -->

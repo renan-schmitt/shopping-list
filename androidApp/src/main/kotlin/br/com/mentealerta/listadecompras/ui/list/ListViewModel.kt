@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
+import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
@@ -35,6 +36,9 @@ sealed interface ListUiState {
     data class Content(val sections: List<SectionUi>) : ListUiState {
         val isShopping: Boolean = sections.any { section -> section.rows.any { it.checked } }
         val remaining: Int = sections.sumOf { section -> section.rows.count { !it.checked } }
+
+        /** Todos os produtos, riscados ou não: os que saem ao jogar a lista fora (#58). */
+        val total: Int = sections.sumOf { it.rows.size }
     }
 }
 
@@ -55,17 +59,22 @@ data class ListRowUi(
 sealed interface ListNotice {
     /** "Terminei" (#57): [bought] produtos comprados, [remaining] ficaram na lista. */
     data class Finished(val bought: Int, val remaining: Int) : ListNotice
+
+    /** "Jogar a lista fora" (#58). */
+    data object Cleared : ListNotice
 }
 
 /**
  * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. Riscar e tirar
- * o risco (#51) e o "Terminei" (#57) entram na pilha do "Ops, voltar"; [onUndo] desfaz a última ação.
+ * o risco (#51), o "Terminei" (#57) e o "Jogar a lista fora" (#58) entram na pilha do "Ops, voltar";
+ * [onUndo] desfaz a última ação.
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
     catalogIndex: CatalogIndex,
     private val setItemChecked: SetItemCheckedUseCase,
     private val finishShopping: FinishShoppingUseCase,
+    private val clearList: ClearListUseCase,
     private val undoLastAction: UndoLastActionUseCase,
 ) : ViewModel() {
     private val mutableNotice = MutableStateFlow<ListNotice?>(null)
@@ -96,6 +105,13 @@ class ListViewModel(
     fun onFinish() {
         viewModelScope.launch {
             finishShopping()?.let { mutableNotice.value = ListNotice.Finished(it.bought, it.remaining) }
+        }
+    }
+
+    /** "Sim, jogar fora" da confirmação: tira todos os produtos, riscados ou não, e mostra o aviso. */
+    fun onClearList() {
+        viewModelScope.launch {
+            if (clearList()) mutableNotice.value = ListNotice.Cleared
         }
     }
 

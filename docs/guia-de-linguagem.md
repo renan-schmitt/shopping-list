@@ -50,6 +50,7 @@
 | Produto riscado | *(só o risco e a vibração, sem mensagem)* |
 | Produto tirado da lista | "Feijão saiu da lista." · **Ops, voltar** |
 | Jogar a lista fora | "Jogar a lista fora? Os 12 produtos serão tirados." · **Sim, jogar fora** · **Não** |
+| Lista jogada fora | "A lista foi jogada fora." · **Ops, voltar** |
 | Terminei | "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |
 | Voz sem internet (e sem a voz baixada) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
