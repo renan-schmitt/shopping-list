@@ -1,0 +1,24 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 9L11 6H25L21 9H7Z" fill="url(#ob_top)"/>
+<path d="M21 9L25 6V26L21 29V9Z" fill="url(#ob_side)"/>
+<path d="M7 9H21V29H8.5C7.67 29 7 28.33 7 27.5V9Z" fill="url(#ob_front)"/>
+<rect x="8.6" y="10.8" width="10.8" height="2.2" rx="1.1" fill="#2C6FB8"/>
+<ellipse cx="14" cy="20.4" rx="5.2" ry="5.4" fill="#F7EBCF"/>
+<ellipse cx="14" cy="20.4" rx="5.2" ry="5.4" stroke="#FFFFFF" stroke-width="0.8"/>
+<g fill="url(#ob_flake)">
+<path d="M10.8 18.6C11.2 17.6 12.8 17.4 13.2 18.4C13.5 19.2 12.4 19.9 11.6 19.7C11 19.6 10.6 19.1 10.8 18.6Z"/>
+<path d="M15 17.6C15.4 16.6 17 16.4 17.4 17.4C17.7 18.2 16.6 18.9 15.8 18.7C15.2 18.6 14.8 18.1 15 17.6Z"/>
+<path d="M12.8 21.6C13.2 20.6 14.8 20.4 15.2 21.4C15.5 22.2 14.4 22.9 13.6 22.7C13 22.6 12.6 22.1 12.8 21.6Z"/>
+<path d="M16.2 20.8C16.6 19.8 18.2 19.6 18.6 20.6C18.9 21.4 17.8 22.1 17 21.9C16.4 21.8 16 21.3 16.2 20.8Z"/>
+<path d="M10.6 22.4C11 21.4 12.6 21.2 13 22.2C13.3 23 12.2 23.7 11.4 23.5C10.8 23.4 10.4 22.9 10.6 22.4Z"/>
+<path d="M14.2 23.6C14.6 22.6 16.2 22.4 16.6 23.4C16.9 24.2 15.8 24.9 15 24.7C14.4 24.6 14 24.1 14.2 23.6Z"/>
+<path d="M12.4 16.2C12.8 15.2 14.4 15 14.8 16C15.1 16.8 14 17.5 13.2 17.3C12.6 17.2 12.2 16.7 12.4 16.2Z"/>
+</g>
+<path d="M8.2 14.6V27.4" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="ob_top" x1="7" y1="7.5" x2="25" y2="7.5" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE9A0"/><stop offset="1" stop-color="#F5CD5A"/></linearGradient>
+<linearGradient id="ob_side" x1="21" y1="17.5" x2="25" y2="17.5" gradientUnits="userSpaceOnUse"><stop stop-color="#D79A22"/><stop offset="1" stop-color="#B07A12"/></linearGradient>
+<linearGradient id="ob_front" x1="7" y1="19" x2="21" y2="19" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD866"/><stop offset="1" stop-color="#F0B42E"/></linearGradient>
+<linearGradient id="ob_flake" x1="10" y1="15" x2="19" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#E8CC92"/><stop offset="1" stop-color="#C9A462"/></linearGradient>
+</defs>
+</svg>

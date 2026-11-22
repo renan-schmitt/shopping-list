@@ -165,7 +165,7 @@ empada,Empada,bakery,350,fluent:Pie,approx,active,,Torta no lugar da empadinha
 coxinha,Coxinha,bakery,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 esfiha,Esfiha,bakery,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 sandwich,Sanduíche natural,bakery,380,fluent:Sandwich,exact,active,,
-ground_beef,Carne moída,meat,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+ground_beef,Carne moída,meat,10,own:ground_beef,exact,active,,
 beef_steak,Bife,meat,20,fluent:Cut of meat,exact,active,,
 picanha,Picanha,meat,30,fluent:Cut of meat,exact,active,,
 top_sirloin,Alcatra,meat,40,fluent:Cut of meat,exact,active,,
@@ -184,11 +184,11 @@ hump,Cupim,meat,160,fluent:Cut of meat,approx,active,,Bife genérico
 beef_ribs,Costela,meat,170,fluent:Meat on bone,approx,active,,Carne no osso genérica
 oxtail,Rabada,meat,180,fluent:Meat on bone,approx,active,,Carne no osso genérica
 cow_foot,Mocotó,meat,190,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-beef_liver,Fígado,meat,200,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+beef_liver,Fígado,meat,200,own:liver,exact,active,,
 tripe,Dobradinha,meat,210,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-sun_dried_beef,Carne de sol,meat,220,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-dried_beef,Carne-seca,meat,230,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-jerked_beef,Charque,meat,240,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sun_dried_beef,Carne de sol,meat,220,own:dried_beef,approx,active,,Manta de carne-seca no lugar da carne de sol
+dried_beef,Carne-seca,meat,230,own:dried_beef,exact,active,,
+jerked_beef,Charque,meat,240,own:dried_beef,exact,active,,
 goat_meat,Carne de bode,meat,250,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
 lamb,Carne de carneiro,meat,260,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 pork_loin,Lombo,meat,270,fluent:Cut of meat,approx,active,,Bife genérico
@@ -215,9 +215,9 @@ chicken_drumstick,Coxa de frango,meat,460,fluent:Poultry leg,exact,active,,
 chicken_thigh,Sobrecoxa,meat,470,fluent:Poultry leg,approx,active,,Coxa no lugar da sobrecoxa
 chicken_wing,Asa de frango,meat,480,fluent:Poultry leg,approx,active,,Coxa no lugar da asa
 chicken_drumette,Coxinha da asa,meat,490,fluent:Poultry leg,exact,active,,
-chicken_heart,Coração de frango,meat,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-chicken_liver,Fígado de frango,meat,510,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-chicken_gizzard,Moela,meat,520,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+chicken_heart,Coração de frango,meat,500,own:chicken_giblets,exact,active,,
+chicken_liver,Fígado de frango,meat,510,own:liver,approx,active,,Fígado de boi no lugar do de frango
+chicken_gizzard,Moela,meat,520,own:chicken_giblets,exact,active,,
 turkey,Peru,meat,530,fluent:Poultry leg,approx,active,,Coxa no lugar do peru inteiro
 garlic_bread,Pão de alho,meat,540,,,active,,"Sem ícone Fluent; candidata ao complemento próprio; fica junto do açougue, para o churrasco"
 fish,Peixe,meat,550,fluent:Fish,exact,active,,
@@ -259,7 +259,7 @@ curd,Coalhada,deli_dairy,110,own:yogurt_cup,approx,active,,Pote de iogurte no lu
 butter,Manteiga,deli_dairy,120,fluent:Butter,exact,active,,
 clarified_butter,Manteiga de garrafa,deli_dairy,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
 margarine,Margarina,deli_dairy,140,own:margarine_tub,exact,active,,
-fresh_cream,Creme de leite fresco,deli_dairy,150,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+fresh_cream,Creme de leite fresco,deli_dairy,150,own:cream_box,approx,active,,Caixinha no lugar do frasco do creme fresco
 cream_cheese_spread,Requeijão,deli_dairy,160,own:cream_cheese_cup,exact,active,,
 cream_cheese,Cream cheese,deli_dairy,170,own:cream_cheese_cup,approx,active,,Copo de requeijão no lugar do pote de cream cheese
 cheese,Queijo,deli_dairy,180,fluent:Cheese wedge,exact,active,,
@@ -483,7 +483,7 @@ lentil,Lentilha,pantry,110,fluent:Beans,approx,active,,"Grãos soltos, não o pa
 chickpea,Grão-de-bico,pantry,120,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
 dried_peas,Ervilha seca,pantry,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 textured_soy,Proteína de soja,pantry,140,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-oats,Aveia,pantry,150,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+oats,Aveia,pantry,150,own:oats_box,exact,active,,
 granola,Granola,pantry,160,fluent:Bowl with spoon,approx,active,,Tigela no lugar do pacote
 breakfast_cereal,Cereal matinal,pantry,170,fluent:Bowl with spoon,approx,active,,Tigela no lugar da caixa
 popcorn_kernels,Milho de pipoca,pantry,180,fluent:Popcorn,approx,active,,"Pipoca pronta, não o grão"
@@ -504,12 +504,12 @@ sweet_cassava_starch,Polvilho doce,pantry,320,,,active,,Sem ícone Fluent; candi
 sour_cassava_starch,Polvilho azedo,pantry,330,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 granulated_tapioca,Tapioca granulada,pantry,350,own:tapioca_starch,approx,active,,Saco de goma no lugar do pacote de flocos
 sago,Sagu,pantry,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-baking_powder,Fermento em pó,pantry,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-dry_yeast,Fermento biológico,pantry,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+baking_powder,Fermento em pó,pantry,370,own:baking_powder_can,exact,active,,
+dry_yeast,Fermento biológico,pantry,380,own:baking_powder_can,approx,active,,Lata de fermento em pó no lugar do sachê
 cake_mix,Mistura para bolo,pantry,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 gelatin,Gelatina,pantry,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 pudding_mix,Pó para pudim,pantry,410,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-malted_milk_flour,Farinha láctea,pantry,420,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+malted_milk_flour,Farinha láctea,pantry,420,own:powdered_milk_can,approx,active,,Lata de leite em pó no lugar da farinha láctea
 pasta,Macarrão,pantry,430,fluent:Spaghetti,approx,active,,"Prato de espaguete, não o pacote"
 spaghetti,Espaguete,pantry,440,fluent:Spaghetti,approx,active,,"Prato de espaguete, não o pacote"
 fusilli,Macarrão parafuso,pantry,450,fluent:Spaghetti,approx,active,,"Prato de espaguete, não o pacote"
@@ -520,9 +520,9 @@ instant_noodles,Macarrão instantâneo,pantry,490,fluent:Steaming bowl,approx,ac
 tomato_sauce,Molho de tomate,pantry,500,own:tomato_sauce,exact,active,,
 tomato_paste,Extrato de tomate,pantry,510,own:tomato_sauce,approx,active,,Caixinha de molho no lugar da latinha ou do sachê
 peeled_tomatoes,Tomate pelado,pantry,520,fluent:Canned food,approx,active,,Lata genérica
-mayonnaise,Maionese,pantry,530,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-ketchup,Ketchup,pantry,540,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-mustard,Mostarda,pantry,550,,,active,,Sem ícone Fluent; candidata ao complemento próprio; a folha fica no Hortifrúti
+mayonnaise,Maionese,pantry,530,own:sauce_squeeze_bottle,exact,active,,
+ketchup,Ketchup,pantry,540,own:sauce_squeeze_bottle,approx,active,,Bisnaga da maionese; falta a cor do ketchup
+mustard,Mostarda,pantry,550,own:sauce_squeeze_bottle,approx,active,,Bisnaga da maionese; falta a cor da mostarda; a folha fica no Hortifrúti
 soy_sauce,Molho shoyu,pantry,560,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 hot_sauce,Molho de pimenta,pantry,570,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 worcestershire_sauce,Molho inglês,pantry,580,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -534,29 +534,29 @@ lard,Banha,pantry,630,,,active,,Sem ícone Fluent; candidata ao complemento pró
 coconut_milk,Leite de coco,pantry,640,fluent:Coconut,approx,active,,Coco no lugar do vidrinho
 grated_coconut,Coco ralado,pantry,650,fluent:Coconut,approx,active,,Coco no lugar do pacote
 condensed_milk,Leite condensado,pantry,660,fluent:Canned food,approx,active,,Lata genérica
-table_cream,Creme de leite,pantry,670,,,active,,Sem ícone Fluent; candidata ao complemento próprio; o fresco fica em Frios e laticínios
-powdered_milk,Leite em pó,pantry,680,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+table_cream,Creme de leite,pantry,670,own:cream_box,exact,active,,O fresco fica em Frios e laticínios
+powdered_milk,Leite em pó,pantry,680,own:powdered_milk_can,exact,active,,
 salt,Sal,pantry,690,fluent:Salt,exact,active,,
 coarse_salt,Sal grosso,pantry,700,fluent:Salt,approx,active,,Saleiro no lugar do pacote
 sugar,Açúcar,pantry,710,own:sugar_package,exact,active,,
 brown_sugar,Açúcar mascavo,pantry,720,own:sugar_package,approx,active,,Pacote de açúcar branco; o mascavo é escuro
 demerara_sugar,Açúcar demerara,pantry,730,own:sugar_package,approx,active,,Pacote de açúcar branco; o demerara é dourado
-sweetener,Adoçante,pantry,740,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sweetener,Adoçante,pantry,740,own:sweetener,exact,active,,
 honey,Mel,pantry,750,fluent:Honey pot,exact,active,,
 cane_syrup,Melado,pantry,755,fluent:Honey pot,approx,active,,Pote de mel no lugar do melado de cana
 rapadura,Rapadura,pantry,760,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-black_pepper,Pimenta-do-reino,pantry,770,,,active,,Sem ícone Fluent; candidata ao complemento próprio; a pimenta fresca fica no Hortifrúti
-seasoning_mix,Tempero pronto,pantry,780,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-bouillon_cube,Caldo em tablete,pantry,790,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-colorau,Colorau,pantry,800,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-turmeric,Açafrão,pantry,810,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cumin,Cominho,pantry,820,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-paprika,Páprica,pantry,830,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+black_pepper,Pimenta-do-reino,pantry,770,own:spice_jar,approx,active,,Pote de tempero genérico; a pimenta fresca fica no Hortifrúti
+seasoning_mix,Tempero pronto,pantry,780,own:bouillon_cube,approx,active,,Caldo em tablete no lugar do tempero pronto
+bouillon_cube,Caldo em tablete,pantry,790,own:bouillon_cube,exact,active,,
+colorau,Colorau,pantry,800,own:spice_jar,approx,active,,Pote de tempero genérico
+turmeric,Açafrão,pantry,810,own:spice_jar,approx,active,,Pote de tempero genérico
+cumin,Cominho,pantry,820,own:spice_jar,approx,active,,Pote de tempero genérico
+paprika,Páprica,pantry,830,own:spice_jar,approx,active,,Pote de tempero genérico
 oregano,Orégano,pantry,840,fluent:Herb,approx,active,,Erva genérica
 bay_leaf,Louro,pantry,850,fluent:Herb,approx,active,,Erva genérica
-cinnamon,Canela,pantry,860,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-clove,Cravo,pantry,870,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-nutmeg,Noz-moscada,pantry,880,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cinnamon,Canela,pantry,860,own:spice_jar,approx,active,,Pote de tempero genérico
+clove,Cravo,pantry,870,own:spice_jar,approx,active,,Pote de tempero genérico
+nutmeg,Noz-moscada,pantry,880,own:spice_jar,approx,active,,Pote de tempero genérico
 canned_corn,Milho em lata,pantry,890,fluent:Canned food,exact,active,,
 canned_peas,Ervilha em lata,pantry,900,fluent:Canned food,exact,active,,
 canned_mixed_vegetables,Seleta de legumes,pantry,910,fluent:Canned food,exact,active,,
@@ -569,7 +569,7 @@ peach_in_syrup,Pêssego em calda,pantry,970,fluent:Canned food,approx,active,,La
 coffee,Café,pantry,980,own:coffee_package,exact,active,,
 instant_coffee,Café solúvel,pantry,990,fluent:Hot beverage,approx,active,,"Xícara, não o vidro"
 coffee_capsule,Café em cápsula,pantry,1000,fluent:Hot beverage,approx,active,,"Xícara, não a cápsula"
-coffee_filter,Filtro de café,pantry,1010,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+coffee_filter,Filtro de café,pantry,1010,own:coffee_filter,exact,active,,
 tea,Chá,pantry,1020,fluent:Teacup without handle,approx,active,,"Xícara, não a caixinha"
 chamomile_tea,Chá de camomila,pantry,1030,fluent:Teacup without handle,approx,active,,"Xícara, não a caixinha"
 boldo_tea,Chá de boldo,pantry,1040,fluent:Teacup without handle,approx,active,,"Xícara, não a caixinha"

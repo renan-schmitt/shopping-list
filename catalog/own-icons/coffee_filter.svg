@@ -1,0 +1,16 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.5 7.5H27.5L20.6 27.6H11.4L4.5 7.5Z" fill="url(#cf_body)"/>
+<path d="M4.5 7.5H7L13.3 27.6H11.4L4.5 7.5Z" fill="#CFA868"/>
+<path d="M5.6 10.4L7.6 9.9M6.6 13.3L8.6 12.8M7.6 16.2L9.6 15.7M8.6 19.1L10.6 18.6M9.6 22L11.6 21.5M10.6 24.9L12.6 24.4" stroke="#B48A4C" stroke-width="0.6" stroke-linecap="round"/>
+<path d="M11.4 26.4H20.9L20.6 27.6H11.4Z" fill="#CFA868"/>
+<path d="M13 26.4V27.6M15 26.4V27.6M17 26.4V27.6M19 26.4V27.6" stroke="#B48A4C" stroke-width="0.5"/>
+<path d="M17.8 10V26.2" stroke="#C69C5C" stroke-opacity="0.5" stroke-width="0.6" stroke-linecap="round"/>
+<ellipse cx="16" cy="7.5" rx="11.5" ry="2.4" fill="url(#cf_inside)"/>
+<ellipse cx="16.4" cy="8.1" rx="8" ry="1.4" fill="url(#cf_coffee)"/>
+<path d="M22.6 11.5L19.6 20.5" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+<defs>
+<linearGradient id="cf_body" x1="4.5" y1="17" x2="27.5" y2="17" gradientUnits="userSpaceOnUse"><stop stop-color="#F8E7C6"/><stop offset="0.6" stop-color="#E6C892"/><stop offset="1" stop-color="#C9A266"/></linearGradient>
+<linearGradient id="cf_inside" x1="4.5" y1="7.5" x2="27.5" y2="7.5" gradientUnits="userSpaceOnUse"><stop stop-color="#D9B77E"/><stop offset="1" stop-color="#F3DDB4"/></linearGradient>
+<linearGradient id="cf_coffee" x1="8.4" y1="8.1" x2="24.4" y2="8.1" gradientUnits="userSpaceOnUse"><stop stop-color="#5A3520"/><stop offset="1" stop-color="#7E4E2E"/></linearGradient>
+</defs>
+</svg>

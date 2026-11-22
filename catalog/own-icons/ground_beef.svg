@@ -1,0 +1,15 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="2" y="13" width="28" height="13" rx="3" fill="url(#gb_tray)"/>
+<rect x="4.2" y="14.6" width="23.6" height="8.4" rx="2" fill="#CDD5DF"/>
+<path d="M5 22C5 16.5 8.8 11.5 16 11.5C23.2 11.5 27 16.5 27 22V23H5V22Z" fill="url(#gb_meat)"/>
+<path d="M9 19.5C9.8 18.8 10.6 19.6 11.4 19M13 16.2C13.8 15.5 14.6 16.3 15.4 15.7M17.5 18.6C18.3 17.9 19.1 18.7 19.9 18.1M20.6 15.2C21.4 14.5 22.2 15.3 23 14.7M11.5 14.8C12.3 14.1 13.1 14.9 13.9 14.3M14.6 20.6C15.4 19.9 16.2 20.7 17 20.1M21.5 20.4C22.3 19.7 23.1 20.5 23.9 19.9M7.6 21.4C8.4 20.7 9.2 21.5 10 20.9M16.4 13.6C17.2 12.9 18 13.7 18.8 13.1" stroke="#F7A3A3" stroke-width="0.8" stroke-linecap="round"/>
+<path d="M10.5 17.2C11.3 16.5 12.1 17.3 12.9 16.7M15.6 17.8C16.4 17.1 17.2 17.9 18 17.3M19 21.2C19.8 20.5 20.6 21.3 21.4 20.7M18.6 15.4C19.4 14.7 20.2 15.5 21 14.9M23.2 17.6C24 16.9 24.8 17.7 25.6 17.1M7.4 18.6C8.2 17.9 9 18.7 9.8 18.1M12.2 21.8C13 21.1 13.8 21.9 14.6 21.3" stroke="#9E2A33" stroke-width="0.8" stroke-linecap="round"/>
+<path d="M8 15.5C10 13.2 12.6 12.4 15 12.3" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1" stroke-linecap="round"/>
+<path d="M2 21.6H30V23C30 24.66 28.66 26 27 26H5C3.34 26 2 24.66 2 23V21.6Z" fill="url(#gb_lip)"/>
+<path d="M4 23.2H28" stroke="#FFFFFF" stroke-opacity="0.8" stroke-width="0.6" stroke-linecap="round"/>
+<defs>
+<linearGradient id="gb_tray" x1="16" y1="13" x2="16" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#D7DEE7"/></linearGradient>
+<linearGradient id="gb_meat" x1="5" y1="12" x2="27" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#E8636B"/><stop offset="0.5" stop-color="#CF3F4A"/><stop offset="1" stop-color="#A52A36"/></linearGradient>
+<linearGradient id="gb_lip" x1="16" y1="21.6" x2="16" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#F4F7FA"/><stop offset="1" stop-color="#BAC5D2"/></linearGradient>
+</defs>
+</svg>

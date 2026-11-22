@@ -1,0 +1,27 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 11L7.2 7.8H15.2L12 11H4Z" fill="url(#bc_top)"/>
+<path d="M12 11L15.2 7.8V15.8L12 19V11Z" fill="url(#bc_side)"/>
+<path d="M4 11H12V19H5C4.45 19 4 18.55 4 18V11Z" fill="url(#bc_front)"/>
+<path d="M4 14H12V16.4H4Z" fill="#D63A2E"/>
+<path d="M12 14L15.2 10.8V13.2L12 16.4V14Z" fill="#A32A20"/>
+<path d="M15 12L18.2 8.8H26.2L23 12H15Z" fill="url(#bc_top)"/>
+<path d="M23 12L26.2 8.8V16.8L23 20V12Z" fill="url(#bc_side)"/>
+<path d="M15 12H23V20H16C15.45 20 15 19.55 15 19V12Z" fill="url(#bc_front2)"/>
+<path d="M15 15H23V17.4H15Z" fill="#D63A2E"/>
+<path d="M23 15L26.2 11.8V14.2L23 17.4V15Z" fill="#A32A20"/>
+<path d="M3.5 26.5L9.5 22.4H25.5L29 25.4L22.2 29.6H6.8Z" fill="url(#bc_foil)"/>
+<path d="M8 27.4L11 25.6M23 27.6L25.6 26M6.4 25.8L8.4 24.6" stroke="#FFF4C8" stroke-opacity="0.8" stroke-width="0.6" stroke-linecap="round"/>
+<path d="M10 19L13.2 15.8H21.2L18 19H10Z" fill="#C98642"/>
+<path d="M18 19L21.2 15.8V23.8L18 27V19Z" fill="#7A4718"/>
+<path d="M10 19H18V27H10Z" fill="url(#bc_cube)"/>
+<g fill="#6A3C14"><circle cx="12" cy="21.4" r="0.35"/><circle cx="15.4" cy="22.6" r="0.3"/><circle cx="13.2" cy="24.8" r="0.35"/><circle cx="16.4" cy="25.4" r="0.3"/></g>
+<path d="M5 12V17.6M16 13V18.6" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="0.8" stroke-linecap="round"/>
+<defs>
+<linearGradient id="bc_top" x1="4" y1="9.4" x2="26" y2="9.4" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF0B0"/><stop offset="1" stop-color="#F1CD6A"/></linearGradient>
+<linearGradient id="bc_side" x1="12" y1="14" x2="26" y2="14" gradientUnits="userSpaceOnUse"><stop stop-color="#C79430"/><stop offset="1" stop-color="#9E7016"/></linearGradient>
+<linearGradient id="bc_front" x1="4" y1="15" x2="12" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#FBDF86"/><stop offset="1" stop-color="#DDA93C"/></linearGradient>
+<linearGradient id="bc_front2" x1="15" y1="16" x2="23" y2="16" gradientUnits="userSpaceOnUse"><stop stop-color="#FBDF86"/><stop offset="1" stop-color="#DDA93C"/></linearGradient>
+<linearGradient id="bc_foil" x1="3.5" y1="26" x2="29" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#FCE596"/><stop offset="0.5" stop-color="#E9C25A"/><stop offset="1" stop-color="#C79430"/></linearGradient>
+<linearGradient id="bc_cube" x1="10" y1="23" x2="18" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#B8763A"/><stop offset="1" stop-color="#93591F"/></linearGradient>
+</defs>
+</svg>

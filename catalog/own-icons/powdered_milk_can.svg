@@ -1,0 +1,16 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 9.5H24V27C24 28.4 20.4 29.5 16 29.5C11.6 29.5 8 28.4 8 27V9.5Z" fill="url(#pm_body)"/>
+<path d="M8 17C10 18.2 13 18.6 16 18.2C19 17.8 21.5 17 24 17.6V27C24 28.4 20.4 29.5 16 29.5C11.6 29.5 8 28.4 8 27V17Z" fill="url(#pm_band)"/>
+<path d="M16 20.2C16 20.2 14 22.8 14 24.2C14 25.3 14.9 26.2 16 26.2C17.1 26.2 18 25.3 18 24.2C18 22.8 16 20.2 16 20.2Z" fill="#FFFFFF"/>
+<rect x="11" y="12.6" width="10" height="1.8" rx="0.9" fill="#2A63C4"/>
+<rect x="12.5" y="15.2" width="7" height="1.2" rx="0.6" fill="#9DBBE6"/>
+<path d="M7.4 7.5H24.6V9.6C24.6 10.9 20.7 11.9 16 11.9C11.3 11.9 7.4 10.9 7.4 9.6V7.5Z" fill="url(#pm_lid_side)"/>
+<ellipse cx="16" cy="7.5" rx="8.6" ry="2.3" fill="url(#pm_lid_top)"/>
+<path d="M9.6 13V26.8" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="1" stroke-linecap="round"/>
+<defs>
+<linearGradient id="pm_body" x1="8" y1="19" x2="24" y2="19" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="0.6" stop-color="#EEF2F7"/><stop offset="1" stop-color="#C3CEDC"/></linearGradient>
+<linearGradient id="pm_band" x1="8" y1="23" x2="24" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#4A8CF0"/><stop offset="0.6" stop-color="#3271D6"/><stop offset="1" stop-color="#1F4E9E"/></linearGradient>
+<linearGradient id="pm_lid_side" x1="7.4" y1="9.7" x2="24.6" y2="9.7" gradientUnits="userSpaceOnUse"><stop stop-color="#F7C948"/><stop offset="1" stop-color="#D49A12"/></linearGradient>
+<linearGradient id="pm_lid_top" x1="7.4" y1="7.5" x2="24.6" y2="7.5" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE38A"/><stop offset="1" stop-color="#F2B92A"/></linearGradient>
+</defs>
+</svg>
