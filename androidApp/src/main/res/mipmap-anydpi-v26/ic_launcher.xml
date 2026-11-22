@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícone do app: arte da família Mente Alerta (plano §4.8, #10).
+     Sem camada de uma cor: a ilustração não vira silhueta, e o celular mostra o ícone colorido.
+     Fica em -v26: sem o qualificador, o build de release não encontra o ícone. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MonochromeLauncherIcon">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>

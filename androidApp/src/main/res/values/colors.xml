@@ -4,4 +4,6 @@
     <!-- Seta do "Voltar para a lista" (#122): verde-folha com contorno de tinta -->
     <color name="back_arrow_fill">#2E6B3A</color>
     <color name="back_arrow_outline">#141414</color>
+    <!-- Fundo do ícone do app (#10): azul-petróleo da borda da arte -->
+    <color name="ic_launcher_background">#02979F</color>
 </resources>
