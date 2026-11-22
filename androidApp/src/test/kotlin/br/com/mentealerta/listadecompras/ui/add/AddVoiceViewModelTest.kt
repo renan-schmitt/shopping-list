@@ -188,11 +188,11 @@ class AddVoiceViewModelTest {
     @Test
     fun everythingSaidEntersTheListWhenDone() {
         val viewModel = listening()
-        voice.say(VoiceEvent.Heard(listOf("bananas e maçã")), VoiceEvent.Heard(listOf("duas bananas")))
+        voice.say(VoiceEvent.Heard(listOf("bananas e maçã")), VoiceEvent.Heard(listOf("duas bergamotas")))
 
         viewModel.onSpeakRelease(short = false)
 
-        assertEquals(listOf("banana", "apple", "banana"), fixture.added.map { it.productId })
+        assertEquals(listOf("banana", "apple", null), fixture.added.map { it.productId })
         assertEquals(Quantity(2.0), fixture.added.last().quantity)
         val state = viewModel.uiState.value
         assertNull(state.voice)
@@ -208,6 +208,66 @@ class AddVoiceViewModelTest {
         viewModel.onSpeakRelease(short = false)
 
         assertEquals(listOf("maçã", "bananas"), viewModel.added.value.map { it.name })
+    }
+
+    @Test
+    fun whatIsAlreadyOnTheListDoesNotEnterAgain() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        val banana = fixture.items.single()
+        fixture.voicePreferences.noticeShown = true
+        viewModel.onSpeakPress(hasMicrophone = true)
+        voice.say(VoiceEvent.Heard(listOf("bananas e maçã")))
+
+        viewModel.onSpeakRelease()
+
+        assertEquals(listOf("banana", "apple"), fixture.items.map { it.productId })
+        assertEquals(banana, fixture.items.first())
+        assertEquals(AddedUi("maçã", count = 1, alreadyOnList = listOf("Banana")), viewModel.uiState.value.lastAdded)
+    }
+
+    @Test
+    fun repeatedInTheSameSpeechEntersOnce() {
+        val viewModel = listening()
+        voice.say(VoiceEvent.Heard(listOf("banana maçã e banana")))
+
+        viewModel.onSpeakRelease()
+
+        assertEquals(listOf("banana", "apple"), fixture.items.map { it.productId })
+        assertEquals(2, viewModel.uiState.value.lastAdded?.count)
+    }
+
+    @Test
+    fun checkedItemDoesNotCountAsAlreadyOnTheList() = runTest {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        fixture.check(fixture.items.single().id)
+        fixture.voicePreferences.noticeShown = true
+        viewModel.onSpeakPress(hasMicrophone = true)
+        voice.say(VoiceEvent.Heard(listOf("banana")))
+
+        viewModel.onSpeakRelease()
+
+        assertEquals(2, fixture.items.size)
+        assertEquals(emptyList<String>(), viewModel.uiState.value.lastAdded?.alreadyOnList)
+    }
+
+    @Test
+    fun everythingAlreadyOnTheListOnlySaysSo() {
+        val viewModel = fixture.viewModel()
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        fixture.voicePreferences.noticeShown = true
+        viewModel.onSpeakPress(hasMicrophone = true)
+        voice.say(VoiceEvent.Heard(listOf("banana")))
+
+        viewModel.onSpeakRelease()
+
+        assertEquals(1, fixture.items.size)
+        assertEquals(AddedUi("", count = 0, alreadyOnList = listOf("Banana")), viewModel.uiState.value.lastAdded)
+        assertNull(viewModel.uiState.value.voice)
     }
 
     @Test

@@ -63,7 +63,16 @@ data class AddUiState(
  * O que entrou na lista: [again] quando a pessoa respondeu "Sim, mais um". Pela voz podem entrar
  * vários de uma vez: com [count] maior que 1, o aviso diz quantos ("Adicionados: 3 produtos.").
  */
-data class AddedUi(val name: String, val again: Boolean = false, val count: Int = 1)
+data class AddedUi(
+    val name: String,
+    val again: Boolean = false,
+    val count: Int = 1,
+    /**
+     * Falados que já estavam na lista e não entraram de novo (#127), com o nome que têm na lista.
+     * Com [count] 0, nada entrou: o aviso só diz o que já estava.
+     */
+    val alreadyOnList: List<String> = emptyList(),
+)
 
 /** Etapas de falar os produtos (#60, plano §3.3). */
 sealed interface VoiceUi {
@@ -114,7 +123,8 @@ data class AddOptionUi(
  * Falar (#60, #123): segurar o botão abre o microfone e soltar fecha. Quem usa o TalkBack toca para
  * abrir e toca para fechar. Na primeira vez pelo serviço padrão, vem antes a explicação do microfone
  * ([VoicePreferences]); depois, o pedido de microfone do Android, se faltar. O [ParseSpeechUseCase]
- * separa os produtos, que entram direto na lista. (A conferência antes de pôr na lista é a #61.)
+ * separa os produtos, que entram direto na lista, menos os que já estão nela (#127). (A conferência
+ * antes de pôr na lista é a #61.)
  *
  * O que entrou desde que a tela abriu aparece em [added] ("Adicionados", #122), o mais recente no
  * topo, como está na lista agora ([ObserveListUseCase]): com a quantidade nova depois do "Sim, mais
@@ -361,11 +371,33 @@ class AddViewModel(
             if (items.isEmpty()) {
                 _uiState.update { it.copy(voice = problem ?: VoiceUi.Message.NOT_UNDERSTOOD) }
             } else {
-                addMutex.withLock { remember(addItems(items).map { it.id }) }
-                val added = AddedUi(name = items.first().name, count = items.size)
+                val added = addMutex.withLock { addSpoken(items) }
                 _uiState.update { it.copy(voice = problem, lastAdded = added) }
             }
         }
+    }
+
+    /**
+     * Põe na lista o que foi falado, um por vez, menos o que já está nela (#127): o mesmo do "Não"
+     * na pergunta de produto repetido. Um por vez, para o repetido na mesma fala também ficar de fora.
+     */
+    private suspend fun addSpoken(items: List<ParsedItem>): AddedUi {
+        val entered = mutableListOf<ParsedItem>()
+        val alreadyOnList = mutableListOf<String>()
+        items.forEach { item ->
+            val same = findSameItem(item)
+            if (same == null) {
+                remember(addItems(listOf(item)).map { it.id })
+                entered += item
+            } else if (same.name !in alreadyOnList) {
+                alreadyOnList += same.name
+            }
+        }
+        return AddedUi(
+            name = entered.firstOrNull()?.name.orEmpty(),
+            count = entered.size,
+            alreadyOnList = alreadyOnList,
+        )
     }
 
     /**

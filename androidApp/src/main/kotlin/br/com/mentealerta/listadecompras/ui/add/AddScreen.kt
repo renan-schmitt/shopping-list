@@ -344,20 +344,28 @@ private fun SearchField(
 @Composable
 private fun AddedNotice(added: AddedUi?) {
     val text = when {
-        added == null -> ""
+        added == null || added.count == 0 -> null
         added.count > 1 -> pluralStringResource(R.plurals.add_added_many, added.count, added.count)
         added.again -> stringResource(R.string.add_added_again, added.name.capitalized())
         else -> stringResource(R.string.add_added, added.name.capitalized())
     }
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.primary,
+    val already = added?.alreadyOnList.orEmpty()
+    val alreadyText = when {
+        already.isEmpty() -> null
+        already.size == 1 -> stringResource(R.string.add_already_on_list, already.single().capitalized())
+        else -> pluralStringResource(R.plurals.add_already_on_list_many, already.size, already.size)
+    }
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = if (added == null) 0.dp else 8.dp)
-            .semantics { liveRegion = LiveRegionMode.Polite },
-    )
+            .semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        listOfNotNull(text, alreadyText).forEach {
+            Text(text = it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+        }
+    }
 }
 
 /**

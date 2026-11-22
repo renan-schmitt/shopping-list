@@ -113,6 +113,13 @@
     <string name="add_voice_downloading">Estou baixando a voz para ouvir sem internet. Você pode escrever enquanto isso.</string>
     <!-- O microfone ou o serviço de voz não funcionaram (ocupado, outro erro) -->
     <string name="add_voice_unavailable">Não deu certo ouvir agora. Você pode escrever.</string>
+    <!-- Falado que já estava na lista e não entrou de novo (#127); com vários, o add_already_on_list_many -->
+    <string name="add_already_on_list">%1$s já estava na lista.</string>
+    <plurals name="add_already_on_list_many">
+        <item quantity="one">%d produto já estava na lista.</item>
+        <item quantity="many">%d produtos já estavam na lista.</item>
+        <item quantity="other">%d produtos já estavam na lista.</item>
+    </plurals>
     <!-- Aviso depois de falar vários produtos de uma vez (com um só, vale o add_added) -->
     <plurals name="add_added_many">
         <item quantity="one">Adicionado: %d produto.</item>

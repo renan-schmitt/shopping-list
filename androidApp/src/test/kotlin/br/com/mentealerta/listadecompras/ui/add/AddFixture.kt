@@ -63,6 +63,13 @@ class AddFixture {
     /** Muda a cada escrita, para a lista observada ("Adicionados") emitir de novo. */
     private val version = MutableStateFlow(0)
 
+    /** Risca o item, como na lista. */
+    fun check(id: ListItemId) {
+        val index = items.indexOfFirst { it.id == id }
+        items[index] = items[index].copy(checked = true)
+        version.value++
+    }
+
     /** Tira o item da lista, como o "Tirar da lista" faria em outra tela. */
     fun remove(id: ListItemId) {
         items.removeAll { it.id == id }

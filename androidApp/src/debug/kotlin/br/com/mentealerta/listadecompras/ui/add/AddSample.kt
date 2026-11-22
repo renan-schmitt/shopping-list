@@ -49,6 +49,9 @@ val SampleAdded = listOf(
     ),
 )
 
+/** Depois de falar "leite, feijão e ovos" com o leite já na lista (#127): o que entrou e o que já estava. */
+val SampleAddAlreadyOnListState = AddUiState(lastAdded = AddedUi("feijão", count = 2, alreadyOnList = listOf("Leite")))
+
 /** Nada achado: só a opção de pôr o texto como está. */
 val SampleAddNothingFoundState = AddUiState(
     query = "bergamota",

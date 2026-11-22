@@ -49,6 +49,7 @@
 | Lista vazia | Título **Lista de Compras** · "Toque em **Adicionar** para começar sua lista." (2026-11-22) |
 | Campo da tela de adicionar | "Digite ou fale o que quer comprar." · resultados sob **Adicionar na lista de compras** · lista **Adicionados** (2026-11-22) |
 | Produto posto na lista | "Adicionado: Farinha." (serve para masculino e feminino; 2026-11-22) |
+| Falado que já estava na lista (não entra de novo) | "Leite já estava na lista." · com vários, "2 produtos já estavam na lista." — em outra linha, depois do que entrou (2026-11-22, #127) |
 | Produtos riscados | Seção **Já peguei**, no fim da lista (2026-11-22) |
 | Mudar produtos da lista | Botão **Mudar a lista** (não "Corrigir": a pessoa não errou); **Jogar a lista fora** fica lá dentro (2026-11-22) |
 | Produto riscado | *(só o risco e a vibração, sem mensagem)* |

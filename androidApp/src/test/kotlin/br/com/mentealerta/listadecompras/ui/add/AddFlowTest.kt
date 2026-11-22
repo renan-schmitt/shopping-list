@@ -309,6 +309,27 @@ class AddFlowTest {
     }
 
     @Test
+    fun spokenProductAlreadyOnTheListIsNotRepeated() {
+        grantMicrophone()
+        fixture.voicePreferences.noticeShown = true
+        show()
+        field.performTextInput("banana")
+        compose.onNode(hasText("Banana") and hasClickAction()).performClick()
+        speakButton().performTouchInput { down(center) }
+        fixture.voice.say(VoiceEvent.Heard(listOf("banana e maçã")))
+
+        speakButton("Terminei").performTouchInput {
+            advanceEventTime(1_000)
+            up()
+        }
+
+        assertEquals(listOf("banana", "apple"), fixture.items.map { it.productId })
+        compose.onNodeWithText("Adicionado: Maçã.", substring = true).assertExists()
+        compose.onNodeWithText("Banana já estava na lista.", substring = true)
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+    }
+
+    @Test
     fun notUnderstoodAsksToSpeakAgain() {
         grantMicrophone()
         fixture.voicePreferences.noticeShown = true

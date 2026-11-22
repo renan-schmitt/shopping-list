@@ -105,6 +105,16 @@ class AddScreenshotTest {
     @Config(qualifiers = "+night", fontScale = 1.0f)
     fun added_dark_font100() = capture("added_dark_font100", SampleAddAddedState, SampleAdded)
 
+    @Test
+    @Config(fontScale = 1.0f)
+    fun alreadyOnList_light_font100() =
+        capture("already_on_list_light_font100", SampleAddAlreadyOnListState, SampleAdded)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun alreadyOnList_light_font200() =
+        capture("already_on_list_light_font200", SampleAddAlreadyOnListState, SampleAdded)
+
     private fun capture(name: String, state: AddUiState = SampleAddState, added: List<ListRowUi> = emptyList()) {
         compose.setContent { ShoppingListTheme { AddContent(state, added = added, canSpeak = true) } }
         compose.onRoot().captureRoboImage("src/test/screenshots/add_$name.png")

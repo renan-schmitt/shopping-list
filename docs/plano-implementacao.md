@@ -164,6 +164,7 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 - Ouvindo: "Estou ouvindo. Pode falar.", cada trecho entendido numa linha e **Terminei**. O TalkBack lê só o "Estou ouvindo", para o microfone não ouvir o próprio celular.
 - Recados: os do guia, mais "Sem o microfone, não consigo ouvir. Você pode escrever." (permissão negada) e "Não deu certo ouvir agora. Você pode escrever." (microfone ou serviço com problema). Os que sugerem escrever abrem o teclado.
 - Até a conferência (#61), o que foi falado entra direto na lista, sem a pergunta de produto repetido, com o aviso "3 produtos entraram na lista."
+  - **Revisto em 2026-11-22 (#127):** o que já está na lista não entra de novo nem muda a quantidade, como no "Não" da pergunta de produto repetido; o repetido na mesma fala também entra uma vez só. O aviso diz o que entrou e, em outra linha, o que já estava ("Leite já estava na lista." ou "2 produtos já estavam na lista."). Descartados: somar na quantidade (muitas vezes a pessoa só esqueceu que já estava) e perguntar no meio da fala (fica para a conferência da #61, que mostra "já está na lista").
 
 **Prova de conceito:** não haverá uma separada. A primeira issue da tela de voz começa medindo num celular de entrada:
 - se a escuta reabre sem bipe nem atraso incômodo;
