@@ -1,0 +1,15 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.5 14H27.5L26 25.6C25.8 27.4 21.4 28.8 16 28.8C10.6 28.8 6.2 27.4 6 25.6L4.5 14Z" fill="url(#mt_body)"/>
+<path d="M5.1 19C5.1 19 9.8 20.6 16 20.6C22.2 20.6 26.9 19 26.9 19L26.4 23.4C26.4 23.4 22 25 16 25C10 25 5.6 23.4 5.6 23.4L5.1 19Z" fill="url(#mt_band)"/>
+<path d="M3.5 12.2C3.5 14.2 9.1 15.8 16 15.8C22.9 15.8 28.5 14.2 28.5 12.2V14.6C28.5 16.6 22.9 18.2 16 18.2C9.1 18.2 3.5 16.6 3.5 14.6V12.2Z" fill="url(#mt_lid_side)"/>
+<ellipse cx="16" cy="12.2" rx="12.5" ry="3.6" fill="url(#mt_lid)"/>
+<ellipse cx="16" cy="12.2" rx="8.6" ry="2.3" fill="#FFF4C2"/>
+<path d="M12.2 12.6C13.2 11.1 17.6 10.9 19.2 12.1C20 12.8 18.8 13.8 16.6 13.6C15 13.4 14.8 12.4 16.2 12.1" stroke="#F2B400" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M6.8 17.2L7.2 19.8M7.8 24.2L8 25.6" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="mt_body" x1="4.5" y1="21" x2="27.5" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="0.5" stop-color="#F1F3F6"/><stop offset="1" stop-color="#C9D0DA"/></linearGradient>
+<linearGradient id="mt_band" x1="5" y1="22" x2="27" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#4A8CF0"/><stop offset="0.5" stop-color="#3876DE"/><stop offset="1" stop-color="#2556AE"/></linearGradient>
+<linearGradient id="mt_lid_side" x1="3.5" y1="15" x2="28.5" y2="15" gradientUnits="userSpaceOnUse"><stop stop-color="#FFC928"/><stop offset="1" stop-color="#D49200"/></linearGradient>
+<linearGradient id="mt_lid" x1="3.5" y1="12.2" x2="28.5" y2="12.2" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE680"/><stop offset="1" stop-color="#F5BE1E"/></linearGradient>
+</defs>
+</svg>

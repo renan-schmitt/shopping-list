@@ -307,6 +307,8 @@ shopping-list/
 
 **Ícones próprios da Mercearia (2026-11-22, #25):** 13 ícones em `catalog/own-icons/`, no estilo Color do Fluent e sem marca. São eles: pacote de arroz, de feijão, de açúcar, de farinha de trigo, de farinha de mandioca, de fubá e de café; óleo, azeite, vinagre, molho de tomate, achocolatado e goma de tapioca. Cobrem 28 produtos, alguns como aproximado (ex.: açúcar mascavo usa o pacote de açúcar). Arroz, feijão e café trocam a tigela, os grãos e a xícara do Fluent pelo pacote. O resto da Mercearia espera a lista por prioridade da medição de cobertura (#23).
 
+**Ícones próprios de Frios e laticínios (2026-11-22, #26):** 9 ícones em `catalog/own-icons/`, no mesmo estilo e sem marca: caixinha de leite, pote de margarina, copo de requeijão, pote de iogurte, presunto, mortadela, linguiça, pão de queijo e queijo coalho no espeto. Cobrem 23 produtos, alguns como aproximado (ex.: apresuntado e peito de peru usam o presunto; calabresa e salsichão usam a linguiça). Linguiça e pão de queijo ficam no Açougue e na Padaria, mas entraram nesta leva. O leite troca o copo do Fluent pela caixinha, e o queijo coalho troca o queijo amarelo pelo espeto. O copo de leite continua nas bebidas de soja e vegetal.
+
 **Descartados:** Noto Emoji (mesmas lacunas, estilo mais simples), OpenMoji (CC BY-SA obriga adaptações na mesma licença; estilo menos atraente), conjunto 100% próprio (custo e prazo).
 
 ### 4.5 Privacidade, métricas e coleta de dados

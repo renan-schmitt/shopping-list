@@ -1,0 +1,23 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M8.5 6.5H22V25.5H8.5C6 25.5 4 21.2 4 16C4 10.8 6 6.5 8.5 6.5Z" fill="url(#mo_casing)"/>
+<path d="M10.2 6.8C8.9 9.2 8.2 12.5 8.2 16C8.2 19.5 8.9 22.8 10.2 25.2M14.5 6.6V25.4M18.5 6.6V25.4M4.8 11H22M4.1 16H22M4.8 21H22" stroke="#F8D3B0" stroke-opacity="0.55" stroke-width="0.5"/>
+<path d="M4.4 16H2.4" stroke="#C48A52" stroke-width="1.1" stroke-linecap="round"/>
+<ellipse cx="22" cy="16" rx="6.4" ry="9.5" fill="#C9473B"/>
+<ellipse cx="22" cy="16" rx="5.5" ry="8.6" fill="url(#mo_face)"/>
+<ellipse cx="20.4" cy="11.4" rx="0.8" ry="0.65" fill="#FFFFFF"/>
+<ellipse cx="23.6" cy="9.8" rx="0.7" ry="0.6" fill="#FFFFFF"/>
+<ellipse cx="24.4" cy="14.6" rx="0.85" ry="0.7" fill="#FFFFFF"/>
+<ellipse cx="20.6" cy="16.8" rx="0.75" ry="0.65" fill="#FFFFFF"/>
+<ellipse cx="23.2" cy="19.8" rx="0.8" ry="0.65" fill="#FFFFFF"/>
+<ellipse cx="20.8" cy="22" rx="0.7" ry="0.6" fill="#FFFFFF"/>
+<ellipse cx="25.4" cy="18.2" rx="0.6" ry="0.55" fill="#FFFFFF"/>
+<ellipse cx="18.8" cy="14" rx="0.55" ry="0.5" fill="#FFFFFF"/>
+<circle cx="22.2" cy="13" r="0.3" fill="#6B3B3B"/>
+<circle cx="19.4" cy="19.4" r="0.3" fill="#6B3B3B"/>
+<circle cx="24.6" cy="22.2" r="0.3" fill="#6B3B3B"/>
+<path d="M6.6 10.2C6 12 5.7 14 5.7 16" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="mo_casing" x1="13" y1="6.5" x2="13" y2="25.5" gradientUnits="userSpaceOnUse"><stop stop-color="#F0705E"/><stop offset="0.5" stop-color="#D84C3E"/><stop offset="1" stop-color="#A9322A"/></linearGradient>
+<radialGradient id="mo_face" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(21.4 14) scale(6 9.5)"><stop stop-color="#FFC4CB"/><stop offset="1" stop-color="#F18A98"/></radialGradient>
+</defs>
+</svg>

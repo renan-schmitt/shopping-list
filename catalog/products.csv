@@ -134,7 +134,7 @@ homemade_bread,Pão caseiro,bakery,50,fluent:Bread,exact,active,,
 milk_bread_roll,Bisnaguinha,bakery,60,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 baguette,Baguete,bakery,70,fluent:Baguette bread,exact,active,,
 pita_bread,Pão sírio,bakery,80,fluent:Flatbread,exact,active,,
-cheese_bread,Pão de queijo,bakery,90,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cheese_bread,Pão de queijo,bakery,90,own:cheese_bread,exact,active,,
 sweet_bread,Pão doce,bakery,100,fluent:Bread,approx,active,,Pão genérico
 sweet_braided_bread,Rosca,bakery,110,fluent:Bread,approx,active,,Pão genérico no lugar da rosca trançada
 cornbread,Broa,bakery,120,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -201,11 +201,11 @@ pork_rind,Torresmo,meat,330,,,active,,Sem ícone Fluent; candidata ao complement
 pork_feet,Pé de porco,meat,340,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 pork_ear,Orelha de porco,meat,350,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 feijoada_kit,Kit feijoada,meat,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-sausage,Linguiça,meat,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-tuscan_sausage,Linguiça toscana,meat,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-salsichao,Salsichão,meat,385,,,active,,Sem ícone Fluent; candidata ao complemento próprio; linguiça grossa do Sul
-calabrese_sausage,Linguiça calabresa,meat,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-chicken_sausage,Linguiça de frango,meat,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sausage,Linguiça,meat,370,own:sausage,exact,active,,
+tuscan_sausage,Linguiça toscana,meat,380,own:sausage,exact,active,,
+salsichao,Salsichão,meat,385,own:sausage,approx,active,,Linguiça comum; o salsichão é mais grosso; regional do Sul
+calabrese_sausage,Linguiça calabresa,meat,390,own:sausage,approx,active,,Linguiça fresca no lugar da calabresa curva
+chicken_sausage,Linguiça de frango,meat,400,own:sausage,exact,active,,
 paio,Paio,meat,410,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 whole_chicken,Frango,meat,420,fluent:Poultry leg,approx,active,,Coxa no lugar do frango inteiro
 free_range_chicken,Frango caipira,meat,430,fluent:Poultry leg,approx,active,,Coxa no lugar do frango inteiro
@@ -245,29 +245,29 @@ blue_crab,Siri,meat,750,fluent:Crab,approx,active,,Caranguejo no lugar do siri
 lobster,Lagosta,meat,760,fluent:Lobster,exact,active,,
 oyster,Ostra,meat,770,fluent:Oyster,exact,active,,
 mussel,Mexilhão,meat,780,fluent:Oyster,approx,active,,Ostra no lugar do mexilhão
-milk,Leite,deli_dairy,10,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
-skim_milk,Leite desnatado,deli_dairy,20,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
-semi_skimmed_milk,Leite semidesnatado,deli_dairy,30,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
-lactose_free_milk,Leite sem lactose,deli_dairy,40,fluent:Glass of milk,approx,active,,Copo no lugar da caixinha
+milk,Leite,deli_dairy,10,own:milk_carton,exact,active,,
+skim_milk,Leite desnatado,deli_dairy,20,own:milk_carton,exact,active,,
+semi_skimmed_milk,Leite semidesnatado,deli_dairy,30,own:milk_carton,exact,active,,
+lactose_free_milk,Leite sem lactose,deli_dairy,40,own:milk_carton,exact,active,,
 fermented_milk,Leite fermentado,deli_dairy,50,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 dairy_drink,Bebida láctea,deli_dairy,60,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-yogurt,Iogurte,deli_dairy,70,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-plain_yogurt,Iogurte natural,deli_dairy,80,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-greek_yogurt,Iogurte grego,deli_dairy,90,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-petit_suisse,Petit suisse,deli_dairy,100,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-curd,Coalhada,deli_dairy,110,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+yogurt,Iogurte,deli_dairy,70,own:yogurt_cup,exact,active,,
+plain_yogurt,Iogurte natural,deli_dairy,80,own:yogurt_cup,exact,active,,
+greek_yogurt,Iogurte grego,deli_dairy,90,own:yogurt_cup,exact,active,,
+petit_suisse,Petit suisse,deli_dairy,100,own:yogurt_cup,approx,active,,Pote de iogurte no lugar dos potinhos
+curd,Coalhada,deli_dairy,110,own:yogurt_cup,approx,active,,Pote de iogurte no lugar do pote de coalhada
 butter,Manteiga,deli_dairy,120,fluent:Butter,exact,active,,
 clarified_butter,Manteiga de garrafa,deli_dairy,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste
-margarine,Margarina,deli_dairy,140,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+margarine,Margarina,deli_dairy,140,own:margarine_tub,exact,active,,
 fresh_cream,Creme de leite fresco,deli_dairy,150,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cream_cheese_spread,Requeijão,deli_dairy,160,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cream_cheese,Cream cheese,deli_dairy,170,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cream_cheese_spread,Requeijão,deli_dairy,160,own:cream_cheese_cup,exact,active,,
+cream_cheese,Cream cheese,deli_dairy,170,own:cream_cheese_cup,approx,active,,Copo de requeijão no lugar do pote de cream cheese
 cheese,Queijo,deli_dairy,180,fluent:Cheese wedge,exact,active,,
 mozzarella,Muçarela,deli_dairy,190,fluent:Cheese wedge,approx,active,,Queijo amarelo genérico
 prato_cheese,Queijo prato,deli_dairy,200,fluent:Cheese wedge,exact,active,,
 minas_cheese,Queijo minas,deli_dairy,210,fluent:Cheese wedge,approx,active,,Queijo amarelo no lugar do branco
 cured_minas_cheese,Queijo minas padrão,deli_dairy,220,fluent:Cheese wedge,exact,active,,
-coalho_cheese,Queijo coalho,deli_dairy,230,fluent:Cheese wedge,approx,active,,Queijo amarelo no lugar do branco
+coalho_cheese,Queijo coalho,deli_dairy,230,own:coalho_cheese,exact,active,,Espeto de queijo coalho tostado
 colonial_cheese,Queijo colonial,deli_dairy,235,fluent:Cheese wedge,exact,active,,Regional do Sul
 parmesan,Parmesão,deli_dairy,240,fluent:Cheese wedge,exact,active,,
 grated_cheese,Queijo ralado,deli_dairy,250,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -283,12 +283,12 @@ cottage_cheese,Queijo cottage,deli_dairy,340,,,active,,Sem ícone Fluent; candid
 egg,Ovo,deli_dairy,350,fluent:Egg,exact,active,,
 free_range_egg,Ovo caipira,deli_dairy,360,fluent:Egg,exact,active,,
 quail_egg,Ovo de codorna,deli_dairy,370,fluent:Egg,approx,active,,Ovo de galinha no lugar do de codorna
-ham,Presunto,deli_dairy,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-ham_product,Apresuntado,deli_dairy,390,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-mortadella,Mortadela,deli_dairy,400,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+ham,Presunto,deli_dairy,380,own:ham,exact,active,,
+ham_product,Apresuntado,deli_dairy,390,own:ham,approx,active,,Presunto no lugar do apresuntado
+mortadella,Mortadela,deli_dairy,400,own:mortadella,exact,active,,
 salami,Salame,deli_dairy,410,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 colonial_salami,Salame colonial,deli_dairy,415,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Sul
-turkey_breast,Peito de peru,deli_dairy,420,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+turkey_breast,Peito de peru,deli_dairy,420,own:ham,approx,active,,Presunto no lugar do peito de peru
 hot_dog_sausage,Salsicha,deli_dairy,430,fluent:Hot dog,approx,active,,Cachorro-quente no lugar da salsicha
 bacon,Bacon,deli_dairy,440,fluent:Bacon,exact,active,,
 coppa,Copa,deli_dairy,450,,,active,,Sem ícone Fluent; candidata ao complemento próprio

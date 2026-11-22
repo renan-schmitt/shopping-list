@@ -52,7 +52,7 @@ val SampleListState = ListUiState.Content(
                 row(
                     "milk",
                     "Leite",
-                    R.drawable.catalog_fluent_glass_of_milk,
+                    R.drawable.catalog_own_milk_carton,
                     Quantity(2.0, QuantityUnit.LITER),
                     detail = "desnatado",
                 ),

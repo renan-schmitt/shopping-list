@@ -1,0 +1,22 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.5 9L11 5.5H25L21.5 9H7.5Z" fill="url(#mc_top)"/>
+<path d="M21.5 9L25 5.5V26.5L21.5 30V9Z" fill="url(#mc_side)"/>
+<path d="M7.5 9H21.5V30H9C8.17 30 7.5 29.33 7.5 28.5V9Z" fill="url(#mc_front)"/>
+<path d="M7.5 19.5C10 18.2 12.5 18.2 14.5 19.3C16.6 20.4 19 20.4 21.5 19.2V30H9C8.17 30 7.5 29.33 7.5 28.5V19.5Z" fill="url(#mc_wave)"/>
+<path d="M21.5 19.2C22.7 18.6 23.9 17.6 25 16.6V26.5L21.5 30V19.2Z" fill="url(#mc_wave_side)"/>
+<path d="M9.3 7.2H23.2" stroke="#C9D6E6" stroke-width="0.4"/>
+<ellipse cx="18.4" cy="7.4" rx="2" ry="0.8" fill="#2A63C4"/>
+<rect x="16.5" y="5.4" width="3.8" height="2" rx="0.6" fill="url(#mc_cap)"/>
+<rect x="9.5" y="11.4" width="10" height="1.8" rx="0.9" fill="#3876DE"/>
+<rect x="9.5" y="14.4" width="6.5" height="1.3" rx="0.65" fill="#9DBBE6"/>
+<path d="M14.5 21.4C14.5 21.4 12.5 23.9 12.5 25.3C12.5 26.4 13.4 27.3 14.5 27.3C15.6 27.3 16.5 26.4 16.5 25.3C16.5 23.9 14.5 21.4 14.5 21.4Z" fill="#FFFFFF"/>
+<path d="M8.8 21V28" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="mc_top" x1="7.5" y1="7.25" x2="25" y2="7.25" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCE4EE"/></linearGradient>
+<linearGradient id="mc_side" x1="21.5" y1="18" x2="25" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#BCCADB"/><stop offset="1" stop-color="#93A7C0"/></linearGradient>
+<linearGradient id="mc_front" x1="7.5" y1="19" x2="21.5" y2="19" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#E6ECF3"/></linearGradient>
+<linearGradient id="mc_wave" x1="7.5" y1="24" x2="21.5" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#4A8CF0"/><stop offset="1" stop-color="#2A63C4"/></linearGradient>
+<linearGradient id="mc_wave_side" x1="21.5" y1="23" x2="25" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#2556AE"/><stop offset="1" stop-color="#1B4590"/></linearGradient>
+<linearGradient id="mc_cap" x1="16.5" y1="6.4" x2="20.3" y2="6.4" gradientUnits="userSpaceOnUse"><stop stop-color="#6FA4F5"/><stop offset="1" stop-color="#2A63C4"/></linearGradient>
+</defs>
+</svg>
