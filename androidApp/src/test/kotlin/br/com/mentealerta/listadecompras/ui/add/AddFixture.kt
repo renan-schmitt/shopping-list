@@ -131,6 +131,14 @@ class FakeVoiceRecognizer(override val isAvailable: Boolean = true) : VoiceRecog
     var lastStopOnSilence: Boolean? = null
         private set
 
+    /** Quantas vezes a tela pediu para preparar a voz. */
+    var prepares = 0
+        private set
+
+    override suspend fun prepare() {
+        prepares++
+    }
+
     override suspend fun mayUseInternet() = mayUseInternet
 
     override fun listen(stopOnSilence: Boolean): Flow<VoiceEvent> {

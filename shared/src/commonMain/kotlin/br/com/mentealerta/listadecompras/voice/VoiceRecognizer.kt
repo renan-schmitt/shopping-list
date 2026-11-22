@@ -22,6 +22,9 @@ sealed interface VoiceEvent {
      */
     data object SwitchedToService : VoiceEvent
 
+    /** A voz pt-BR ainda não está no celular; o download foi pedido ou já está em andamento (#123). */
+    data object VoiceMissing : VoiceEvent
+
     /** O microfone ou o serviço de voz não funcionaram (ocupado, sem permissão, outro erro). */
     data object Unavailable : VoiceEvent
 }
@@ -35,6 +38,12 @@ sealed interface VoiceEvent {
 interface VoiceRecognizer {
     /** `false` quando o celular não tem serviço de voz: o botão "Falar" nem aparece. */
     val isAvailable: Boolean
+
+    /**
+     * Escolhe o reconhecedor de novo e, se faltar a voz pt-BR, pede o download. Chamado quando a tela
+     * de adicionar abre, para o pedido do sistema não aparecer no meio do toque em "Falar" (#123).
+     */
+    suspend fun prepare()
 
     /**
      * `true` quando a escuta vai pelo serviço de voz padrão, que pode enviar o som ao Google: só

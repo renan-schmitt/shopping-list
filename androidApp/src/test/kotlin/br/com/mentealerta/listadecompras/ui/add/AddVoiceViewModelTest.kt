@@ -43,7 +43,7 @@ class AddVoiceViewModelTest {
         viewModel.onSpeakRelease(short = false)
         assertEquals(0, voice.listens)
 
-        viewModel.onAcceptNotice(hasMicrophone = true)
+        viewModel.onNoticeAnswer(accepted = true, hasMicrophone = true)
         assertTrue(fixture.voicePreferences.noticeShown)
         assertNull(viewModel.uiState.value.voice)
 
@@ -68,7 +68,7 @@ class AddVoiceViewModelTest {
         val viewModel = fixture.viewModel()
         viewModel.onSpeakPress(hasMicrophone = true)
 
-        viewModel.onDeclineNotice()
+        viewModel.onNoticeAnswer(accepted = false, hasMicrophone = true)
         assertNull(viewModel.uiState.value.voice)
         assertFalse(fixture.voicePreferences.noticeShown)
 
@@ -80,7 +80,7 @@ class AddVoiceViewModelTest {
     fun withoutMicrophoneAsksTheAndroidPermission() {
         val viewModel = fixture.viewModel()
         viewModel.onSpeakPress(hasMicrophone = false)
-        viewModel.onAcceptNotice(hasMicrophone = false)
+        viewModel.onNoticeAnswer(accepted = true, hasMicrophone = false)
         assertEquals(VoiceUi.AskingPermission, viewModel.uiState.value.voice)
 
         viewModel.onMicrophonePermission(granted = false)
@@ -244,6 +244,26 @@ class AddVoiceViewModelTest {
         voice.finish()
 
         assertEquals(VoiceUi.Message.NO_INTERNET, viewModel.uiState.value.voice)
+    }
+
+    @Test
+    fun openingPreparesTheVoiceBeforeAnyTouch() {
+        val viewModel = fixture.viewModel()
+        assertEquals(0, voice.prepares)
+
+        viewModel.onOpen()
+
+        assertEquals(1, voice.prepares)
+        assertEquals(0, voice.listens)
+    }
+
+    @Test
+    fun voiceStillDownloadingSuggestsWriting() {
+        val viewModel = listening()
+        voice.say(VoiceEvent.VoiceMissing)
+        voice.finish()
+
+        assertEquals(VoiceUi.Message.DOWNLOADING_VOICE, viewModel.uiState.value.voice)
     }
 
     @Test

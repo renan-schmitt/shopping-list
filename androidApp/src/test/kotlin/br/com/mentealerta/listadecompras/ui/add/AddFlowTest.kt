@@ -294,6 +294,21 @@ class AddFlowTest {
     }
 
     @Test
+    fun voiceStillDownloadingSuggestsWriting() {
+        grantMicrophone()
+        fixture.voicePreferences.noticeShown = true
+        show()
+        assertEquals(1, fixture.voice.prepares)
+        speakButton().performTouchInput { down(center) }
+
+        fixture.voice.say(VoiceEvent.VoiceMissing)
+        fixture.voice.finish()
+
+        compose.onNodeWithText("Estou baixando a voz para ouvir sem internet. Você pode escrever enquanto isso.")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+    }
+
+    @Test
     fun notUnderstoodAsksToSpeakAgain() {
         grantMicrophone()
         fixture.voicePreferences.noticeShown = true

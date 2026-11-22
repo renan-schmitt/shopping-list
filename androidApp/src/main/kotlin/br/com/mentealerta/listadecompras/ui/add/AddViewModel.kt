@@ -76,8 +76,18 @@ sealed interface VoiceUi {
     /** Ouvindo: os trechos já entendidos ([heard]) e o que está aparecendo agora ([partial]). */
     data class Listening(val heard: List<String> = emptyList(), val partial: String = "") : VoiceUi
 
-    /** Recados depois da escuta. [HOLD_TO_SPEAK]: o botão foi só tocado, sem segurar (#123). */
-    enum class Message : VoiceUi { NOT_UNDERSTOOD, NO_INTERNET, NO_MICROPHONE, UNAVAILABLE, HOLD_TO_SPEAK }
+    /**
+     * Recados depois da escuta. [HOLD_TO_SPEAK]: o botão foi só tocado, sem segurar; [DOWNLOADING_VOICE]:
+     * a voz pt-BR ainda está sendo baixada (#123).
+     */
+    enum class Message : VoiceUi {
+        NOT_UNDERSTOOD,
+        NO_INTERNET,
+        NO_MICROPHONE,
+        UNAVAILABLE,
+        HOLD_TO_SPEAK,
+        DOWNLOADING_VOICE,
+    }
 }
 
 /** A pergunta do produto repetido: [name] é o nome do item que já está na lista; [option], a tocada. */
@@ -259,17 +269,27 @@ class AddViewModel(
         }
     }
 
-    /** "Usar o microfone" na explicação: ela não aparece mais. A pessoa aperta "Falar" de novo. */
-    fun onAcceptNotice(hasMicrophone: Boolean) {
+    /**
+     * A tela abriu: escolhe o reconhecedor e, se faltar a voz, o pedido de download do Android aparece
+     * agora, e não no meio do toque em "Falar" (#123).
+     */
+    fun onOpen() {
+        if (canSpeak) viewModelScope.launch { voiceRecognizer.prepare() }
+    }
+
+    /**
+     * Resposta à explicação. "Usar o microfone" ([accepted]): ela não aparece mais e a pessoa aperta
+     * "Falar" de novo. "Escrever": na próxima vez ela aparece de novo.
+     */
+    fun onNoticeAnswer(accepted: Boolean, hasMicrophone: Boolean) {
+        if (!accepted) {
+            _uiState.update { it.copy(voice = null) }
+            return
+        }
         viewModelScope.launch {
             voicePreferences.setNoticeShown()
             _uiState.update { it.copy(voice = if (hasMicrophone) null else VoiceUi.AskingPermission) }
         }
-    }
-
-    /** "Escrever" na explicação: na próxima vez ela aparece de novo. */
-    fun onDeclineNotice() {
-        _uiState.update { it.copy(voice = null) }
     }
 
     /** Resposta ao pedido de microfone do Android. Com permissão, a pessoa aperta "Falar" de novo. */
@@ -329,6 +349,7 @@ class AddViewModel(
                     }
                     VoiceEvent.NoInternet -> problem = VoiceUi.Message.NO_INTERNET
                     VoiceEvent.Unavailable -> problem = VoiceUi.Message.UNAVAILABLE
+                    VoiceEvent.VoiceMissing -> problem = VoiceUi.Message.DOWNLOADING_VOICE
                     VoiceEvent.SwitchedToService -> switched = true
                 }
             }

@@ -109,6 +109,8 @@
     <string name="add_voice_no_microphone">Sem o microfone, não consigo ouvir. Você pode escrever.</string>
     <!-- Toque rápido no Falar, sem segurar (#123) -->
     <string name="add_voice_hold">Segure o botão enquanto fala.</string>
+    <!-- A voz pt-BR ainda não está no celular; o download foi pedido (#123) -->
+    <string name="add_voice_downloading">Estou baixando a voz para ouvir sem internet. Você pode escrever enquanto isso.</string>
     <!-- O microfone ou o serviço de voz não funcionaram (ocupado, outro erro) -->
     <string name="add_voice_unavailable">Não deu certo ouvir agora. Você pode escrever.</string>
     <!-- Aviso depois de falar vários produtos de uma vez (com um só, vale o add_added) -->

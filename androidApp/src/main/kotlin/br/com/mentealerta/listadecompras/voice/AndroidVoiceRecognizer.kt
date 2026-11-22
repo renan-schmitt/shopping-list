@@ -16,6 +16,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -34,11 +35,15 @@ private const val ERROR_LANGUAGE_UNAVAILABLE = 13
 /**
  * [VoiceRecognizer] com o `SpeechRecognizer` do Android, em pt-BR (plano §3.3, #123):
  * - Android 13+: o reconhecedor do aparelho, se ele já tem a voz pt-BR. Se não tem, pede o download
- *   uma vez e, até lá, usa o serviço padrão.
+ *   ([prepare], ao abrir a tela) e, até lá, usa o serviço padrão. Se a escuta ainda encontra a voz
+ *   faltando, avisa ([VoiceEvent.VoiceMissing]) e pede o download de novo, se não estiver em andamento.
  * - Android 12: o reconhecedor do aparelho, sem como conferir a voz antes. Se faltar, a escuta avisa
  *   ([VoiceEvent.SwitchedToService]) e passa ao serviço padrão daí em diante.
  * - Android 8–11, ou sem reconhecedor no aparelho: o serviço padrão (quase sempre o do Google), que
  *   pode usar a internet.
+ *
+ * A escolha é refeita a cada [prepare]: quando o download termina, a próxima tela já usa o
+ * reconhecedor do aparelho.
  *
  * O reconhecedor encerra cada escuta numa pausa curta; o microfone segue aberto até [stop] (a pessoa
  * soltou o botão). "Sem internet" só sai de erro de rede de verdade, no serviço padrão.
@@ -56,6 +61,10 @@ class AndroidVoiceRecognizer(private val context: Context) : VoiceRecognizer {
         get() = SpeechRecognizer.isRecognitionAvailable(context) || hasOnDeviceRecognizer()
 
     private var stopCurrent: (() -> Unit)? = null
+
+    override suspend fun prepare() {
+        engine = withContext(Dispatchers.Main.immediate) { chooseEngine() }
+    }
 
     override suspend fun mayUseInternet(): Boolean = engine() == Engine.SERVICE
 
@@ -107,7 +116,12 @@ class AndroidVoiceRecognizer(private val context: Context) : VoiceRecognizer {
                         SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> listenAgainOrFinish()
 
                         ERROR_LANGUAGE_NOT_SUPPORTED, ERROR_LANGUAGE_UNAVAILABLE ->
-                            if (onDevice) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && hasOnDeviceRecognizer()) {
+                                // Sem a voz baixada (também no serviço padrão, que pode ser só offline)
+                                launch { onDeviceHasPortuguese() }
+                                finishWith(VoiceEvent.VoiceMissing)
+                            } else if (onDevice) {
+                                // Android 12: sem como baixar pelo app; segue pelo serviço padrão
                                 this@AndroidVoiceRecognizer.engine = Engine.SERVICE
                                 finishWith(VoiceEvent.SwitchedToService)
                             } else {

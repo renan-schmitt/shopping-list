@@ -59,6 +59,7 @@
 | Botão de voz (segurar para falar) | "Segure para falar." acima de **Falar**; com o microfone aberto, o botão vira **Terminei** (2026-11-22, #123) |
 | Toque rápido no **Falar**, sem segurar | "Segure o botão enquanto fala." |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |
+| Voz pt-BR ainda baixando | "Estou baixando a voz para ouvir sem internet. Você pode escrever enquanto isso." (2026-11-22, #123) |
 | Voz sem internet (só em erro de rede de verdade) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
 | Antes de pedir o microfone (uma vez) | "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." · **Usar o microfone** · **Escrever** — só quando o app cai no serviço de voz padrão (2026-11-22) |
 | Voz para usar sem internet (configurações, Android 13+) | **Baixar a voz para usar sem internet** |

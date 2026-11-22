@@ -109,6 +109,7 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
     LaunchedEffect(uiState.voice) {
         if (uiState.voice == VoiceUi.AskingPermission) askMicrophone.launch(Manifest.permission.RECORD_AUDIO)
     }
+    LaunchedEffect(Unit) { viewModel.onOpen() }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onSpeakRelease() }
     AddContent(
         uiState = uiState,
@@ -122,8 +123,8 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
         onSpeakPress = { viewModel.onSpeakPress(context.hasMicrophone()) },
         onSpeakRelease = viewModel::onSpeakRelease,
         onSpeakToggle = { viewModel.onSpeakPress(context.hasMicrophone(), byToggle = true) },
-        onAcceptNotice = { viewModel.onAcceptNotice(context.hasMicrophone()) },
-        onDeclineNotice = viewModel::onDeclineNotice,
+        onAcceptNotice = { viewModel.onNoticeAnswer(accepted = true, context.hasMicrophone()) },
+        onDeclineNotice = { viewModel.onNoticeAnswer(accepted = false, context.hasMicrophone()) },
         onClose = close,
         modifier = modifier,
     )
@@ -464,6 +465,7 @@ private fun VoiceMessage(message: VoiceUi.Message) {
         VoiceUi.Message.NO_MICROPHONE -> R.string.add_voice_no_microphone
         VoiceUi.Message.UNAVAILABLE -> R.string.add_voice_unavailable
         VoiceUi.Message.HOLD_TO_SPEAK -> R.string.add_voice_hold
+        VoiceUi.Message.DOWNLOADING_VOICE -> R.string.add_voice_downloading
     }
     Text(
         text = stringResource(text),
