@@ -1,0 +1,19 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.2 13.4L11 4.4L13.2 4.1L14.4 13.4H12.2Z" fill="url(#gs_strip)"/>
+<path d="M11 4.4L13.2 4.1L13.55 6.6L11.35 6.9L11 4.4Z" fill="#F5A623"/>
+<rect x="14.9" y="2.6" width="2.2" height="10.8" fill="url(#gs_strip)"/>
+<rect x="14.9" y="2.6" width="2.2" height="2.6" fill="#F5A623"/>
+<path d="M17.8 13.4L19.4 4.6L21.5 5L20 13.4H17.8Z" fill="url(#gs_strip)"/>
+<path d="M19.4 4.6L21.5 5L21 7.5L18.9 7.1L19.4 4.6Z" fill="#F5A623"/>
+<path d="M10 14H22V27.5C22 28.9 20.9 30 19.5 30H12.5C11.1 30 10 28.9 10 27.5V14Z" fill="url(#gs_body)"/>
+<rect x="9.4" y="12.4" width="13.2" height="2.6" rx="0.8" fill="url(#gs_rim)"/>
+<rect x="10" y="17.6" width="12" height="7.6" fill="url(#gs_label)"/>
+<path d="M16 18.6C16 18.6 13.8 21.2 13.8 22.6C13.8 23.8 14.8 24.6 16 24.6C17.2 24.6 18.2 23.8 18.2 22.6C18.2 21.2 16 18.6 16 18.6Z" fill="#E5484D"/>
+<path d="M11.5 16V27.6" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="gs_strip" x1="11" y1="8" x2="21.5" y2="8" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#D2D9E2"/></linearGradient>
+<linearGradient id="gs_body" x1="10" y1="22" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop stop-color="#8E9BAC"/><stop offset="1" stop-color="#4A5768"/></linearGradient>
+<linearGradient id="gs_rim" x1="9.4" y1="13.7" x2="22.6" y2="13.7" gradientUnits="userSpaceOnUse"><stop stop-color="#7A8899"/><stop offset="1" stop-color="#3D4857"/></linearGradient>
+<linearGradient id="gs_label" x1="10" y1="21.4" x2="22" y2="21.4" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#D8DFE7"/></linearGradient>
+</defs>
+</svg>

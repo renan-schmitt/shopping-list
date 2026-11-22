@@ -1,0 +1,15 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 15H28V26C28 27.1 27.1 28 26 28H6C4.9 28 4 27.1 4 26V15Z" fill="url(#cc_back)"/>
+<path d="M4 23H28V24.4H4Z" fill="#2F6FD0"/>
+<path d="M4 25.4H28V26.1H4Z" fill="#2F6FD0"/>
+<path d="M4 21H28V21.9H4Z" fill="#8C98A8" fill-opacity="0.5"/>
+<path d="M6 6H26C27.1 6 28 6.9 28 8V19.5C28 20.3 27.3 21 26.5 21H5.5C4.7 21 4 20.3 4 19.5V8C4 6.9 4.9 6 6 6Z" fill="url(#cc_front)"/>
+<path d="M4 15.6H28V17H4Z" fill="url(#cc_stripe)"/>
+<path d="M4 18H28V18.7H4Z" fill="url(#cc_stripe)"/>
+<path d="M6 8.4H26" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round"/>
+<defs>
+<linearGradient id="cc_back" x1="4" y1="21" x2="28" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#E9EDF2"/><stop offset="1" stop-color="#B3BECC"/></linearGradient>
+<linearGradient id="cc_front" x1="4" y1="13" x2="28" y2="13" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="0.6" stop-color="#F0F3F7"/><stop offset="1" stop-color="#C6CFDB"/></linearGradient>
+<linearGradient id="cc_stripe" x1="4" y1="17" x2="28" y2="17" gradientUnits="userSpaceOnUse"><stop stop-color="#4C93F5"/><stop offset="1" stop-color="#1F5BC0"/></linearGradient>
+</defs>
+</svg>

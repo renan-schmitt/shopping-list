@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="12" y="9" width="8" height="2.6" fill="#7E3E0C"/>
+<path d="M8.5 15.5C8.5 13.3 10.3 11.4 12.5 11.4H19.5C21.7 11.4 23.5 13.3 23.5 15.5V28C23.5 29.1 22.6 30 21.5 30H10.5C9.4 30 8.5 29.1 8.5 28V15.5Z" fill="url(#mb_body)"/>
+<rect x="10.5" y="3.4" width="11" height="6" rx="1" fill="url(#mb_cap)"/>
+<path d="M12.7 4.3V8.5M14.9 4.3V8.5M17.1 4.3V8.5M19.3 4.3V8.5" stroke="#BCC6D2" stroke-width="0.5"/>
+<rect x="8.5" y="17" width="15" height="8.6" fill="url(#mb_label)"/>
+<path d="M15 18.6H17V20.3H18.7V22.3H17V24H15V22.3H13.3V20.3H15V18.6Z" fill="#E5484D"/>
+<path d="M10.3 14V15.8M10.3 26.6V28" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="mb_body" x1="8.5" y1="21" x2="23.5" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#E9A04A"/><stop offset="0.55" stop-color="#B8641C"/><stop offset="1" stop-color="#7E3E0C"/></linearGradient>
+<linearGradient id="mb_cap" x1="10.5" y1="6.4" x2="21.5" y2="6.4" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="0.6" stop-color="#EEF2F6"/><stop offset="1" stop-color="#BCC7D4"/></linearGradient>
+<linearGradient id="mb_label" x1="8.5" y1="21.3" x2="23.5" y2="21.3" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9E0E8"/></linearGradient>
+</defs>
+</svg>

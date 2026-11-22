@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M8.5 27H23.5V29.6C23.5 30.1 23.1 30.5 22.6 30.5H9.4C8.9 30.5 8.5 30.1 8.5 29.6V27Z" fill="url(#cg_base)"/>
+<path d="M5.5 15C5.5 11.5 9 10 13 10H19C23 10 26.5 11.5 26.5 15V24C26.5 26.5 23.5 27.6 19 27.6H13C8.5 27.6 5.5 26.5 5.5 24V15Z" fill="url(#cg_body)"/>
+<path d="M5.6 19C9 19.9 23 19.9 26.4 19" stroke="#8E2611" stroke-width="0.6" stroke-linecap="round"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M9.5 11V5.6C9.5 4.7 10.2 4 11.1 4H20.9C21.8 4 22.5 4.7 22.5 5.6V11H9.5ZM11.4 5.8H20.6V8H11.4V5.8Z" fill="url(#cg_collar)"/>
+<rect x="14.7" y="2.4" width="2.6" height="3" rx="0.6" fill="url(#cg_valve)"/>
+<path d="M8.2 13.6V24.2" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="1.2" stroke-linecap="round"/>
+<defs>
+<linearGradient id="cg_body" x1="5.5" y1="19" x2="26.5" y2="19" gradientUnits="userSpaceOnUse"><stop stop-color="#F57A4E"/><stop offset="0.55" stop-color="#D9431F"/><stop offset="1" stop-color="#9C2A12"/></linearGradient>
+<linearGradient id="cg_collar" x1="9.5" y1="7.5" x2="22.5" y2="7.5" gradientUnits="userSpaceOnUse"><stop stop-color="#F06A45"/><stop offset="1" stop-color="#A82E14"/></linearGradient>
+<linearGradient id="cg_base" x1="8.5" y1="28.7" x2="23.5" y2="28.7" gradientUnits="userSpaceOnUse"><stop stop-color="#B4381A"/><stop offset="1" stop-color="#6E1C0B"/></linearGradient>
+<linearGradient id="cg_valve" x1="14.7" y1="3.9" x2="17.3" y2="3.9" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD66B"/><stop offset="1" stop-color="#B88418"/></linearGradient>
+</defs>
+</svg>

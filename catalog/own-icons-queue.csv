@@ -1,13 +1,4 @@
 icon_id,name,priority,products,notes
-alcohol_bottle,Frasco de álcool,1,cleaning_alcohol;hand_sanitizer,
-steel_wool,Palha de aço,1,steel_wool,
-cleaning_cloth,Pano de limpeza,1,floor_cloth;dish_towel;cleaning_wipe;flannel,Pano dobrado
-foil_roll,Rolo de papel-alumínio,1,aluminum_foil;plastic_wrap;parchment_paper,Caixa comprida com o rolo saindo
-paper_napkin,Guardanapo de papel,1,napkin;tissues,
-denture,Dentadura,1,denture_adhesive;denture_cleaner,
-glucose_strip,Fita de glicemia,1,glucose_strip,Frasco com as fitas
-medicine_bottle,Frasco de remédio,1,cough_syrup;saline;hydrogen_peroxide;antiseptic;rehydration_salts,Frasco âmbar sem rótulo de marca
-cooking_gas,Botijão de gás,1,cooking_gas,
 mouthwash,Enxaguante bucal,2,mouthwash,
 cotton,Algodão,2,cotton;cotton_swab,
 bandage,Gaze e esparadrapo,2,gauze;medical_tape;elastic_bandage,
