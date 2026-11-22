@@ -1,0 +1,17 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M9.5 30H23C25.2 30 27 28.2 27 26V14.5C27 11.5 24.5 9 21.5 9H18.6V8H10V9.7C7.4 10.5 5.5 12.9 5.5 15.8V26C5.5 28.2 7.3 30 9.5 30ZM20.4 11.6H22.6C23.4 11.6 24 12.2 24 13V16.2C24 17 23.4 17.6 22.6 17.6H20.4C19.6 17.6 19 17 19 16.2V13C19 12.2 19.6 11.6 20.4 11.6Z" fill="url(#fs_body)"/>
+<rect x="9.2" y="3.6" width="10.2" height="5.4" rx="1.3" fill="url(#fs_cap)"/>
+<path d="M11.2 4.4V8.2M13.2 4.4V8.2M15.2 4.4V8.2M17.2 4.4V8.2" stroke="#C93E7C" stroke-width="0.5"/>
+<ellipse cx="15.6" cy="23" rx="6.6" ry="4.6" fill="#FFFFFF"/>
+<circle cx="15.6" cy="21.3" r="1.25" fill="#FF7FB4"/>
+<circle cx="17.3" cy="22.5" r="1.25" fill="#FF7FB4"/>
+<circle cx="16.7" cy="24.5" r="1.25" fill="#F45E9F"/>
+<circle cx="14.5" cy="24.5" r="1.25" fill="#F45E9F"/>
+<circle cx="13.9" cy="22.5" r="1.25" fill="#FF7FB4"/>
+<circle cx="15.6" cy="23" r="0.9" fill="#FFD84A"/>
+<path d="M7.4 15.4V18.4M7.6 26V27.4" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1" stroke-linecap="round"/>
+<defs>
+<linearGradient id="fs_body" x1="5.5" y1="19.5" x2="27" y2="19.5" gradientUnits="userSpaceOnUse"><stop stop-color="#8FE3F5"/><stop offset="0.5" stop-color="#3DBCE0"/><stop offset="1" stop-color="#1A8AB8"/></linearGradient>
+<linearGradient id="fs_cap" x1="9.2" y1="6.3" x2="19.4" y2="6.3" gradientUnits="userSpaceOnUse"><stop stop-color="#FF9CC8"/><stop offset="1" stop-color="#DE4A8A"/></linearGradient>
+</defs>
+</svg>

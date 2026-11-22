@@ -309,6 +309,8 @@ shopping-list/
 
 **Ícones próprios de Frios e laticínios (2026-11-22, #26):** 9 ícones em `catalog/own-icons/`, no mesmo estilo e sem marca: caixinha de leite, pote de margarina, copo de requeijão, pote de iogurte, presunto, mortadela, linguiça, pão de queijo e queijo coalho no espeto. Cobrem 23 produtos, alguns como aproximado (ex.: apresuntado e peito de peru usam o presunto; calabresa e salsichão usam a linguiça). Linguiça e pão de queijo ficam no Açougue e na Padaria, mas entraram nesta leva. O leite troca o copo do Fluent pela caixinha, e o queijo coalho troca o queijo amarelo pelo espeto. O copo de leite continua nas bebidas de soja e vegetal.
 
+**Ícones próprios de Limpeza e higiene (2026-11-22, #27):** 10 ícones em `catalog/own-icons/`, no mesmo estilo e sem marca: caixa de sabão em pó, frasco de detergente, galão de água sanitária, frasco de desinfetante, frasco de amaciante, rolo de papel-toalha, tubo de creme dental, desodorante em spray, absorvente e fralda. Cobrem 18 produtos, alguns como aproximado (ex.: multiuso e desengordurante usam o detergente; sabão líquido usa o amaciante; pomada usa o tubo de creme dental). A fralda aparece aberta, não no pacote, para se reconhecer em 32 px; a geriátrica é fiel e a infantil, aproximada. O papel-toalha troca o rolo do papel higiênico pelo rolo alto. O resto das duas seções espera a lista por prioridade (#23).
+
 **Descartados:** Noto Emoji (mesmas lacunas, estilo mais simples), OpenMoji (CC BY-SA obriga adaptações na mesma licença; estilo menos atraente), conjunto 100% próprio (custo e prazo).
 
 ### 4.5 Privacidade, métricas e coleta de dados

@@ -1,0 +1,20 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.6 8.6H19.4V10.4C19.4 11.2 20 11.8 20.8 12.3L22.6 13.5C23.5 14.1 24 15.1 24 16.2V28C24 29.1 23.1 30 22 30H10C8.9 30 8 29.1 8 28V16.2C8 15.1 8.5 14.1 9.4 13.5L11.2 12.3C12 11.8 12.6 11.2 12.6 10.4V8.6Z" fill="url(#df_glass)"/>
+<path d="M8 16.4C10.6 15.6 13.2 15.6 16 16.2C18.8 16.8 21.4 16.8 24 16V28C24 29.1 23.1 30 22 30H10C8.9 30 8 29.1 8 28V16.4Z" fill="url(#df_liquid)"/>
+<rect x="11.8" y="3" width="8.4" height="6" rx="1.2" fill="url(#df_cap)"/>
+<path d="M13.6 3.8V8.2M15.2 3.8V8.2M16.8 3.8V8.2M18.4 3.8V8.2" stroke="#C9D2DE" stroke-width="0.5"/>
+<rect x="9.8" y="19.4" width="12.4" height="7.6" rx="1" fill="#FFFFFF"/>
+<path d="M16 26V21.4" stroke="#4CAF50" stroke-width="0.7" stroke-linecap="round"/>
+<ellipse cx="16" cy="20.9" rx="0.75" ry="1" fill="#9B59E0"/>
+<ellipse cx="15.2" cy="22.4" rx="0.75" ry="0.95" fill="#B47CF0"/>
+<ellipse cx="16.8" cy="22.4" rx="0.75" ry="0.95" fill="#8A47D6"/>
+<ellipse cx="15.2" cy="24" rx="0.7" ry="0.9" fill="#9B59E0"/>
+<ellipse cx="16.8" cy="24" rx="0.7" ry="0.9" fill="#B47CF0"/>
+<path d="M9.6 17.4V18.6M9.6 27.6V28.4" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1" stroke-linecap="round"/>
+<path d="M9.8 14.6L11 13.8" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="df_glass" x1="8" y1="19" x2="24" y2="19" gradientUnits="userSpaceOnUse"><stop stop-color="#F4ECFF"/><stop offset="1" stop-color="#CDB8EC"/></linearGradient>
+<linearGradient id="df_liquid" x1="8" y1="23" x2="24" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#C084FC"/><stop offset="0.5" stop-color="#9B4DEB"/><stop offset="1" stop-color="#6B2BB8"/></linearGradient>
+<linearGradient id="df_cap" x1="11.8" y1="6" x2="20.2" y2="6" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#BFC9D6"/></linearGradient>
+</defs>
+</svg>

@@ -300,22 +300,22 @@ tofu,Tofu,deli_dairy,500,,,active,,Sem ícone Fluent; candidata ao complemento p
 cooking_oil,Óleo,pantry,620,own:cooking_oil,exact,active,,
 tapioca_starch,Goma de tapioca,pantry,340,own:tapioca_starch,exact,active,,
 massa_puba,Massa puba,pantry,345,,,active,,Sem ícone Fluent; candidata ao complemento próprio; mandioca fermentada do Norte e do Nordeste
-laundry_powder,Sabão em pó,cleaning,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-liquid_laundry_detergent,Sabão líquido,cleaning,20,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+laundry_powder,Sabão em pó,cleaning,10,own:laundry_powder_box,exact,active,,
+liquid_laundry_detergent,Sabão líquido,cleaning,20,own:fabric_softener_bottle,approx,active,,Frasco de amaciante no lugar do sabão líquido
 laundry_bar_soap,Sabão em barra,cleaning,30,fluent:Soap,exact,active,,
 coconut_soap,Sabão de coco,cleaning,40,fluent:Soap,exact,active,,
-fabric_softener,Amaciante,cleaning,50,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-stain_remover,Tira-manchas,cleaning,60,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-bleach,Água sanitária,cleaning,70,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-non_chlorine_bleach,Alvejante sem cloro,cleaning,80,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+fabric_softener,Amaciante,cleaning,50,own:fabric_softener_bottle,exact,active,,
+stain_remover,Tira-manchas,cleaning,60,own:laundry_powder_box,approx,active,,Caixa de sabão em pó no lugar do tira-manchas
+bleach,Água sanitária,cleaning,70,own:bleach_jug,exact,active,,
+non_chlorine_bleach,Alvejante sem cloro,cleaning,80,own:bleach_jug,approx,active,,Galão de água sanitária no lugar do alvejante
 ironing_aid,Passa-roupa,cleaning,90,,,active,,Sem ícone Fluent; candidata ao complemento próprio; facilitador de passar roupa
-dish_detergent,Detergente,cleaning,100,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-disinfectant,Desinfetante,cleaning,110,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-multipurpose_cleaner,Limpador multiuso,cleaning,120,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+dish_detergent,Detergente,cleaning,100,own:dish_detergent_bottle,exact,active,,
+disinfectant,Desinfetante,cleaning,110,own:disinfectant_bottle,exact,active,,
+multipurpose_cleaner,Limpador multiuso,cleaning,120,own:dish_detergent_bottle,approx,active,,Frasco de detergente no lugar do multiuso
 cleaning_alcohol,Álcool,cleaning,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio; álcool líquido de limpeza; o álcool em gel fica em higiene
 glass_cleaner,Limpa-vidros,cleaning,140,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-bathroom_cleaner,Limpador de banheiro,cleaning,150,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-degreaser,Desengordurante,cleaning,160,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+bathroom_cleaner,Limpador de banheiro,cleaning,150,own:disinfectant_bottle,approx,active,,Frasco de desinfetante no lugar do limpador
+degreaser,Desengordurante,cleaning,160,own:dish_detergent_bottle,approx,active,,Frasco de detergente no lugar do desengordurante
 scouring_cleaner,Saponáceo,cleaning,170,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 floor_wax,Cera para piso,cleaning,180,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 furniture_polish,Lustra-móveis,cleaning,190,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -345,7 +345,7 @@ trash_bag,Saco de lixo,cleaning,420,fluent:Wastebasket,approx,active,,Lixeira no
 trash_can,Lixeira,cleaning,430,fluent:Wastebasket,exact,active,,
 clothespin,Prendedor de roupa,cleaning,440,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 clothesline,Varal,cleaning,450,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-paper_towel,Papel-toalha,cleaning,460,fluent:Roll of paper,approx,active,,Mesmo rolo do papel higiênico
+paper_towel,Papel-toalha,cleaning,460,own:paper_towel_roll,exact,active,,
 napkin,Guardanapo,cleaning,470,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 aluminum_foil,Papel-alumínio,cleaning,480,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 plastic_wrap,Filme plástico,cleaning,490,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -363,13 +363,13 @@ hair_dye,Tintura de cabelo,personal_care,90,,,active,,Sem ícone Fluent; candida
 comb,Pente,personal_care,100,fluent:Hair pick,approx,active,,Garfo de cabelo no lugar do pente
 hairbrush,Escova de cabelo,personal_care,110,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 hair_tie,Elástico de cabelo,personal_care,120,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-toothpaste,Creme dental,personal_care,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+toothpaste,Creme dental,personal_care,130,own:toothpaste_tube,exact,active,,
 toothbrush,Escova de dente,personal_care,140,fluent:Toothbrush,exact,active,,
 dental_floss,Fio dental,personal_care,150,fluent:Thread,approx,active,,Carretel de linha no lugar do fio
 mouthwash,Enxaguante bucal,personal_care,160,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 denture_adhesive,Fixador de dentadura,personal_care,170,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 denture_cleaner,Limpador de dentadura,personal_care,180,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-deodorant,Desodorante,personal_care,190,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+deodorant,Desodorante,personal_care,190,own:deodorant,exact,active,,
 body_lotion,Hidratante,personal_care,200,fluent:Lotion bottle,exact,active,,
 sunscreen,Protetor solar,personal_care,210,fluent:Lotion bottle,approx,active,,Frasco genérico
 insect_repellent,Repelente,personal_care,220,fluent:Mosquito,approx,active,,Mosquito no lugar do frasco
@@ -383,9 +383,9 @@ nail_polish_remover,Acetona,personal_care,290,,,active,,Sem ícone Fluent; candi
 lipstick,Batom,personal_care,300,fluent:Lipstick,exact,active,,
 perfume,Perfume,personal_care,310,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 talcum,Talco,personal_care,320,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-sanitary_pad,Absorvente,personal_care,330,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-adult_diaper,Fralda geriátrica,personal_care,340,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-baby_diaper,Fralda infantil,personal_care,350,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sanitary_pad,Absorvente,personal_care,330,own:sanitary_pad,exact,active,,
+adult_diaper,Fralda geriátrica,personal_care,340,own:diaper,exact,active,,
+baby_diaper,Fralda infantil,personal_care,350,own:diaper,approx,active,,Mesma fralda da geriátrica
 baby_bottle,Mamadeira,personal_care,360,fluent:Baby bottle,exact,active,,
 hand_sanitizer,Álcool em gel,personal_care,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 condom,Preservativo,personal_care,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -408,7 +408,7 @@ ibuprofen,Ibuprofeno,personal_care,540,fluent:Pill,approx,active,,Comprimido gen
 antacid,Antiácido,personal_care,550,fluent:Pill,approx,active,,Comprimido genérico
 dewormer,Vermífugo,personal_care,560,fluent:Pill,approx,active,,Comprimido genérico; também o de pet
 cough_syrup,Xarope,personal_care,570,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-ointment,Pomada,personal_care,580,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+ointment,Pomada,personal_care,580,own:toothpaste_tube,approx,active,,Tubo de creme dental no lugar da pomada
 throat_lozenge,Pastilha para garganta,personal_care,590,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 syringe,Seringa,personal_care,600,fluent:Syringe,exact,active,,
 glucose_strip,Fita de glicemia,personal_care,610,,,active,,Sem ícone Fluent; candidata ao complemento próprio

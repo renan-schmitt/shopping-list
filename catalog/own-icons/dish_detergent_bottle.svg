@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M15.2 6.4L15.8 2.6C15.85 2.25 16.15 2.25 16.2 2.6L16.8 6.4H15.2Z" fill="#1F8A3A"/>
+<rect x="12.8" y="5.8" width="6.4" height="4.8" rx="1" fill="url(#dd_cap)"/>
+<path d="M12.8 8.6H19.2" stroke="#16702E" stroke-width="0.4"/>
+<path d="M10 12.6C10 11.3 11.1 10.2 12.4 10.2H19.6C20.9 10.2 22 11.3 22 12.6V16.6C22 17.8 21 18.6 21 20C21 21.4 22 22.2 22 23.4V28.2C22 29.2 21.2 30 20.2 30H11.8C10.8 30 10 29.2 10 28.2V23.4C10 22.2 11 21.4 11 20C11 18.6 10 17.8 10 16.6V12.6Z" fill="url(#dd_body)"/>
+<path d="M10 23.6H22V28.2C22 29.2 21.2 30 20.2 30H11.8C10.8 30 10 29.2 10 28.2V23.6Z" fill="url(#dd_label)"/>
+<circle cx="14.4" cy="26.4" r="1.4" fill="#FFFFFF"/>
+<circle cx="17.2" cy="25.6" r="0.9" fill="#FFFFFF" fill-opacity="0.85"/>
+<circle cx="17.6" cy="27.8" r="0.7" fill="#FFFFFF" fill-opacity="0.7"/>
+<circle cx="17.6" cy="14" r="1.1" fill="#FFFFFF" fill-opacity="0.55"/>
+<circle cx="15.6" cy="16.4" r="0.7" fill="#FFFFFF" fill-opacity="0.45"/>
+<path d="M11.8 12.4V16.4M12.4 20.6V22" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="1" stroke-linecap="round"/>
+<defs>
+<linearGradient id="dd_cap" x1="12.8" y1="8.2" x2="19.2" y2="8.2" gradientUnits="userSpaceOnUse"><stop stop-color="#4CC768"/><stop offset="1" stop-color="#1F8A3A"/></linearGradient>
+<linearGradient id="dd_body" x1="10" y1="20" x2="22" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#FFEC7A"/><stop offset="0.45" stop-color="#FFD43B"/><stop offset="1" stop-color="#E8A800"/></linearGradient>
+<linearGradient id="dd_label" x1="10" y1="26.8" x2="22" y2="26.8" gradientUnits="userSpaceOnUse"><stop stop-color="#3FB85A"/><stop offset="1" stop-color="#1F7F36"/></linearGradient>
+</defs>
+</svg>

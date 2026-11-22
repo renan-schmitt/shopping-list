@@ -1,0 +1,15 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.5 9C4.5 7.9 5.4 7 6.5 7H25.5C26.6 7 27.5 7.9 27.5 9V13C27.5 14.5 26.4 15.6 24.9 16.2C22.8 17 21.4 18.9 21.4 21.2V23.8C21.4 26.4 19 28.4 16 28.4C13 28.4 10.6 26.4 10.6 23.8V21.2C10.6 18.9 9.2 17 7.1 16.2C5.6 15.6 4.5 14.5 4.5 13V9Z" fill="url(#dp_body)"/>
+<path d="M4.5 9C4.5 7.9 5.4 7 6.5 7H25.5C26.6 7 27.5 7.9 27.5 9V10.2H4.5V9Z" fill="url(#dp_band)"/>
+<path d="M4.5 10.2H27.5" stroke="#5A9BEA" stroke-width="0.4"/>
+<path d="M7.6 16.6C10 17.8 11.4 19.6 11.6 22.4M24.4 16.6C22 17.8 20.6 19.6 20.4 22.4" stroke="#9CC8F5" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M16 13V25.6" stroke="#FFD84A" stroke-width="1.2" stroke-linecap="round"/>
+<rect x="2.6" y="11.2" width="4.2" height="3" rx="0.8" fill="url(#dp_tab)"/>
+<rect x="25.2" y="11.2" width="4.2" height="3" rx="0.8" fill="url(#dp_tab)"/>
+<path d="M6.2 11.6V15" stroke="#FFFFFF" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="dp_body" x1="4.5" y1="17.7" x2="27.5" y2="17.7" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="0.6" stop-color="#EEF2F7"/><stop offset="1" stop-color="#C3CDDA"/></linearGradient>
+<linearGradient id="dp_band" x1="4.5" y1="8.6" x2="27.5" y2="8.6" gradientUnits="userSpaceOnUse"><stop stop-color="#BFE0FF"/><stop offset="1" stop-color="#7FB4EE"/></linearGradient>
+<linearGradient id="dp_tab" x1="2.6" y1="12.7" x2="29.4" y2="12.7" gradientUnits="userSpaceOnUse"><stop stop-color="#5A9BF5"/><stop offset="1" stop-color="#2156B8"/></linearGradient>
+</defs>
+</svg>

@@ -1,0 +1,21 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="9.4" cy="5.2" r="0.8" fill="#8FD0FF"/>
+<circle cx="7.2" cy="4" r="0.6" fill="#8FD0FF" fill-opacity="0.8"/>
+<circle cx="7" cy="6.6" r="0.7" fill="#8FD0FF" fill-opacity="0.8"/>
+<circle cx="4.8" cy="5.2" r="0.6" fill="#8FD0FF" fill-opacity="0.6"/>
+<circle cx="5" cy="2.8" r="0.45" fill="#8FD0FF" fill-opacity="0.5"/>
+<circle cx="4.8" cy="7.8" r="0.45" fill="#8FD0FF" fill-opacity="0.5"/>
+<rect x="12.8" y="3.6" width="6.4" height="5.4" rx="1.2" fill="url(#do_actuator)"/>
+<circle cx="13.9" cy="5.3" r="0.55" fill="#4A5566"/>
+<path d="M10 12.2C10 10.2 12.7 8.6 16 8.6C19.3 8.6 22 10.2 22 12.2H10Z" fill="url(#do_shoulder)"/>
+<path d="M10 12H22V28C22 29.1 21.1 30 20 30H12C10.9 30 10 29.1 10 28V12Z" fill="url(#do_can)"/>
+<path d="M10 12H22" stroke="#7D8899" stroke-width="0.5"/>
+<path d="M10 19.4C12.2 18 14.4 18 16.4 19C18.4 20 20.2 20 22 18.9V23.6C20.2 24.6 18.4 24.6 16.4 23.6C14.4 22.6 12.2 22.6 10 24V19.4Z" fill="#FFFFFF"/>
+<path d="M10 28C10 29.1 10.9 30 12 30H20C21.1 30 22 29.1 22 28V27.2H10V28Z" fill="#B9C3D0"/>
+<path d="M11.6 13.6V17.6M11.6 25V26" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="1" stroke-linecap="round"/>
+<defs>
+<linearGradient id="do_actuator" x1="12.8" y1="6.3" x2="19.2" y2="6.3" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#BFC9D6"/></linearGradient>
+<linearGradient id="do_shoulder" x1="10" y1="10.4" x2="22" y2="10.4" gradientUnits="userSpaceOnUse"><stop stop-color="#F2F5F9"/><stop offset="1" stop-color="#A9B4C2"/></linearGradient>
+<linearGradient id="do_can" x1="10" y1="21" x2="22" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#3FA9F5"/><stop offset="0.5" stop-color="#1C7FD6"/><stop offset="1" stop-color="#0F4F99"/></linearGradient>
+</defs>
+</svg>
