@@ -60,6 +60,9 @@ Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git).
 - Build completo (Android, iOS e testes): `./gradlew build`
 - Instalar no emulador ou celular: `./gradlew :androidApp:installDebug`
 - Testes do `shared` (Android e simulador iOS): `./gradlew :shared:allTests`
+- Testes do `androidApp` (ViewModels, fluxos com Compose UI Test, acessibilidade e screenshots, tudo no Robolectric): `./gradlew :androidApp:testDebugUnitTest`
+- Um teste só: acrescente `--tests '*ListFinishFlowTest'` (vale também para `:shared:testAndroidHostTest`)
+- Acessibilidade: checks próprios em `androidApp/src/test/.../ui/AccessibilityChecks.kt` (área de toque, rótulos, texto cortado) e `ContrastTest`; o Accessibility Test Framework não roda no Robolectric ([plano §4.6](docs/plano-implementacao.md#46-qualidade-e-testes))
 - Screenshots Roborazzi: gravar `./gradlew :androidApp:recordRoborazziDebug`, conferir `./gradlew :androidApp:verifyRoborazziDebug` (referências em `androidApp/src/test/screenshots/`, no git)
 - Catálogo (valida `catalog/` e gera o catálogo embarcado): `./gradlew :shared:generateCatalog` — também roda no build
 - Ícones do catálogo (baixa os SVG do Fluent usados na planilha para `catalog/fluent-svg/`): `./gradlew :shared:downloadFluentIcons` — rodar à mão ao usar um ícone Fluent novo; a conversão para VectorDrawable roda no build
