@@ -110,15 +110,27 @@ class CatalogIndexTest {
 
     private val section = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
 
+    /** Catálogo com um produto sem ícone; o real ganha ícones a cada leva e não serve de exemplo. */
+    private val iconless = CatalogIndex(
+        Catalog(
+            sections = listOf(section),
+            products = listOf(product("papaya", "Mamão")),
+            terms = emptyList(),
+            replacements = emptyMap(),
+            retiredProductIds = emptySet(),
+        ),
+    )
+
     @Test
     fun itemIconIsTheProductIconOrItsSectionIcon() {
         assertEquals(CatalogIcon.Fluent("Banana"), index.icon(productId = "banana", sectionId = "produce"))
-        assertEquals(CatalogIcon.Fluent("Leafy green"), index.icon(productId = "papaya", sectionId = "produce"))
+        assertEquals(CatalogIcon.Fluent("Leafy green"), iconless.icon(productId = "papaya", sectionId = "produce"))
     }
 
     @Test
     fun productMovedToAnotherSectionKeepsItsIcon() {
-        assertEquals(CatalogIcon.Fluent("Leafy green"), index.icon(productId = "papaya", sectionId = "pantry"))
+        assertEquals(CatalogIcon.Own("papaya"), index.icon(productId = "papaya", sectionId = "pantry"))
+        assertEquals(CatalogIcon.Fluent("Leafy green"), iconless.icon(productId = "papaya", sectionId = "pantry"))
     }
 
     @Test

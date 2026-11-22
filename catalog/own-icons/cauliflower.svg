@@ -1,0 +1,19 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2.6 14.4C6.4 14 10 16.6 12 21.4L16 29.6L6.6 25.6C3.6 23.2 2.2 19 2.6 14.4Z" fill="url(#cf_leaf_l)"/>
+<path d="M29.4 14.4C25.6 14 22 16.6 20 21.4L16 29.6L25.4 25.6C28.4 23.2 29.8 19 29.4 14.4Z" fill="url(#cf_leaf_r)"/>
+<path d="M9 17.8C9 13.4 12 9 16 9C20 9 23 13.4 23 17.8L16 29.6Z" fill="url(#cf_leaf_c)"/>
+<circle cx="9.4" cy="13.4" r="4.4" fill="url(#cf_floret)"/>
+<circle cx="22.6" cy="13.4" r="4.4" fill="url(#cf_floret)"/>
+<circle cx="12.4" cy="8.4" r="4.4" fill="url(#cf_floret)"/>
+<circle cx="19.6" cy="8.4" r="4.4" fill="url(#cf_floret)"/>
+<circle cx="16" cy="14" r="5" fill="url(#cf_floret)"/>
+<circle cx="16" cy="5.6" r="3.6" fill="url(#cf_floret)"/>
+<path d="M7.6 11.8A2 2 0 0 1 9.8 10.4M10.8 6.8A2 2 0 0 1 13 5.4M18 6.8A2 2 0 0 1 20.2 5.4M21 11.8A2 2 0 0 1 23.2 10.4M14 12A2.4 2.4 0 0 1 16.6 10.4" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M11.4 22L16 28.6L20.6 22" stroke="#C9E7A6" stroke-opacity="0.8" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="cf_leaf_l" x1="3" y1="15" x2="14" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#7BBE4E"/><stop offset="1" stop-color="#3A7A2C"/></linearGradient>
+<linearGradient id="cf_leaf_r" x1="29" y1="15" x2="18" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#7BBE4E"/><stop offset="1" stop-color="#3A7A2C"/></linearGradient>
+<linearGradient id="cf_leaf_c" x1="16" y1="18" x2="16" y2="29" gradientUnits="userSpaceOnUse"><stop stop-color="#A9D67E"/><stop offset="1" stop-color="#5C9C3E"/></linearGradient>
+<radialGradient id="cf_floret" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14 7) rotate(70) scale(14 12)"><stop stop-color="#FFFDF2"/><stop offset="0.6" stop-color="#F6EDCF"/><stop offset="1" stop-color="#DCCB98"/></radialGradient>
+</defs>
+</svg>

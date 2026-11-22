@@ -1,14 +1,4 @@
 icon_id,name,priority,products,notes
-cassava,Mandioca,1,cassava;frozen_cassava,Raiz com casca marrom e a ponta cortada mostrando o branco
-papaya,Mamão,1,papaya,Metade aberta com as sementes pretas
-pumpkin,Abóbora,1,pumpkin,Abóbora cabotiá com uma fatia cortada
-chayote,Chuchu,1,chayote,
-beet,Beterraba,1,beet,Com as folhas
-cabbage,Repolho,1,cabbage;red_cabbage,Repolho verde; o roxo pode virar uma variação depois
-cauliflower,Couve-flor,1,cauliflower,
-okra,Quiabo,1,okra,
-guava,Goiaba,1,guava;guava_paste,A goiabada fica aproximada até ter a lata própria
-passion_fruit,Maracujá,1,passion_fruit,Metade aberta com a polpa amarela
 ground_beef,Carne moída,1,ground_beef,Bandeja de isopor com a carne moída
 liver,Fígado,1,beef_liver;chicken_liver,
 chicken_giblets,Miúdos de frango,1,chicken_heart;chicken_gizzard,Coração e moela na bandeja

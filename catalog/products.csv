@@ -9,7 +9,7 @@ lime,Limão,produce,70,fluent:Lime,exact,active,,
 lemon,Limão-siciliano,produce,80,fluent:Lemon,exact,active,,
 sweet_lime,Lima-da-pérsia,produce,90,fluent:Lime,approx,active,,Limão no lugar da lima
 grape,Uva,produce,100,fluent:Grapes,exact,active,,
-papaya,Mamão,produce,110,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+papaya,Mamão,produce,110,own:papaya,exact,active,,
 melon,Melão,produce,120,fluent:Melon,exact,active,,
 watermelon,Melancia,produce,130,fluent:Watermelon,exact,active,,
 pineapple,Abacaxi,produce,140,fluent:Pineapple,exact,active,,
@@ -20,8 +20,8 @@ nectarine,Nectarina,produce,180,fluent:Peach,approx,active,,Pêssego no lugar da
 plum,Ameixa,produce,190,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 strawberry,Morango,produce,200,fluent:Strawberry,exact,active,,
 avocado,Abacate,produce,210,fluent:Avocado,exact,active,,
-guava,Goiaba,produce,220,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-passion_fruit,Maracujá,produce,230,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+guava,Goiaba,produce,220,own:guava,exact,active,,
+passion_fruit,Maracujá,produce,230,own:passion_fruit,exact,active,,
 kiwi,Kiwi,produce,240,fluent:Kiwi fruit,exact,active,,
 coconut,Coco,produce,250,fluent:Coconut,exact,active,,
 green_coconut,Coco verde,produce,260,fluent:Coconut,approx,active,,Coco seco no lugar do verde
@@ -62,12 +62,12 @@ tomato,Tomate,produce,570,fluent:Tomato,exact,active,,
 cherry_tomato,Tomate-cereja,produce,580,fluent:Tomato,approx,active,,Tomate grande no lugar do pequeno
 potato,Batata,produce,590,fluent:Potato,exact,active,,
 sweet_potato,Batata-doce,produce,600,fluent:Roasted sweet potato,approx,active,,"Batata-doce assada, não crua"
-cassava,Mandioca,produce,610,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cassava,Mandioca,produce,610,own:cassava,exact,active,,
 arracacha,Mandioquinha,produce,620,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 taro,Inhame,produce,630,,,active,,Sem ícone Fluent; candidata ao complemento próprio; no Nordeste inhame é o cará do Sudeste
 yam,Cará,produce,640,,,active,,Sem ícone Fluent; candidata ao complemento próprio; no Nordeste é chamado de inhame
 carrot,Cenoura,produce,650,fluent:Carrot,exact,active,,
-beet,Beterraba,produce,660,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+beet,Beterraba,produce,660,own:beet,exact,active,,
 radish,Rabanete,produce,670,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 turnip,Nabo,produce,680,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 onion,Cebola,produce,690,fluent:Onion,exact,active,,
@@ -80,9 +80,9 @@ hot_pepper,Pimenta,produce,750,fluent:Hot pepper,exact,active,,Pimenta fresca; a
 aji_dulce,Pimenta-de-cheiro,produce,760,fluent:Hot pepper,approx,active,,Pimenta comprida no lugar da redonda
 cucumber,Pepino,produce,770,fluent:Cucumber,exact,active,,
 zucchini,Abobrinha,produce,780,fluent:Cucumber,approx,active,,Pepino no lugar da abobrinha
-pumpkin,Abóbora,produce,790,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-chayote,Chuchu,produce,800,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-okra,Quiabo,produce,810,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+pumpkin,Abóbora,produce,790,own:pumpkin,exact,active,,
+chayote,Chuchu,produce,800,own:chayote,exact,active,,
+okra,Quiabo,produce,810,own:okra,exact,active,,
 eggplant,Berinjela,produce,820,fluent:Eggplant,exact,active,,
 scarlet_eggplant,Jiló,produce,830,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 gherkin,Maxixe,produce,840,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -91,10 +91,10 @@ snow_pea,Ervilha-torta,produce,860,fluent:Pea pod,exact,active,,
 fresh_bean,Feijão-verde,produce,870,fluent:Beans,approx,active,,Feijão seco no lugar do verde
 corn,Milho,produce,880,fluent:Ear of corn,exact,active,,
 broccoli,Brócolis,produce,890,fluent:Broccoli,exact,active,,
-cauliflower,Couve-flor,produce,900,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cauliflower,Couve-flor,produce,900,own:cauliflower,exact,active,,
 brussels_sprout,Couve-de-bruxelas,produce,910,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cabbage,Repolho,produce,920,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-red_cabbage,Repolho roxo,produce,930,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cabbage,Repolho,produce,920,own:cabbage,exact,active,,
+red_cabbage,Repolho roxo,produce,930,own:cabbage,approx,active,,Repolho verde no lugar do roxo
 celery,Salsão,produce,940,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 fennel,Erva-doce,produce,950,,,active,,Sem ícone Fluent; candidata ao complemento próprio; a semente fica em Mercearia
 asparagus,Aspargo,produce,960,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -599,7 +599,7 @@ candy,Bala,pantry,1270,fluent:Candy,exact,active,,
 lollipop,Pirulito,pantry,1280,fluent:Lollipop,exact,active,,
 chewing_gum,Chiclete,pantry,1290,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 sprinkles,Granulado,pantry,1300,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-guava_paste,Goiabada,pantry,1310,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+guava_paste,Goiabada,pantry,1310,own:guava,approx,active,,Goiaba no lugar da lata de goiabada
 bananada,Bananada,pantry,1320,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 pacoca,Paçoca,pantry,1330,fluent:Peanuts,approx,active,,Amendoim no lugar do doce
 pe_de_moleque,Pé de moleque,pantry,1340,fluent:Peanuts,approx,active,,Amendoim no lugar do doce
@@ -658,6 +658,6 @@ frozen_fries,Batata frita congelada,frozen,120,fluent:French fries,approx,active
 frozen_cheese_bread,Pão de queijo congelado,frozen,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio; o assado fica na Padaria
 frozen_snacks,Salgado congelado,frozen,140,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 frozen_vegetables,Legumes congelados,frozen,150,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-frozen_cassava,Mandioca congelada,frozen,160,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+frozen_cassava,Mandioca congelada,frozen,160,own:cassava,approx,active,,Mandioca no lugar do saco congelado
 frozen_fish,Peixe congelado,frozen,170,fluent:Fish,approx,active,,"Peixe inteiro, não o pacote"
 waffle,Waffle,frozen,180,fluent:Waffle,exact,active,,

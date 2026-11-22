@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 3C23.2 3 29.2 8.8 29.2 16.2C29.2 23.6 23.2 29.4 16 29.4C8.8 29.4 2.8 23.6 2.8 16.2C2.8 8.8 8.8 3 16 3Z" fill="url(#pf_skin)"/>
+<path d="M16 5C22.2 5 27.2 10 27.2 16.2C27.2 22.4 22.2 27.4 16 27.4C9.8 27.4 4.8 22.4 4.8 16.2C4.8 10 9.8 5 16 5Z" fill="#FFF4D8"/>
+<path d="M16 6.8C21.2 6.8 25.4 11 25.4 16.2C25.4 21.4 21.2 25.6 16 25.6C10.8 25.6 6.6 21.4 6.6 16.2C6.6 11 10.8 6.8 16 6.8Z" fill="url(#pf_pulp)"/>
+<circle cx="16" cy="11" r="1.1" fill="#3A2A14"/><circle cx="12" cy="13" r="1.1" fill="#3A2A14"/><circle cx="20" cy="13" r="1.1" fill="#3A2A14"/>
+<circle cx="10.6" cy="17.2" r="1.1" fill="#3A2A14"/><circle cx="14.4" cy="15.8" r="1.1" fill="#3A2A14"/><circle cx="17.8" cy="16.4" r="1.1" fill="#3A2A14"/><circle cx="21.4" cy="17.4" r="1.1" fill="#3A2A14"/>
+<circle cx="12.8" cy="20.4" r="1.1" fill="#3A2A14"/><circle cx="16.2" cy="20.2" r="1.1" fill="#3A2A14"/><circle cx="19.6" cy="21" r="1.1" fill="#3A2A14"/><circle cx="16" cy="23.4" r="1" fill="#3A2A14"/>
+<path d="M9.4 12.2C10.6 10.2 12.4 8.8 14.4 8.2" stroke="#FFF7B8" stroke-opacity="0.85" stroke-width="1" stroke-linecap="round"/>
+<defs>
+<linearGradient id="pf_skin" x1="6" y1="5" x2="26" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="#E2CC3A"/><stop offset="0.5" stop-color="#C6A82A"/><stop offset="1" stop-color="#8E7418"/></linearGradient>
+<radialGradient id="pf_pulp" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(16 16.2) scale(9.4)"><stop stop-color="#FFD43A"/><stop offset="0.75" stop-color="#FFC21E"/><stop offset="1" stop-color="#F0A812"/></radialGradient>
+</defs>
+</svg>

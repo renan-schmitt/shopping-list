@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M14.9 7.6C14.9 5.6 15.6 4 17.2 3.2" stroke="#7A5A2E" stroke-width="2" stroke-linecap="round"/>
+<path d="M16 7C24 7 29.4 11.4 29.4 18.2C29.4 25 24 28.8 16 28.8C8 28.8 2.6 25 2.6 18.2C2.6 11.4 8 7 16 7Z" fill="url(#pk_skin)"/>
+<path d="M10.2 8.6C7.6 11.6 7.2 22.6 10.2 28M16 7.2V28.8M21.8 8.6C23 10 23.8 12.8 24.2 16" stroke="#1E3A1E" stroke-opacity="0.45" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M6.4 12C8.4 9.8 11.2 8.6 14 8.3" stroke="#B8D898" stroke-opacity="0.7" stroke-width="1" stroke-linecap="round"/>
+<path d="M18.4 17.4L29 17C29.1 20.8 27.6 24.6 24.8 26.4Z" fill="url(#pk_flesh)"/>
+<path d="M18.4 17.4L29 17M18.4 17.4L24.8 26.4" stroke="#D96A0E" stroke-width="0.8" stroke-linecap="round"/>
+<path d="M21.8 18.6L22.6 19.6M24.4 18.6L25.2 19.8M23.4 21.4L24.2 22.4M26.2 21.2L26.8 22.2" stroke="#FFF1C8" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<radialGradient id="pk_skin" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(11 12) rotate(50) scale(20 22)"><stop stop-color="#86B266"/><stop offset="0.55" stop-color="#4E7E40"/><stop offset="1" stop-color="#36602C"/></radialGradient>
+<linearGradient id="pk_flesh" x1="19" y1="17" x2="27" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#FFB536"/><stop offset="1" stop-color="#F58418"/></linearGradient>
+</defs>
+</svg>

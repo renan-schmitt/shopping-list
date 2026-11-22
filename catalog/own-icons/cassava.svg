@@ -1,0 +1,12 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4.2 22.6C3.1 21.5 3.3 19.6 4.7 18.4L18.6 7.6C21.8 5.2 25.4 4.2 28.6 3.6C28 6.8 26.9 10.3 24.5 13.5L13.7 27.4C12.5 28.8 10.6 29 9.5 27.9L4.2 22.6Z" fill="url(#cv_skin)"/>
+<path d="M9.2 16.2L11.2 19.6M14 12.4L16 15.8M18.8 8.8L20.6 11.8M13 21.2L15.4 23.4M17.4 16.6L19.6 18.4" stroke="#6E4524" stroke-opacity="0.55" stroke-width="0.8" stroke-linecap="round"/>
+<path d="M7.4 16.6L19.4 7.2C21.6 5.6 24.2 4.7 26.6 4.1" stroke="#E2B07C" stroke-opacity="0.7" stroke-width="0.9" stroke-linecap="round"/>
+<ellipse cx="6.85" cy="25.15" rx="2.6" ry="4.1" transform="rotate(-45 6.85 25.15)" fill="url(#cv_cut)"/>
+<ellipse cx="6.85" cy="25.15" rx="1.5" ry="2.7" transform="rotate(-45 6.85 25.15)" fill="#FFFDF4"/>
+<circle cx="6.85" cy="25.15" r="0.45" fill="#E9D9A8"/>
+<defs>
+<linearGradient id="cv_skin" x1="10" y1="12" x2="17" y2="19" gradientUnits="userSpaceOnUse"><stop stop-color="#B57B47"/><stop offset="0.55" stop-color="#8E5A31"/><stop offset="1" stop-color="#6B3F1F"/></linearGradient>
+<linearGradient id="cv_cut" x1="4.5" y1="22.8" x2="9.2" y2="27.5" gradientUnits="userSpaceOnUse"><stop stop-color="#F7EBCB"/><stop offset="1" stop-color="#E3CC93"/></linearGradient>
+</defs>
+</svg>
