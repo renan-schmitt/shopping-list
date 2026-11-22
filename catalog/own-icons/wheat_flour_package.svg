@@ -1,0 +1,22 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 3.5H24L25 7.5H7L8 3.5Z" fill="url(#wf_fold)"/>
+<path d="M8 3.5H24L23.4 5.2H8.6L8 3.5Z" fill="#E7DCC6"/>
+<path d="M7 7.5H25V28.5C25 29.33 24.33 30 23.5 30H8.5C7.67 30 7 29.33 7 28.5V7.5Z" fill="url(#wf_body)"/>
+<path d="M7 7.5H25V9H7V7.5Z" fill="#E3D6BC"/>
+<path d="M7 23.5H25V28.5C25 29.33 24.33 30 23.5 30H8.5C7.67 30 7 29.33 7 28.5V23.5Z" fill="url(#wf_band)"/>
+<path d="M16 22.8V11.6" stroke="#B9852A" stroke-width="0.8" stroke-linecap="round"/>
+<ellipse cx="16" cy="11.4" rx="0.9" ry="1.5" fill="url(#wf_grain)"/>
+<ellipse cx="14.7" cy="13.6" rx="0.9" ry="1.5" transform="rotate(-30 14.7 13.6)" fill="url(#wf_grain)"/>
+<ellipse cx="17.3" cy="13.6" rx="0.9" ry="1.5" transform="rotate(30 17.3 13.6)" fill="url(#wf_grain)"/>
+<ellipse cx="14.7" cy="16.2" rx="0.9" ry="1.5" transform="rotate(-30 14.7 16.2)" fill="url(#wf_grain)"/>
+<ellipse cx="17.3" cy="16.2" rx="0.9" ry="1.5" transform="rotate(30 17.3 16.2)" fill="url(#wf_grain)"/>
+<ellipse cx="14.7" cy="18.8" rx="0.9" ry="1.5" transform="rotate(-30 14.7 18.8)" fill="url(#wf_grain)"/>
+<ellipse cx="17.3" cy="18.8" rx="0.9" ry="1.5" transform="rotate(30 17.3 18.8)" fill="url(#wf_grain)"/>
+<path d="M8.3 9.5V27.8" stroke="#FFFFFF" stroke-opacity="0.8" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="wf_fold" x1="7" y1="5.5" x2="25" y2="5.5" gradientUnits="userSpaceOnUse"><stop stop-color="#FBF6EC"/><stop offset="1" stop-color="#D9CBB0"/></linearGradient>
+<linearGradient id="wf_body" x1="7" y1="18" x2="25" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFDF8"/><stop offset="0.5" stop-color="#F7F1E4"/><stop offset="1" stop-color="#DCCDB0"/></linearGradient>
+<linearGradient id="wf_band" x1="7" y1="26" x2="25" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#F0524A"/><stop offset="0.5" stop-color="#E23A33"/><stop offset="1" stop-color="#B82424"/></linearGradient>
+<linearGradient id="wf_grain" x1="15" y1="10" x2="17" y2="13" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD25A"/><stop offset="1" stop-color="#E0A426"/></linearGradient>
+</defs>
+</svg>

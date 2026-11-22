@@ -297,8 +297,8 @@ pate,Patê,deli_dairy,470,,,active,,Sem ícone Fluent; candidata ao complemento 
 pastry_dough,Massa de pastel,deli_dairy,480,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 fresh_pasta,Macarrão fresco,deli_dairy,490,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 tofu,Tofu,deli_dairy,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cooking_oil,Óleo,pantry,620,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-tapioca_starch,Goma de tapioca,pantry,340,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+cooking_oil,Óleo,pantry,620,own:cooking_oil,exact,active,,
+tapioca_starch,Goma de tapioca,pantry,340,own:tapioca_starch,exact,active,,
 massa_puba,Massa puba,pantry,345,,,active,,Sem ícone Fluent; candidata ao complemento próprio; mandioca fermentada do Norte e do Nordeste
 laundry_powder,Sabão em pó,cleaning,10,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 liquid_laundry_detergent,Sabão líquido,cleaning,20,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -469,16 +469,16 @@ flip_flops,Chinelo,other,310,fluent:Thong sandal,exact,active,,
 umbrella,Guarda-chuva,other,320,fluent:Umbrella,exact,active,,
 newspaper,Jornal,other,330,fluent:Newspaper,exact,active,,
 phone_credit,Recarga de celular,other,340,fluent:Mobile phone,approx,active,,Celular no lugar da recarga
-rice,Arroz,pantry,10,fluent:Cooked rice,approx,active,,"Arroz pronto na tigela, não o pacote"
-brown_rice,Arroz integral,pantry,20,fluent:Cooked rice,approx,active,,"Arroz pronto na tigela, não o pacote"
-parboiled_rice,Arroz parboilizado,pantry,30,fluent:Cooked rice,approx,active,,"Arroz pronto na tigela, não o pacote"
-beans,Feijão,pantry,40,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
-carioca_beans,Feijão carioca,pantry,50,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
-black_beans,Feijão preto,pantry,60,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
-blackeyed_peas,Feijão-fradinho,pantry,70,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
-cowpea,Feijão-de-corda,pantry,80,fluent:Beans,approx,active,,"Grão seco; o fresco é o feijão-verde, no Hortifrúti"
-red_beans,Feijão vermelho,pantry,90,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
-white_beans,Feijão branco,pantry,100,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
+rice,Arroz,pantry,10,own:rice_package,exact,active,,
+brown_rice,Arroz integral,pantry,20,own:rice_package,exact,active,,
+parboiled_rice,Arroz parboilizado,pantry,30,own:rice_package,exact,active,,
+beans,Feijão,pantry,40,own:beans_package,exact,active,,
+carioca_beans,Feijão carioca,pantry,50,own:beans_package,exact,active,,
+black_beans,Feijão preto,pantry,60,own:beans_package,approx,active,,Pacote com grão carioca
+blackeyed_peas,Feijão-fradinho,pantry,70,own:beans_package,approx,active,,Pacote com grão carioca
+cowpea,Feijão-de-corda,pantry,80,own:beans_package,approx,active,,"Pacote com grão carioca; o fresco é o feijão-verde, no Hortifrúti"
+red_beans,Feijão vermelho,pantry,90,own:beans_package,approx,active,,Pacote com grão carioca
+white_beans,Feijão branco,pantry,100,own:beans_package,approx,active,,Pacote com grão carioca
 lentil,Lentilha,pantry,110,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
 chickpea,Grão-de-bico,pantry,120,fluent:Beans,approx,active,,"Grãos soltos, não o pacote"
 dried_peas,Ervilha seca,pantry,130,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -491,18 +491,18 @@ microwave_popcorn,Pipoca de micro-ondas,pantry,190,fluent:Popcorn,approx,active,
 hominy,Canjica,pantry,200,,,active,,"Sem ícone Fluent; candidata ao complemento próprio; no Nordeste, canjica é o creme de milho (mungunzá é o grão)"
 chia,Chia,pantry,210,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 flaxseed,Linhaça,pantry,220,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-wheat_flour,Farinha de trigo,pantry,230,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cassava_flour,Farinha de mandioca,pantry,240,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-farinha_dagua,Farinha d'água,pantry,250,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Norte
+wheat_flour,Farinha de trigo,pantry,230,own:wheat_flour_package,exact,active,,
+cassava_flour,Farinha de mandioca,pantry,240,own:cassava_flour_package,exact,active,,
+farinha_dagua,Farinha d'água,pantry,250,own:cassava_flour_package,approx,active,,Pacote de farinha de mandioca; regional do Norte
 farofa_mix,Farofa pronta,pantry,260,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cornmeal,Fubá,pantry,270,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-flocao,Flocão,pantry,280,,,active,,"Sem ícone Fluent; candidata ao complemento próprio; regional do Nordeste, para cuscuz"
+cornmeal,Fubá,pantry,270,own:cornmeal_package,exact,active,,
+flocao,Flocão,pantry,280,own:cornmeal_package,exact,active,,"Mesmo pacote do fubá; regional do Nordeste, para cuscuz"
 corn_flakes_flour,Farinha de milho,pantry,290,,,active,,"Sem ícone Fluent; candidata ao complemento próprio; a de flocos, para farofa"
 cornstarch,Amido de milho,pantry,300,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 breadcrumbs,Farinha de rosca,pantry,310,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 sweet_cassava_starch,Polvilho doce,pantry,320,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 sour_cassava_starch,Polvilho azedo,pantry,330,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-granulated_tapioca,Tapioca granulada,pantry,350,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+granulated_tapioca,Tapioca granulada,pantry,350,own:tapioca_starch,approx,active,,Saco de goma no lugar do pacote de flocos
 sago,Sagu,pantry,360,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 baking_powder,Fermento em pó,pantry,370,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 dry_yeast,Fermento biológico,pantry,380,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -517,8 +517,8 @@ penne,Macarrão penne,pantry,460,fluent:Spaghetti,approx,active,,"Prato de espag
 soup_pasta,Macarrão para sopa,pantry,470,fluent:Spaghetti,approx,active,,"Prato de espaguete, não o pacote"
 lasagna_sheets,Massa de lasanha,pantry,480,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 instant_noodles,Macarrão instantâneo,pantry,490,fluent:Steaming bowl,approx,active,,Tigela de sopa no lugar do pacotinho
-tomato_sauce,Molho de tomate,pantry,500,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-tomato_paste,Extrato de tomate,pantry,510,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+tomato_sauce,Molho de tomate,pantry,500,own:tomato_sauce,exact,active,,
+tomato_paste,Extrato de tomate,pantry,510,own:tomato_sauce,approx,active,,Caixinha de molho no lugar da latinha ou do sachê
 peeled_tomatoes,Tomate pelado,pantry,520,fluent:Canned food,approx,active,,Lata genérica
 mayonnaise,Maionese,pantry,530,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 ketchup,Ketchup,pantry,540,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -526,8 +526,8 @@ mustard,Mostarda,pantry,550,,,active,,Sem ícone Fluent; candidata ao complement
 soy_sauce,Molho shoyu,pantry,560,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 hot_sauce,Molho de pimenta,pantry,570,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 worcestershire_sauce,Molho inglês,pantry,580,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-vinegar,Vinagre,pantry,590,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-olive_oil,Azeite,pantry,600,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+vinegar,Vinagre,pantry,590,own:vinegar,exact,active,,
+olive_oil,Azeite,pantry,600,own:olive_oil,exact,active,,
 palm_oil,Azeite de dendê,pantry,610,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 tucupi,Tucupi,pantry,615,,,active,,Sem ícone Fluent; candidata ao complemento próprio; regional do Norte
 lard,Banha,pantry,630,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -538,9 +538,9 @@ table_cream,Creme de leite,pantry,670,,,active,,Sem ícone Fluent; candidata ao 
 powdered_milk,Leite em pó,pantry,680,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 salt,Sal,pantry,690,fluent:Salt,exact,active,,
 coarse_salt,Sal grosso,pantry,700,fluent:Salt,approx,active,,Saleiro no lugar do pacote
-sugar,Açúcar,pantry,710,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-brown_sugar,Açúcar mascavo,pantry,720,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-demerara_sugar,Açúcar demerara,pantry,730,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+sugar,Açúcar,pantry,710,own:sugar_package,exact,active,,
+brown_sugar,Açúcar mascavo,pantry,720,own:sugar_package,approx,active,,Pacote de açúcar branco; o mascavo é escuro
+demerara_sugar,Açúcar demerara,pantry,730,own:sugar_package,approx,active,,Pacote de açúcar branco; o demerara é dourado
 sweetener,Adoçante,pantry,740,,,active,,Sem ícone Fluent; candidata ao complemento próprio
 honey,Mel,pantry,750,fluent:Honey pot,exact,active,,
 cane_syrup,Melado,pantry,755,fluent:Honey pot,approx,active,,Pote de mel no lugar do melado de cana
@@ -566,7 +566,7 @@ olives,Azeitona,pantry,940,fluent:Olive,exact,active,,
 heart_of_palm,Palmito,pantry,950,fluent:Jar,approx,active,,Pote genérico
 pickles,Pepino em conserva,pantry,960,fluent:Jar,approx,active,,Pote genérico
 peach_in_syrup,Pêssego em calda,pantry,970,fluent:Canned food,approx,active,,Lata genérica
-coffee,Café,pantry,980,fluent:Hot beverage,approx,active,,"Xícara, não o pacote"
+coffee,Café,pantry,980,own:coffee_package,exact,active,,
 instant_coffee,Café solúvel,pantry,990,fluent:Hot beverage,approx,active,,"Xícara, não o vidro"
 coffee_capsule,Café em cápsula,pantry,1000,fluent:Hot beverage,approx,active,,"Xícara, não a cápsula"
 coffee_filter,Filtro de café,pantry,1010,,,active,,Sem ícone Fluent; candidata ao complemento próprio
@@ -575,8 +575,8 @@ chamomile_tea,Chá de camomila,pantry,1030,fluent:Teacup without handle,approx,a
 boldo_tea,Chá de boldo,pantry,1040,fluent:Teacup without handle,approx,active,,"Xícara, não a caixinha"
 mate_tea,Chá-mate,pantry,1050,fluent:Teacup without handle,approx,active,,"Xícara, não a caixinha"
 yerba_mate,Erva-mate,pantry,1060,fluent:Mate,exact,active,,
-chocolate_drink_mix,Achocolatado,pantry,1070,,,active,,Sem ícone Fluent; candidata ao complemento próprio
-cocoa_powder,Chocolate em pó,pantry,1080,,,active,,Sem ícone Fluent; candidata ao complemento próprio
+chocolate_drink_mix,Achocolatado,pantry,1070,own:chocolate_drink_mix,exact,active,,
+cocoa_powder,Chocolate em pó,pantry,1080,own:chocolate_drink_mix,approx,active,,Lata de achocolatado
 jam,Geleia,pantry,1090,fluent:Jar,approx,active,,Pote genérico
 peanut_butter,Pasta de amendoim,pantry,1100,fluent:Peanuts,approx,active,,Amendoim no lugar do pote
 doce_de_leite,Doce de leite,pantry,1110,fluent:Jar,approx,active,,Pote genérico

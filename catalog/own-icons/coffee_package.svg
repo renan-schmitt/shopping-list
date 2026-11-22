@@ -1,0 +1,17 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 2.5H23L24 7H8L9 2.5Z" fill="url(#cp_fold)"/>
+<path d="M9 2.5H23L22.5 4.2H9.5L9 2.5Z" fill="#7E1414"/>
+<path d="M8 7H24V28.5C24 29.33 23.33 30 22.5 30H9.5C8.67 30 8 29.33 8 28.5V7Z" fill="url(#cp_body)"/>
+<path d="M8 7H24V8.6H8V7Z" fill="#A11E1E"/>
+<rect x="10" y="12" width="12" height="11" rx="2" fill="url(#cp_label)"/>
+<ellipse cx="16" cy="17.5" rx="3" ry="4" transform="rotate(25 16 17.5)" fill="url(#cp_bean)"/>
+<path d="M17.4 14.4C15.6 15.6 16.8 18 15.2 20.4" stroke="#3A1E0E" stroke-width="0.7" stroke-linecap="round"/>
+<path d="M8 25.5H24" stroke="#E0B030" stroke-width="0.8"/>
+<path d="M9.3 9.5V28" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="cp_fold" x1="8" y1="5" x2="24" y2="5" gradientUnits="userSpaceOnUse"><stop stop-color="#C8332B"/><stop offset="1" stop-color="#8E1A1A"/></linearGradient>
+<linearGradient id="cp_body" x1="8" y1="18" x2="24" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#E5473C"/><stop offset="0.5" stop-color="#D13429"/><stop offset="1" stop-color="#9E1E1E"/></linearGradient>
+<linearGradient id="cp_label" x1="10" y1="17.5" x2="22" y2="17.5" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF8E8"/><stop offset="1" stop-color="#EBDDBF"/></linearGradient>
+<linearGradient id="cp_bean" x1="13.5" y1="14" x2="18.5" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#9A5A30"/><stop offset="1" stop-color="#5A2F16"/></linearGradient>
+</defs>
+</svg>

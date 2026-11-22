@@ -305,6 +305,8 @@ shopping-list/
 - Cobertura boa em hortifrúti, padaria e açougue.
 - **Primeira lista do complemento próprio:** as 43 lacunas + revisar os 21 aproximados (~64 ícones, dentro da estimativa de 50–100).
 
+**Ícones próprios da Mercearia (2026-11-22, #25):** 13 ícones em `catalog/own-icons/`, no estilo Color do Fluent e sem marca. São eles: pacote de arroz, de feijão, de açúcar, de farinha de trigo, de farinha de mandioca, de fubá e de café; óleo, azeite, vinagre, molho de tomate, achocolatado e goma de tapioca. Cobrem 28 produtos, alguns como aproximado (ex.: açúcar mascavo usa o pacote de açúcar). Arroz, feijão e café trocam a tigela, os grãos e a xícara do Fluent pelo pacote. O resto da Mercearia espera a lista por prioridade da medição de cobertura (#23).
+
 **Descartados:** Noto Emoji (mesmas lacunas, estilo mais simples), OpenMoji (CC BY-SA obriga adaptações na mesma licença; estilo menos atraente), conjunto 100% próprio (custo e prazo).
 
 ### 4.5 Privacidade, métricas e coleta de dados

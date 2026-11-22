@@ -1,0 +1,17 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 6H25V28.5C25 29.33 24.33 30 23.5 30H8.5C7.67 30 7 29.33 7 28.5V6Z" fill="url(#cm_body)"/>
+<rect x="6.5" y="2.5" width="19" height="4" rx="1.2" fill="url(#cm_seal)"/>
+<path d="M8.5 3.2V5.8M10.5 3.2V5.8M12.5 3.2V5.8M14.5 3.2V5.8M16.5 3.2V5.8M18.5 3.2V5.8M20.5 3.2V5.8M22.5 3.2V5.8M24 3.2V5.8" stroke="#1F7432" stroke-width="0.5" stroke-linecap="round"/>
+<ellipse cx="16" cy="18" rx="6.6" ry="7.6" fill="url(#cm_badge)"/>
+<ellipse cx="16" cy="16.6" rx="2.3" ry="4.6" fill="url(#cm_cob)"/>
+<path d="M14.4 13.6H17.6M14 15.4H18M13.8 17.2H18.2M14 19H18M14.5 20.6H17.5M16 12.2V21" stroke="#E0A010" stroke-width="0.35" stroke-linecap="round"/>
+<path d="M16 24C14 22.6 12.6 20 12.9 16.8C13.6 18.8 14.6 20.4 16 21.4C17.4 20.4 18.4 18.8 19.1 16.8C19.4 20 18 22.6 16 24Z" fill="url(#cm_leaf)"/>
+<path d="M8.3 7V28" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="cm_body" x1="7" y1="18" x2="25" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE066"/><stop offset="0.5" stop-color="#FFD02E"/><stop offset="1" stop-color="#E5A800"/></linearGradient>
+<linearGradient id="cm_seal" x1="6.5" y1="4.5" x2="25.5" y2="4.5" gradientUnits="userSpaceOnUse"><stop stop-color="#3FAE4F"/><stop offset="1" stop-color="#22803A"/></linearGradient>
+<linearGradient id="cm_badge" x1="9.4" y1="18" x2="22.6" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#F1ECDD"/></linearGradient>
+<linearGradient id="cm_cob" x1="13.7" y1="14" x2="18.3" y2="19" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE45C"/><stop offset="1" stop-color="#F5B800"/></linearGradient>
+<linearGradient id="cm_leaf" x1="13" y1="17" x2="19" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#7BC86C"/><stop offset="1" stop-color="#2F8F3E"/></linearGradient>
+</defs>
+</svg>

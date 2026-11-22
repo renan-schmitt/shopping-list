@@ -1,0 +1,19 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.2 3.2C13.4 4.2 14.6 4.4 16 4.4C17.4 4.4 18.6 4.2 19.8 3.2C20.6 4.8 20 7 18.2 8.6H13.8C12 7 11.4 4.8 12.2 3.2Z" fill="url(#tp_top)"/>
+<path d="M13.8 9.6C11 11.6 6.2 15.4 6.2 21.4C6.2 26.4 9.6 30 16 30C22.4 30 25.8 26.4 25.8 21.4C25.8 15.4 21 11.6 18.2 9.6H13.8Z" fill="url(#tp_body)"/>
+<circle cx="11.2" cy="19.6" r="2.4" fill="#FFFFFF"/>
+<circle cx="15.6" cy="17.2" r="2.2" fill="#FFFFFF"/>
+<circle cx="19.8" cy="19.4" r="2.5" fill="#F7F8FA"/>
+<circle cx="13.4" cy="23.8" r="2.6" fill="#F7F8FA"/>
+<circle cx="18.6" cy="24.4" r="2.6" fill="#FFFFFF"/>
+<circle cx="9.6" cy="25.2" r="1.6" fill="#FFFFFF"/>
+<circle cx="22.6" cy="23.6" r="1.6" fill="#EEF1F5"/>
+<rect x="12.6" y="8.2" width="6.8" height="2" rx="1" fill="url(#tp_tie)"/>
+<path d="M18.8 9.2C20.6 8.8 21.8 8 22.2 6.8M18.8 9.4C20.8 9.8 22.2 9.4 23 8.6" stroke="#E23A33" stroke-width="0.8" stroke-linecap="round"/>
+<path d="M8.4 18.6C7.9 19.8 7.6 21 7.6 22.2" stroke="#FFFFFF" stroke-width="0.9" stroke-linecap="round"/>
+<defs>
+<linearGradient id="tp_top" x1="11.8" y1="6" x2="20.2" y2="6" gradientUnits="userSpaceOnUse"><stop stop-color="#F4F7FA"/><stop offset="1" stop-color="#C6D0DA"/></linearGradient>
+<linearGradient id="tp_body" x1="6.2" y1="20" x2="25.8" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#F1F4F7"/><stop offset="0.5" stop-color="#E4E9EE"/><stop offset="1" stop-color="#B8C4CF"/></linearGradient>
+<linearGradient id="tp_tie" x1="12.6" y1="9.2" x2="19.4" y2="9.2" gradientUnits="userSpaceOnUse"><stop stop-color="#F0524A"/><stop offset="1" stop-color="#B82424"/></linearGradient>
+</defs>
+</svg>

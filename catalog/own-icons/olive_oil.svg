@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M14.4 5H17.6V9.6C17.6 10.6 18.2 11.4 19.2 12.2C20.4 13.1 21 14.2 21 15.6V28.5C21 29.33 20.33 30 19.5 30H12.5C11.67 30 11 29.33 11 28.5V15.6C11 14.2 11.6 13.1 12.8 12.2C13.8 11.4 14.4 10.6 14.4 9.6V5Z" fill="url(#oo_glass)"/>
+<rect x="13.8" y="2" width="4.4" height="3.6" rx="0.8" fill="url(#oo_cap)"/>
+<path d="M13.8 4.4H18.2" stroke="#9C7410" stroke-width="0.4"/>
+<rect x="11" y="17" width="10" height="8.6" fill="url(#oo_label)"/>
+<path d="M11 17.6H21M11 25H21" stroke="#B8962E" stroke-width="0.4"/>
+<ellipse cx="15.4" cy="22" rx="1.7" ry="2.2" transform="rotate(-20 15.4 22)" fill="url(#oo_olive)"/>
+<path d="M16.6 20C17.4 19.2 18.4 18.8 19.2 18.9C18.8 19.8 17.8 20.4 16.6 20Z" fill="#7BC86C"/>
+<ellipse cx="14.9" cy="21.2" rx="0.4" ry="0.6" fill="#B9D77E" fill-opacity="0.8"/>
+<path d="M12.4 15V16.2M12.4 26.4V28.4" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M15.2 6.4V9.4" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.6" stroke-linecap="round"/>
+<defs>
+<linearGradient id="oo_glass" x1="11" y1="18" x2="21" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#5E8A2E"/><stop offset="0.45" stop-color="#43701E"/><stop offset="1" stop-color="#253F10"/></linearGradient>
+<linearGradient id="oo_cap" x1="13.8" y1="3.8" x2="18.2" y2="3.8" gradientUnits="userSpaceOnUse"><stop stop-color="#F2CF5B"/><stop offset="1" stop-color="#B88A12"/></linearGradient>
+<linearGradient id="oo_label" x1="11" y1="21" x2="21" y2="21" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF8E4"/><stop offset="1" stop-color="#E6D9B4"/></linearGradient>
+<linearGradient id="oo_olive" x1="14" y1="20" x2="17" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#8DB43C"/><stop offset="1" stop-color="#4F7A1C"/></linearGradient>
+</defs>
+</svg>

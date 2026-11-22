@@ -47,8 +47,8 @@ val SampleListState = ListUiState.Content(
             id = "grocery",
             name = "Mercearia",
             rows = listOf(
-                row("rice", "Arroz", R.drawable.catalog_fluent_cooked_rice, Quantity(5.0, QuantityUnit.KILOGRAM)),
-                row("coffee", "Café", R.drawable.catalog_fluent_hot_beverage),
+                row("rice", "Arroz", R.drawable.catalog_own_rice_package, Quantity(5.0, QuantityUnit.KILOGRAM)),
+                row("coffee", "Café", R.drawable.catalog_own_coffee_package),
                 row(
                     "milk",
                     "Leite",
