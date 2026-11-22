@@ -211,6 +211,12 @@ Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 ### 3.9 Validação com usuários reais
 - Testes de usabilidade com pessoas 60+ antes do lançamento (gesto de deslizar, vocabulário, tamanho de fonte, entrada por voz).
 - Confirmar a legibilidade dos nomes da lista em caixa alta e do estilo quadrinhos.
+- **Roteiro decidido (2026-11-22, #30):** [docs/teste-usuarios/roteiro.md](teste-usuarios/roteiro.md), com [modelo de anotação](teste-usuarios/modelo-sessao.md) por sessão.
+  - Roda no **app de verdade** (APK de teste), no celular de quem conduz, com a letra no tamanho que a pessoa usa. O protótipo HTML não tem voz nem segue a letra do sistema.
+  - 3 a 5 familiares 60+ que nunca viram o app, misturando idade (70+ e se possível 80+), experiência com celular, quem usa papel e quem não faz lista. Sem termo de consentimento (são da família); anotações sem nome e idade em faixa.
+  - 30 a 40 min, em lugar tranquilo; uma pessoa conduz; grava a tela com áudio só se a pessoa aceitar, e apaga depois de anotar.
+  - 12 tarefas contadas como situações da vida, sem as palavras do app (adicionar digitando e falando, produto repetido, editar, tirar, Ops, voltar, riscar, Terminei, jogar fora). Riscados no lugar × no fim da seção (#32) por duas imagens.
+  - Por tarefa: ✅ sozinha / 🟡 com ajuda / ❌; nota final de 1 a 5 com carinhas (sem SUS). Problema em 2 ou mais pessoas é corrigido antes do lançamento.
 
 ---
 
