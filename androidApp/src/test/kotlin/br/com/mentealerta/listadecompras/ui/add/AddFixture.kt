@@ -118,15 +118,24 @@ class AddFixture {
 
 /**
  * Voz falsa: cada [VoiceRecognizer.listen] entrega o que o teste mandar por [say] e termina com
- * [finish] (o silêncio longo) ou com "Terminei" ([stop]).
+ * [finish] (o silêncio longo) ou ao soltar o botão ([stop]). Com [mayUseInternet], faz de conta que
+ * vai pelo serviço padrão (o aviso aparece); senão, pelo reconhecedor do aparelho.
  */
 class FakeVoiceRecognizer(override val isAvailable: Boolean = true) : VoiceRecognizer {
     private var events = Channel<VoiceEvent>(Channel.UNLIMITED)
     var listens = 0
         private set
+    var mayUseInternet = true
 
-    override fun listen(): Flow<VoiceEvent> {
+    /** O `stopOnSilence` da última escuta: `true` quando aberta pelo TalkBack. */
+    var lastStopOnSilence: Boolean? = null
+        private set
+
+    override suspend fun mayUseInternet() = mayUseInternet
+
+    override fun listen(stopOnSilence: Boolean): Flow<VoiceEvent> {
         listens++
+        lastStopOnSilence = stopOnSilence
         events = Channel(Channel.UNLIMITED)
         return events.receiveAsFlow()
     }

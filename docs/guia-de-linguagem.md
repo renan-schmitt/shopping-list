@@ -56,6 +56,8 @@
 | Jogar a lista fora | "Jogar a lista fora? Os 12 produtos serão tirados." · **Sim, jogar fora** · **Não** |
 | Lista jogada fora | "A lista foi jogada fora." · **Ops, voltar** |
 | Terminei | "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." |
+| Botão de voz (segurar para falar) | "Segure para falar." acima de **Falar**; com o microfone aberto, o botão vira **Terminei** (2026-11-22, #123) |
+| Toque rápido no **Falar**, sem segurar | "Segure o botão enquanto fala." |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |
 | Voz sem internet (só em erro de rede de verdade) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
 | Antes de pedir o microfone (uma vez) | "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." · **Usar o microfone** · **Escrever** — só quando o app cai no serviço de voz padrão (2026-11-22) |

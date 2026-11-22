@@ -17,7 +17,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-/** Falar os produtos (#60): explicação, pedido de microfone, escuta e recados. */
+/** Falar os produtos (#60, #123): segurar para falar, explicação, pedido de microfone, escuta e recados. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddVoiceViewModelTest {
     private val fixture = AddFixture()
@@ -31,54 +31,147 @@ class AddVoiceViewModelTest {
 
     private fun listening(): AddViewModel {
         fixture.voicePreferences.noticeShown = true
-        return fixture.viewModel().apply { onSpeak(hasMicrophone = true) }
+        return fixture.viewModel().apply { onSpeakPress(hasMicrophone = true) }
     }
 
     @Test
     fun noticeComesFirstAndOnlyOnce() {
         val viewModel = fixture.viewModel()
 
-        viewModel.onSpeak(hasMicrophone = true)
+        viewModel.onSpeakPress(hasMicrophone = true)
         assertEquals(VoiceUi.Notice, viewModel.uiState.value.voice)
+        viewModel.onSpeakRelease(short = false)
         assertEquals(0, voice.listens)
 
         viewModel.onAcceptNotice(hasMicrophone = true)
         assertTrue(fixture.voicePreferences.noticeShown)
-        assertEquals(VoiceUi.Listening(), viewModel.uiState.value.voice)
-        voice.finish()
+        assertNull(viewModel.uiState.value.voice)
 
-        viewModel.onSpeak(hasMicrophone = true)
+        viewModel.onSpeakPress(hasMicrophone = true)
         assertEquals(VoiceUi.Listening(), viewModel.uiState.value.voice)
-        assertEquals(2, voice.listens)
+        assertEquals(1, voice.listens)
+    }
+
+    @Test
+    fun onDeviceRecognizerSkipsTheNotice() {
+        voice.mayUseInternet = false
+        val viewModel = fixture.viewModel()
+
+        viewModel.onSpeakPress(hasMicrophone = true)
+
+        assertEquals(VoiceUi.Listening(), viewModel.uiState.value.voice)
+        assertFalse(fixture.voicePreferences.noticeShown)
     }
 
     @Test
     fun decliningTheNoticeAsksAgainNextTime() {
         val viewModel = fixture.viewModel()
-        viewModel.onSpeak(hasMicrophone = true)
+        viewModel.onSpeakPress(hasMicrophone = true)
 
         viewModel.onDeclineNotice()
         assertNull(viewModel.uiState.value.voice)
         assertFalse(fixture.voicePreferences.noticeShown)
 
-        viewModel.onSpeak(hasMicrophone = true)
+        viewModel.onSpeakPress(hasMicrophone = true)
         assertEquals(VoiceUi.Notice, viewModel.uiState.value.voice)
     }
 
     @Test
     fun withoutMicrophoneAsksTheAndroidPermission() {
         val viewModel = fixture.viewModel()
-        viewModel.onSpeak(hasMicrophone = false)
+        viewModel.onSpeakPress(hasMicrophone = false)
         viewModel.onAcceptNotice(hasMicrophone = false)
         assertEquals(VoiceUi.AskingPermission, viewModel.uiState.value.voice)
 
         viewModel.onMicrophonePermission(granted = false)
         assertEquals(VoiceUi.Message.NO_MICROPHONE, viewModel.uiState.value.voice)
+
+        viewModel.onSpeakPress(hasMicrophone = false)
+        assertEquals(VoiceUi.AskingPermission, viewModel.uiState.value.voice)
+        viewModel.onMicrophonePermission(granted = true)
+        assertNull(viewModel.uiState.value.voice)
         assertEquals(0, voice.listens)
 
-        viewModel.onSpeak(hasMicrophone = false)
-        viewModel.onMicrophonePermission(granted = true)
+        viewModel.onSpeakPress(hasMicrophone = true)
         assertEquals(VoiceUi.Listening(), viewModel.uiState.value.voice)
+    }
+
+    @Test
+    fun holdingListensUntilReleasedWithoutTheSilenceLimit() {
+        val viewModel = listening()
+        assertEquals(false, voice.lastStopOnSilence)
+        voice.say(VoiceEvent.Heard(listOf("banana")))
+
+        viewModel.onSpeakRelease(short = false)
+
+        assertEquals(listOf("banana"), fixture.added.map { it.productId })
+    }
+
+    @Test
+    fun aQuickTapRemindsToHoldAndAddsNothing() {
+        val viewModel = listening()
+        voice.say(VoiceEvent.Heard(listOf("banana")))
+
+        viewModel.onSpeakRelease(short = true)
+
+        assertEquals(VoiceUi.Message.HOLD_TO_SPEAK, viewModel.uiState.value.voice)
+        assertTrue(fixture.added.isEmpty())
+    }
+
+    @Test
+    fun talkBackTapsToOpenAndTapsToClose() {
+        fixture.voicePreferences.noticeShown = true
+        val viewModel = fixture.viewModel()
+
+        viewModel.onSpeakPress(hasMicrophone = true, byToggle = true)
+        assertEquals(VoiceUi.Listening(), viewModel.uiState.value.voice)
+        assertEquals(true, voice.lastStopOnSilence)
+        voice.say(VoiceEvent.Heard(listOf("maçã")))
+
+        viewModel.onSpeakPress(hasMicrophone = true, byToggle = true)
+        assertEquals(listOf("apple"), fixture.added.map { it.productId })
+        assertEquals(1, voice.listens)
+    }
+
+    @Test
+    fun leavingTheAppClosesTheMicrophoneOpenedByTalkBack() {
+        fixture.voicePreferences.noticeShown = true
+        val viewModel = fixture.viewModel()
+        viewModel.onSpeakPress(hasMicrophone = true, byToggle = true)
+        voice.say(VoiceEvent.Heard(listOf("banana")))
+
+        viewModel.onSpeakRelease()
+
+        assertEquals(listOf("banana"), fixture.added.map { it.productId })
+    }
+
+    @Test
+    fun withoutTheVoiceOnTheDeviceSwitchesToTheServiceAndExplainsFirst() {
+        voice.mayUseInternet = false
+        val viewModel = fixture.viewModel()
+        viewModel.onSpeakPress(hasMicrophone = true)
+
+        voice.mayUseInternet = true
+        voice.say(VoiceEvent.SwitchedToService)
+        voice.finish()
+
+        assertEquals(VoiceUi.Notice, viewModel.uiState.value.voice)
+        assertEquals(1, voice.listens)
+    }
+
+    @Test
+    fun withoutTheVoiceOnTheDeviceKeepsListeningIfAlreadyExplained() {
+        voice.mayUseInternet = false
+        val viewModel = listening()
+
+        voice.say(VoiceEvent.SwitchedToService)
+        voice.finish()
+
+        assertEquals(VoiceUi.Listening(), viewModel.uiState.value.voice)
+        assertEquals(2, voice.listens)
+        voice.say(VoiceEvent.Heard(listOf("banana")))
+        viewModel.onSpeakRelease(short = false)
+        assertEquals(listOf("banana"), fixture.added.map { it.productId })
     }
 
     @Test
@@ -97,7 +190,7 @@ class AddVoiceViewModelTest {
         val viewModel = listening()
         voice.say(VoiceEvent.Heard(listOf("bananas e maçã")), VoiceEvent.Heard(listOf("duas bananas")))
 
-        viewModel.onStopListening()
+        viewModel.onSpeakRelease(short = false)
 
         assertEquals(listOf("banana", "apple", "banana"), fixture.added.map { it.productId })
         assertEquals(Quantity(2.0), fixture.added.last().quantity)
@@ -112,7 +205,7 @@ class AddVoiceViewModelTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.added.collect {} }
         voice.say(VoiceEvent.Heard(listOf("bananas e maçã")))
 
-        viewModel.onStopListening()
+        viewModel.onSpeakRelease(short = false)
 
         assertEquals(listOf("maçã", "bananas"), viewModel.added.value.map { it.name })
     }
@@ -130,7 +223,7 @@ class AddVoiceViewModelTest {
     fun picksTheAlternativeThatMatchesTheCatalog() {
         val viewModel = listening()
         voice.say(VoiceEvent.Heard(listOf("ba nana", "banana")))
-        viewModel.onStopListening()
+        viewModel.onSpeakRelease(short = false)
 
         assertEquals(listOf("banana"), fixture.added.map { it.productId })
     }

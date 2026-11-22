@@ -68,6 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.components.BackToListButton
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
+import br.com.mentealerta.listadecompras.ui.components.HoldButton
 import br.com.mentealerta.listadecompras.ui.components.LabeledTextField
 import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
@@ -108,7 +109,7 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
     LaunchedEffect(uiState.voice) {
         if (uiState.voice == VoiceUi.AskingPermission) askMicrophone.launch(Manifest.permission.RECORD_AUDIO)
     }
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onStopListening() }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onSpeakRelease() }
     AddContent(
         uiState = uiState,
         added = added,
@@ -118,10 +119,11 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
         onSubmit = viewModel::onSubmit,
         onAddMore = viewModel::onAddMore,
         onKeepAsIs = viewModel::onKeepAsIs,
-        onSpeak = { viewModel.onSpeak(context.hasMicrophone()) },
+        onSpeakPress = { viewModel.onSpeakPress(context.hasMicrophone()) },
+        onSpeakRelease = viewModel::onSpeakRelease,
+        onSpeakToggle = { viewModel.onSpeakPress(context.hasMicrophone(), byToggle = true) },
         onAcceptNotice = { viewModel.onAcceptNotice(context.hasMicrophone()) },
         onDeclineNotice = viewModel::onDeclineNotice,
-        onStopListening = viewModel::onStopListening,
         onClose = close,
         modifier = modifier,
     )
@@ -150,10 +152,11 @@ fun AddContent(
     onSubmit: () -> Unit = {},
     onAddMore: () -> Unit = {},
     onKeepAsIs: () -> Unit = {},
-    onSpeak: () -> Unit = {},
+    onSpeakPress: () -> Unit = {},
+    onSpeakRelease: (short: Boolean) -> Unit = {},
+    onSpeakToggle: () -> Unit = {},
     onAcceptNotice: () -> Unit = {},
     onDeclineNotice: () -> Unit = {},
-    onStopListening: () -> Unit = {},
     onClose: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
@@ -170,11 +173,13 @@ fun AddContent(
     Column(modifier = modifier.fillMaxSize().background(colors.surface)) {
         AddTopBar(
             query = uiState.query,
-            showSpeak = canSpeak && voice !is VoiceUi.Listening && voice != VoiceUi.Notice,
+            speak = speakButton(canSpeak, voice),
             focusRequester = focusRequester,
             onQueryChange = onQueryChange,
             onSubmit = onSubmit,
-            onSpeak = onSpeak,
+            onSpeakPress = onSpeakPress,
+            onSpeakRelease = onSpeakRelease,
+            onSpeakToggle = onSpeakToggle,
             onClose = onClose,
         )
         val repeated = uiState.repeated
@@ -193,7 +198,7 @@ fun AddContent(
                     VoiceNotice(onAccept = onAcceptNotice, onDecline = onDeclineNotice)
                 }
                 voice is VoiceUi.Listening -> item(key = "listening", contentType = "listening") {
-                    Listening(listening = voice, onStop = onStopListening)
+                    Listening(listening = voice)
                 }
                 repeated != null -> item(key = "repeated", contentType = "repeated") {
                     RepeatedQuestion(name = repeated.name, onAddMore = onAddMore, onKeepAsIs = onKeepAsIs)
@@ -212,15 +217,30 @@ fun AddContent(
     }
 }
 
-/** Topo verde: "Voltar para a lista", o campo e, se o celular tem voz, o botão **Falar**. */
+/** Botão de voz no topo: parado ("Segure para falar.") ou com o microfone aberto ("Terminei"). */
+private enum class SpeakButton { IDLE, LISTENING }
+
+/** Sem voz no celular, ou com a explicação na tela, o botão some. */
+private fun speakButton(canSpeak: Boolean, voice: VoiceUi?): SpeakButton? = when {
+    !canSpeak || voice == VoiceUi.Notice -> null
+    voice is VoiceUi.Listening -> SpeakButton.LISTENING
+    else -> SpeakButton.IDLE
+}
+
+/**
+ * Topo verde: "Voltar para a lista", o campo e, se o celular tem voz ([speak]), o botão de segurar
+ * para falar (#123). Ele fica no mesmo lugar durante a escuta, para o dedo não perder o botão.
+ */
 @Composable
 private fun AddTopBar(
     query: String,
-    showSpeak: Boolean,
+    speak: SpeakButton?,
     focusRequester: FocusRequester,
     onQueryChange: (String) -> Unit,
     onSubmit: () -> Unit,
-    onSpeak: () -> Unit,
+    onSpeakPress: () -> Unit,
+    onSpeakRelease: (short: Boolean) -> Unit,
+    onSpeakToggle: () -> Unit,
     onClose: () -> Unit,
 ) {
     Column(
@@ -233,11 +253,28 @@ private fun AddTopBar(
     ) {
         BackToListButton(onClick = onClose)
         SearchField(query = query, onQueryChange = onQueryChange, onSubmit = onSubmit, focusRequester = focusRequester)
-        if (showSpeak) {
-            SecondaryButton(
-                text = stringResource(R.string.add_speak),
-                onClick = onSpeak,
+        if (speak != null) {
+            Text(
+                text = stringResource(R.string.add_speak_hint),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
+            HoldButton(
+                text = stringResource(
+                    if (speak ==
+                        SpeakButton.LISTENING
+                    ) {
+                        R.string.add_voice_done
+                    } else {
+                        R.string.add_speak
+                    },
+                ),
+                onPress = onSpeakPress,
+                onRelease = onSpeakRelease,
+                onToggle = onSpeakToggle,
                 icon = painterResource(R.drawable.ic_mic),
+                held = speak == SpeakButton.LISTENING,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -357,8 +394,8 @@ private fun RepeatedQuestion(name: String, onAddMore: () -> Unit, onKeepAsIs: ()
 }
 
 /**
- * Explicação antes do pedido de microfone, só na primeira vez (#60, plano §3.3): **Usar o microfone**
- * e **Não, vou escrever**, um embaixo do outro, em largura total.
+ * Explicação antes do pedido de microfone, só na primeira vez e só no serviço padrão (#60, #123,
+ * plano §3.3): **Usar o microfone** e **Escrever**, um embaixo do outro, em largura total.
  */
 @Composable
 private fun VoiceNotice(onAccept: () -> Unit, onDecline: () -> Unit) {
@@ -388,11 +425,12 @@ private fun VoiceNotice(onAccept: () -> Unit, onDecline: () -> Unit) {
 
 /**
  * Microfone aberto: "Estou ouvindo. Pode falar.", cada trecho entendido numa linha e, por último, o
- * texto que está aparecendo. **Terminei** fecha o microfone. Só o "Estou ouvindo" é lido pelo
- * TalkBack: ler o que aparece faria o microfone ouvir o próprio celular.
+ * texto que está aparecendo. Soltar o botão (ou tocar em **Terminei** pelo TalkBack) fecha o
+ * microfone (#123). Só o "Estou ouvindo" é lido pelo TalkBack: ler o que aparece faria o microfone
+ * ouvir o próprio celular.
  */
 @Composable
-private fun Listening(listening: VoiceUi.Listening, onStop: () -> Unit) {
+private fun Listening(listening: VoiceUi.Listening) {
     val tokens = ComicTheme.tokens
     val colors = MaterialTheme.colorScheme
     ComicCard(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = tokens.largeShadow)) {
@@ -413,11 +451,6 @@ private fun Listening(listening: VoiceUi.Listening, onStop: () -> Unit) {
                     color = colors.onSurfaceVariant,
                 )
             }
-            PrimaryButton(
-                text = stringResource(R.string.add_voice_done),
-                onClick = onStop,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
     }
 }
@@ -430,6 +463,7 @@ private fun VoiceMessage(message: VoiceUi.Message) {
         VoiceUi.Message.NO_INTERNET -> R.string.add_voice_no_internet
         VoiceUi.Message.NO_MICROPHONE -> R.string.add_voice_no_microphone
         VoiceUi.Message.UNAVAILABLE -> R.string.add_voice_unavailable
+        VoiceUi.Message.HOLD_TO_SPEAK -> R.string.add_voice_hold
     }
     Text(
         text = stringResource(text),

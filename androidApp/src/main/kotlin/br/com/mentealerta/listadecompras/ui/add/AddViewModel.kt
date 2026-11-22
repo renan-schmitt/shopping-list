@@ -67,7 +67,7 @@ data class AddedUi(val name: String, val again: Boolean = false, val count: Int 
 
 /** Etapas de falar os produtos (#60, plano §3.3). */
 sealed interface VoiceUi {
-    /** Explicação do microfone e do envio do som ao Google, na primeira vez. */
+    /** Explicação do microfone e do envio do som ao Google, na primeira vez, só no serviço padrão. */
     data object Notice : VoiceUi
 
     /** Esperando a pessoa responder ao pedido de microfone do Android. */
@@ -76,8 +76,8 @@ sealed interface VoiceUi {
     /** Ouvindo: os trechos já entendidos ([heard]) e o que está aparecendo agora ([partial]). */
     data class Listening(val heard: List<String> = emptyList(), val partial: String = "") : VoiceUi
 
-    /** Recados depois da escuta, acima do botão "Falar". */
-    enum class Message : VoiceUi { NOT_UNDERSTOOD, NO_INTERNET, NO_MICROPHONE, UNAVAILABLE }
+    /** Recados depois da escuta. [HOLD_TO_SPEAK]: o botão foi só tocado, sem segurar (#123). */
+    enum class Message : VoiceUi { NOT_UNDERSTOOD, NO_INTERNET, NO_MICROPHONE, UNAVAILABLE, HOLD_TO_SPEAK }
 }
 
 /** A pergunta do produto repetido: [name] é o nome do item que já está na lista; [option], a tocada. */
@@ -101,10 +101,10 @@ data class AddOptionUi(
  * na quantidade do item que já está, pelo [EditItemUseCase] (o "Ops, voltar" desfaz); "Não" deixa
  * como está. Voltar a digitar também conta como "Não".
  *
- * Falar (#60): na primeira vez, a explicação do microfone ([VoicePreferences]); depois, o pedido de
- * microfone do Android, se faltar. O [VoiceRecognizer] escuta até "Terminei" ou o silêncio longo; o
- * [ParseSpeechUseCase] separa os produtos, que entram direto na lista. (A conferência antes de pôr
- * na lista é a #61.)
+ * Falar (#60, #123): segurar o botão abre o microfone e soltar fecha. Quem usa o TalkBack toca para
+ * abrir e toca para fechar. Na primeira vez pelo serviço padrão, vem antes a explicação do microfone
+ * ([VoicePreferences]); depois, o pedido de microfone do Android, se faltar. O [ParseSpeechUseCase]
+ * separa os produtos, que entram direto na lista. (A conferência antes de pôr na lista é a #61.)
  *
  * O que entrou desde que a tela abriu aparece em [added] ("Adicionados", #122), o mais recente no
  * topo, como está na lista agora ([ObserveListUseCase]): com a quantidade nova depois do "Sim, mais
@@ -142,6 +142,12 @@ class AddViewModel(
 
     private var searchJob: Job? = null
     private var voiceJob: Job? = null
+
+    /** O dedo está no botão "Falar". */
+    private var holding = false
+
+    /** A escuta foi aberta com um toque (TalkBack): fecha com outro toque ou no silêncio longo. */
+    private var toggled = false
     private val addMutex = Mutex()
 
     /** O campo mudou: o texto entra na hora (o campo não pode esperar a busca) e a busca vem depois. */
@@ -225,41 +231,50 @@ class AddViewModel(
     }
 
     /**
-     * Botão "Falar": a explicação na primeira vez; depois, o pedido de microfone se ainda não houver
-     * permissão ([hasMicrophone]), ou a escuta.
+     * Apertou o botão "Falar": abre o microfone, se já pode (ver [startSpeaking]). Pelo TalkBack
+     * ([byToggle]) é um toque: abre, e outro toque com o microfone aberto fecha.
      */
-    fun onSpeak(hasMicrophone: Boolean) {
-        if (_uiState.value.voice is VoiceUi.Listening) return
-        viewModelScope.launch {
-            if (voicePreferences.wasNoticeShown()) {
-                listenOrAsk(hasMicrophone)
-            } else {
-                _uiState.update { it.copy(voice = VoiceUi.Notice, lastAdded = null, repeated = null) }
-            }
+    fun onSpeakPress(hasMicrophone: Boolean, byToggle: Boolean = false) {
+        if (_uiState.value.voice is VoiceUi.Listening) {
+            if (byToggle) voiceRecognizer.stop()
+            return
+        }
+        holding = !byToggle
+        startSpeaking(hasMicrophone, byToggle)
+    }
+
+    /**
+     * Soltou o botão "Falar" (ou o app saiu da tela): fecha o microfone e o último trecho ainda
+     * entra. Um toque rápido ([short]) não ouve nada: lembra de segurar.
+     */
+    fun onSpeakRelease(short: Boolean = false) {
+        val wasHolding = holding
+        holding = false
+        if (_uiState.value.voice !is VoiceUi.Listening) return
+        if (short && wasHolding) {
+            voiceJob?.cancel()
+            _uiState.update { it.copy(voice = VoiceUi.Message.HOLD_TO_SPEAK) }
+        } else {
+            voiceRecognizer.stop()
         }
     }
 
-    /** "Usar o microfone" na explicação: ela não aparece mais. */
+    /** "Usar o microfone" na explicação: ela não aparece mais. A pessoa aperta "Falar" de novo. */
     fun onAcceptNotice(hasMicrophone: Boolean) {
         viewModelScope.launch {
             voicePreferences.setNoticeShown()
-            listenOrAsk(hasMicrophone)
+            _uiState.update { it.copy(voice = if (hasMicrophone) null else VoiceUi.AskingPermission) }
         }
     }
 
-    /** "Não, vou escrever" na explicação: na próxima vez ela aparece de novo. */
+    /** "Escrever" na explicação: na próxima vez ela aparece de novo. */
     fun onDeclineNotice() {
         _uiState.update { it.copy(voice = null) }
     }
 
-    /** Resposta ao pedido de microfone do Android. */
+    /** Resposta ao pedido de microfone do Android. Com permissão, a pessoa aperta "Falar" de novo. */
     fun onMicrophonePermission(granted: Boolean) {
-        if (granted) listen() else _uiState.update { it.copy(voice = VoiceUi.Message.NO_MICROPHONE) }
-    }
-
-    /** "Terminei" durante a escuta: o último trecho ainda entra. */
-    fun onStopListening() {
-        voiceRecognizer.stop()
+        _uiState.update { it.copy(voice = if (granted) null else VoiceUi.Message.NO_MICROPHONE) }
     }
 
     /** Saindo da tela: na próxima vez ela abre com o campo vazio. */
@@ -275,17 +290,37 @@ class AddViewModel(
         addedIds.update { current -> ids.reversed() + current.filterNot { it in ids } }
     }
 
-    private fun listenOrAsk(hasMicrophone: Boolean) {
-        if (hasMicrophone) listen() else _uiState.update { it.copy(voice = VoiceUi.AskingPermission) }
+    /**
+     * Antes de ouvir: a explicação, se a escuta pode ir ao Google e ela ainda não apareceu; o pedido
+     * de microfone, se falta. Se a pessoa já soltou o botão nesse meio tempo, lembra de segurar.
+     */
+    private fun startSpeaking(hasMicrophone: Boolean, byToggle: Boolean) {
+        viewModelScope.launch {
+            val needsNotice = voiceRecognizer.mayUseInternet() && !voicePreferences.wasNoticeShown()
+            val voice = when {
+                needsNotice -> VoiceUi.Notice
+                !hasMicrophone -> VoiceUi.AskingPermission
+                !byToggle && !holding -> VoiceUi.Message.HOLD_TO_SPEAK
+                else -> null
+            }
+            if (voice == null) {
+                listen(byToggle)
+            } else {
+                holding = false
+                _uiState.update { it.copy(voice = voice, lastAdded = null, repeated = null) }
+            }
+        }
     }
 
-    private fun listen() {
+    private fun listen(byToggle: Boolean) {
         voiceJob?.cancel()
+        toggled = byToggle
         _uiState.update { it.copy(voice = VoiceUi.Listening(), lastAdded = null, repeated = null) }
         voiceJob = viewModelScope.launch {
             val segments = mutableListOf<List<String>>()
             var problem: VoiceUi.Message? = null
-            voiceRecognizer.listen().collect { event ->
+            var switched = false
+            voiceRecognizer.listen(stopOnSilence = byToggle).collect { event ->
                 when (event) {
                     is VoiceEvent.Partial -> updateListening { it.copy(partial = event.text) }
                     is VoiceEvent.Heard -> {
@@ -294,7 +329,12 @@ class AddViewModel(
                     }
                     VoiceEvent.NoInternet -> problem = VoiceUi.Message.NO_INTERNET
                     VoiceEvent.Unavailable -> problem = VoiceUi.Message.UNAVAILABLE
+                    VoiceEvent.SwitchedToService -> switched = true
                 }
+            }
+            if (switched) {
+                switchedToService()
+                return@launch
             }
             val items = parseSpeech(segments)
             if (items.isEmpty()) {
@@ -304,6 +344,21 @@ class AddViewModel(
                 val added = AddedUi(name = items.first().name, count = items.size)
                 _uiState.update { it.copy(voice = problem, lastAdded = added) }
             }
+        }
+    }
+
+    /**
+     * O aparelho não tem a voz pt-BR (Android 12): a escuta passa ao serviço padrão. Se a explicação
+     * já apareceu e a pessoa continua segurando (ou abriu pelo TalkBack), ouve de novo na hora.
+     */
+    private suspend fun switchedToService() {
+        when {
+            !voicePreferences.wasNoticeShown() -> {
+                holding = false
+                _uiState.update { it.copy(voice = VoiceUi.Notice) }
+            }
+            holding || toggled -> listen(toggled)
+            else -> _uiState.update { it.copy(voice = null) }
         }
     }
 

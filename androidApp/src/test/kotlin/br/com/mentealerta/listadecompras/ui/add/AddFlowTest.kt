@@ -1,6 +1,7 @@
 package br.com.mentealerta.listadecompras.ui.add
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -16,8 +17,10 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
@@ -25,6 +28,7 @@ import br.com.mentealerta.listadecompras.ui.theme.ThemeScreenshotTest
 import br.com.mentealerta.listadecompras.voice.VoiceEvent
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -206,39 +210,87 @@ class AddFlowTest {
         shadowOf(compose.activity.application).grantPermissions(android.Manifest.permission.RECORD_AUDIO)
     }
 
+    private fun speakButton(text: String = "Falar") = compose.onNode(hasText(text) and hasClickAction())
+
     @Test
-    fun speakingExplainsTheMicrophoneThenPutsWhatWasSaidOnTheList() {
+    fun speakingExplainsTheMicrophoneThenHoldingPutsWhatWasSaidOnTheList() {
         grantMicrophone()
         show()
 
-        compose.onNode(hasText("Falar") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
+        speakButton().assertHeightIsAtLeast(64.dp).performClick()
         compose.onNodeWithText(
             "Para você falar os produtos, o app precisa usar o microfone. " +
                 "Para entender o que você fala, o celular pode enviar o som ao Google.",
         ).assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
         compose.onNode(hasText("Usar o microfone") and hasClickAction()).performClick()
+        assertEquals(0, fixture.voice.listens)
 
+        speakButton().performTouchInput { down(center) }
         compose.onNodeWithText("Estou ouvindo. Pode falar.")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
-        compose.onAllNodesWithText("Falar").assertCountEquals(0)
         fixture.voice.say(VoiceEvent.Heard(listOf("banana e maçã")))
         compose.onNodeWithText("banana e maçã").assertExists()
-        compose.onNode(hasText("Terminei") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
+        speakButton("Terminei").performTouchInput {
+            advanceEventTime(1_000)
+            up()
+        }
 
         assertEquals(listOf("banana", "apple"), fixture.added.map { it.productId })
         compose.onNodeWithText("Adicionados: 2 produtos.")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+        speakButton().assertExists()
     }
 
     @Test
-    fun noticeAnsweredNoGoesBackToWriting() {
+    fun talkBackTapsFalarToOpenAndTermineiToClose() {
+        grantMicrophone()
+        fixture.voicePreferences.noticeShown = true
         show()
-        compose.onNode(hasText("Falar") and hasClickAction()).performClick()
 
-        compose.onNode(hasText("Não, vou escrever") and hasClickAction()).performClick()
+        speakButton().performSemanticsAction(SemanticsActions.OnClick)
+        compose.onNodeWithText("Estou ouvindo. Pode falar.").assertExists()
+        fixture.voice.say(VoiceEvent.Heard(listOf("banana")))
+        speakButton("Terminei").assertHeightIsAtLeast(64.dp).performSemanticsAction(SemanticsActions.OnClick)
+
+        assertEquals(listOf("banana"), fixture.added.map { it.productId })
+        // O "Segure para falar." é só para quem segura; o TalkBack não lê.
+        compose.onAllNodesWithText("Segure para falar.").assertCountEquals(0)
+    }
+
+    @Test
+    fun onDeviceRecognizerGoesStraightToListening() {
+        grantMicrophone()
+        fixture.voice.mayUseInternet = false
+        show()
+
+        speakButton().performTouchInput { down(center) }
+
+        compose.onNodeWithText("Estou ouvindo. Pode falar.").assertExists()
+        compose.onAllNodesWithText("Usar o microfone").assertCountEquals(0)
+    }
+
+    @Test
+    fun aQuickTapRemindsToHold() {
+        grantMicrophone()
+        fixture.voicePreferences.noticeShown = true
+        show()
+
+        speakButton().performClick()
+
+        compose.onNodeWithText("Segure o botão enquanto fala.")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+        assertTrue(fixture.added.isEmpty())
+    }
+
+    @Test
+    fun noticeAnsweredWriteGoesBackToWriting() {
+        show()
+        speakButton().performClick()
+
+        compose.onNode(hasText("Escrever") and hasClickAction()).performClick()
 
         assertEquals(0, fixture.voice.listens)
-        compose.onNode(hasText("Falar") and hasClickAction()).assertExists()
+        speakButton().assertExists()
     }
 
     @Test
@@ -246,12 +298,15 @@ class AddFlowTest {
         grantMicrophone()
         fixture.voicePreferences.noticeShown = true
         show()
-        compose.onNode(hasText("Falar") and hasClickAction()).performClick()
+        speakButton().performTouchInput { down(center) }
 
-        fixture.voice.finish()
+        speakButton("Terminei").performTouchInput {
+            advanceEventTime(1_000)
+            up()
+        }
 
         compose.onNodeWithText("Não entendi. Pode falar de novo?")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
-        compose.onNode(hasText("Falar") and hasClickAction()).assertExists()
+        speakButton().assertExists()
     }
 }
