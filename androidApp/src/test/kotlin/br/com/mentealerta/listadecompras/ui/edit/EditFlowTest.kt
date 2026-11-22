@@ -8,10 +8,10 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
@@ -21,8 +21,8 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextReplacement
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
@@ -40,9 +40,10 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Fluxo da edição pela tela da lista (#55): tocar no produto, mudar nome, quantidade e detalhe, voltar
- * (tudo salvo sozinho); tirar da lista, ver o aviso e voltar com "Ops, voltar". E a acessibilidade da
- * tela: campos com rótulo, botões de 64dp, "Menos" desativado em 1 e a quantidade lida pelo TalkBack.
+ * Fluxo da edição pela tela da lista (#55): "Mudar a lista" (#121), tocar no produto, mudar nome,
+ * quantidade e detalhe, voltar (tudo salvo sozinho); tirar da lista, ver o aviso e voltar com "Ops,
+ * voltar". E a acessibilidade da tela: campos com rótulo, botões de 64dp, "Menos" desativado em 1 e
+ * a quantidade lida pelo TalkBack.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -66,7 +67,9 @@ class EditFlowTest {
                 )
             }
         }
-        compose.onNodeWithText("Feijão").performTouchInput { click(center) }
+        compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Mudar a lista"))
+        button("Mudar a lista").performClick()
+        compose.onNodeWithText("Feijão").performClick()
     }
 
     private fun field(label: String) = compose.onNode(hasSetTextAction() and hasContentDescription(label))
@@ -85,6 +88,8 @@ class EditFlowTest {
 
         button("Voltar para a lista").performClick()
 
+        // Volta para o modo de mudar, já com o produto mudado.
+        compose.onNodeWithText("Toque no produto que quer mudar.").assertExists()
         compose.onNodeWithText("Feijão preto tipo 1, 3").assertExists()
         assertEquals(
             beans.copy(name = "Feijão preto", quantity = Quantity(3.0), detail = "tipo 1"),
@@ -97,6 +102,10 @@ class EditFlowTest {
         showAndOpenBeans()
         button("Mais").performClick()
         compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        compose.onNodeWithText("Feijão, 2").assertExists()
+        // De novo, sai do modo de mudar e volta para a lista.
+        compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        compose.onNodeWithText("Toque no produto que quer mudar.").assertDoesNotExist()
         compose.onNodeWithText("Feijão, 2").assertExists()
     }
 

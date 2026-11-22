@@ -28,9 +28,9 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Riscar e tirar o risco (#51): tocando na marca, passando o dedo para qualquer lado ou pela ação
- * do TalkBack, sempre com vibração. Tocar no nome não risca (fica para a edição, #55) e um arrasto
- * curto volta sem riscar.
+ * Riscar e tirar o risco (#51): tocando em qualquer parte da linha (#121), passando o dedo para
+ * qualquer lado ou pela ação do TalkBack, sempre com vibração. Tocar não abre a edição (fica no modo
+ * "Mudar a lista") e um arrasto curto volta sem riscar.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -41,7 +41,6 @@ class ListCheckGestureTest {
     val compose = createComposeRule()
 
     private val toggles = mutableListOf<Pair<ListItemId, Boolean>>()
-    private val edits = mutableListOf<ListItemId>()
     private val haptics = mutableListOf<HapticFeedbackType>()
 
     private val fakeHaptics = object : HapticFeedback {
@@ -57,7 +56,6 @@ class ListCheckGestureTest {
                     ListContent(
                         SampleListState,
                         onToggleCheck = { id, checked -> toggles += id to checked },
-                        onEdit = { edits += it },
                     )
                 }
             }
@@ -87,36 +85,25 @@ class ListCheckGestureTest {
     }
 
     @Test
-    fun tappingTheNameOpensTheEditInsteadOfChecking() {
+    fun tappingTheNameAlsoChecks() {
         show()
         compose.onNodeWithText("Tomate").performTouchInput { click(center) }
-        assertEquals(emptyList<Pair<ListItemId, Boolean>>(), toggles)
-        assertEquals(listOf(idOf("Tomate")), edits)
+        assertEquals(listOf(idOf("Tomate") to false), toggles)
+        assertEquals(listOf(HapticFeedbackType.ToggleOn), haptics)
     }
 
     @Test
-    fun tappingTheMarkDoesNotOpenTheEdit() {
+    fun tappingTheIconAlsoChecks() {
         show()
-        compose.onNodeWithText("Tomate").performTouchInput { click(Offset(2.dp.toPx(), centerY)) }
-        assertEquals(emptyList<ListItemId>(), edits)
+        compose.onNodeWithText("Tomate").performTouchInput { click(Offset(right - 8.dp.toPx(), centerY)) }
+        assertEquals(listOf(idOf("Tomate") to false), toggles)
     }
 
     @Test
-    fun swipingDoesNotOpenTheEdit() {
+    fun talkBackHasNoEditAction() {
         show()
-        compose.onNodeWithText("Tomate").performTouchInput { swipeRight() }
-        assertEquals(emptyList<ListItemId>(), edits)
-    }
-
-    @Test
-    fun talkBackOffersEditAsAnExtraAction() {
-        show()
-        val action = compose.onNodeWithText("Tomate").fetchSemanticsNode()
-            .config[SemanticsActions.CustomActions].single()
-        assertEquals("Editar", action.label)
-        action.action()
-        assertEquals(listOf(idOf("Tomate")), edits)
-        assertEquals(emptyList<Pair<ListItemId, Boolean>>(), toggles)
+        val node = compose.onNodeWithText("Tomate").fetchSemanticsNode()
+        assertEquals(null, node.config.getOrElseNullable(SemanticsActions.CustomActions) { null })
     }
 
     @Test

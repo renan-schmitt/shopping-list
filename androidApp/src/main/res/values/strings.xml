@@ -8,7 +8,11 @@
 
     <!-- Tela da lista (#50) -->
     <!-- Em HTML escapado, para o negrito chegar ao Compose (AnnotatedString.fromHtml) -->
-    <string name="list_empty">Sua lista está vazia. Toque em &lt;b>Adicionar&lt;/b> para começar.</string>
+    <!-- Título da lista vazia (#121); caixa alta vem do estilo -->
+    <string name="list_title">Lista de Compras</string>
+    <string name="list_empty">Toque em &lt;b>Adicionar&lt;/b> para começar sua lista.</string>
+    <!-- Seção no fim da lista com os produtos riscados (#121) -->
+    <string name="list_bought_section">Já peguei</string>
     <!-- Estado lido pelo TalkBack num produto riscado -->
     <string name="list_item_checked">Comprado</string>
     <!-- Ação do TalkBack para riscar o produto (#51) -->
@@ -40,7 +44,13 @@
     </plurals>
     <!-- Junta as duas frases do aviso do "Terminei": "Pronto! 8 produtos comprados." + "Ficaram 3…" -->
     <string name="list_finished">%1$s %2$s</string>
-    <!-- Botão no fim da folha (#58): a única ação que pede confirmação (guia de linguagem) -->
+    <!-- Botão no fim da folha (#121): abre a lista para mudar os produtos -->
+    <string name="list_change">Mudar a lista</string>
+    <!-- No topo do modo "Mudar a lista" -->
+    <string name="list_change_hint">Toque no produto que quer mudar.</string>
+    <!-- Ação do TalkBack num produto do modo "Mudar a lista" -->
+    <string name="list_item_change">Mudar</string>
+    <!-- No fim do modo "Mudar a lista" (#58, #121): a única ação que pede confirmação (guia de linguagem) -->
     <string name="list_clear">Jogar a lista fora</string>
     <!-- Título da confirmação de jogar a lista fora -->
     <string name="list_clear_question">Jogar a lista fora?</string>
@@ -54,8 +64,6 @@
     <string name="list_clear_no">Não</string>
     <!-- Aviso depois de jogar a lista fora, com o botão "Ops, voltar" -->
     <string name="list_cleared">A lista foi jogada fora.</string>
-    <!-- Ação do TalkBack para abrir a edição do produto (#55) -->
-    <string name="list_item_edit">Editar</string>
     <!-- Aviso depois de tirar o produto da lista, com o botão "Ops, voltar" -->
     <string name="list_item_removed">%1$s saiu da lista.</string>
     <!-- Produto com detalhe: "Leite" + "desnatado" -->

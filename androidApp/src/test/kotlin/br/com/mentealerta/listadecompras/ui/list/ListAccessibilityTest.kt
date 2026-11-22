@@ -5,11 +5,14 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.hasScrollToNodeAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.printToString
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
@@ -57,9 +60,12 @@ class ListAccessibilityTest {
     @Test
     fun sectionTitlesAreHeadings() {
         show()
-        listOf("Hortifrúti", "Padaria", "Açougue", "Mercearia").forEach {
+        listOf("Hortifrúti", "Açougue", "Mercearia").forEach {
             compose.onNodeWithText(it).assert(isHeading())
         }
+        // "Já peguei", no fim, também: o TalkBack ouve em caixa normal.
+        compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Já peguei"))
+        compose.onNodeWithText("Já peguei").assert(isHeading())
     }
 
     @Test
@@ -104,9 +110,10 @@ class ListAccessibilityTest {
     }
 
     @Test
-    fun emptyListShowsTheGuideMessage() {
+    fun emptyListShowsTheTitleAndTheGuideMessage() {
         show(ListUiState.Empty)
-        compose.onNodeWithText("Sua lista está vazia. Toque em Adicionar para começar.").assertExists()
+        compose.onNodeWithText("Lista de Compras").assert(isHeading())
+        compose.onNodeWithText("Toque em Adicionar para começar sua lista.").assertExists()
     }
 
     @Test
@@ -114,7 +121,7 @@ class ListAccessibilityTest {
         show(ListUiState.Loading)
         assertEquals(
             0,
-            compose.onAllNodesWithText("vazia", substring = true).fetchSemanticsNodes().size,
+            compose.onAllNodesWithText("Toque em", substring = true).fetchSemanticsNodes().size,
         )
     }
 }

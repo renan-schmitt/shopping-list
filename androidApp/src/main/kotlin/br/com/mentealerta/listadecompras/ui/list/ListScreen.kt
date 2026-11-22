@@ -1,8 +1,11 @@
 package br.com.mentealerta.listadecompras.ui.list
 
 import android.content.res.Resources
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +31,8 @@ import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -42,6 +47,7 @@ import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.UndoNotice
+import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.components.halftone
 import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
 import br.com.mentealerta.listadecompras.ui.edit.EditScreen
@@ -49,13 +55,16 @@ import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
- * Tela principal: a lista de compras numa folha de papel, agrupada por seção (#50). "Adicionar" abre
- * a tela de adicionar (#53) e tocar num produto abre a edição (#55), as duas por cima da lista, sem
- * biblioteca de navegação; elas continuam abertas numa rotação de tela.
+ * Tela principal: a lista de compras numa folha de papel, agrupada por seção (#50), com os riscados
+ * em "Já peguei", no fim (#121). "Adicionar" abre a tela de adicionar (#53); "Mudar a lista" abre o
+ * modo de mudar (#121), onde tocar num produto abre a edição (#55) e fica o "Jogar a lista fora".
+ * Tudo por cima da lista, sem biblioteca de navegação; continua aberto numa rotação de tela. Ao sair
+ * da edição, a pessoa volta para o modo de mudar.
  *
  * Produto tirado da lista na edição mostra o aviso "Feijão saiu da lista." com **Ops, voltar**; o
  * "Terminei" (#57), "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez.". "Jogar a
- * lista fora" (#58) pergunta antes e, depois, mostra "A lista foi jogada fora." com **Ops, voltar**.
+ * lista fora" (#58) pergunta antes, volta para a lista e mostra "A lista foi jogada fora." com
+ * **Ops, voltar**.
  * Cada aviso fica 15 s na tela (#59) e um novo tira o anterior; riscar não mostra aviso (guia).
  * [editScreen] é a tela de edição; os testes trocam por uma com o ViewModel deles.
  */
@@ -70,6 +79,7 @@ fun ListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val notice by viewModel.notice.collectAsStateWithLifecycle()
     var adding by rememberSaveable { mutableStateOf(false) }
+    var changing by rememberSaveable { mutableStateOf(false) }
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var removedName by rememberSaveable { mutableStateOf<String?>(null) }
     var askingToClear by rememberSaveable { mutableStateOf(false) }
@@ -99,6 +109,14 @@ fun ListScreen(
         viewModel.onNoticeShown()
     }
 
+    // Sem produtos, não há o que mudar: volta para a lista vazia.
+    LaunchedEffect(uiState) { if (uiState == ListUiState.Empty) changing = false }
+
+    val snackbarHost = @Composable {
+        SnackbarHost(snackbarHostState) {
+            UndoNotice(it, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+        }
+    }
     val editing = editingId
     when {
         adding -> AddScreen(onClose = { adding = false }, modifier = modifier)
@@ -108,18 +126,24 @@ fun ListScreen(
                 if (removed != null) removedName = removed
             }
         }
+        changing -> {
+            BackHandler { changing = false }
+            ChangeListContent(
+                uiState = uiState,
+                onEdit = { editingId = it.value },
+                onClear = { askingToClear = true },
+                onClose = { changing = false },
+                snackbarHost = snackbarHost,
+                modifier = modifier,
+            )
+        }
         else -> ListContent(
             uiState = uiState,
             onToggleCheck = viewModel::onToggleCheck,
-            onEdit = { editingId = it.value },
             onAdd = { adding = true },
             onFinish = viewModel::onFinish,
-            onClear = { askingToClear = true },
-            snackbarHost = {
-                SnackbarHost(snackbarHostState) {
-                    UndoNotice(it, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-                }
-            },
+            onChange = { changing = true },
+            snackbarHost = snackbarHost,
             modifier = modifier,
         )
     }
@@ -131,6 +155,7 @@ fun ListScreen(
             total = total,
             onConfirm = {
                 askingToClear = false
+                changing = false
                 viewModel.onClearList()
             },
             onDismiss = { askingToClear = false },
@@ -161,19 +186,18 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
 
 /**
  * Fundo com retícula, a folha da lista (plano §4.8) e o rodapé que se adapta (#52). [onToggleCheck]
- * recebe o produto e o estado atual dele, para riscar ou tirar o risco; [onEdit], o produto tocado.
- * [onClear] é o "Jogar a lista fora", no fim da folha. [snackbarHost] mostra os avisos com "Ops,
- * voltar" acima do rodapé. Comprando, a tela não apaga.
+ * recebe o produto e o estado atual dele, para riscar ou tirar o risco. [onChange] é o "Mudar a
+ * lista", no fim da folha. [snackbarHost] mostra os avisos com "Ops, voltar" acima do rodapé.
+ * Comprando, a tela não apaga.
  */
 @Composable
 fun ListContent(
     uiState: ListUiState,
     modifier: Modifier = Modifier,
     onToggleCheck: (ListItemId, Boolean) -> Unit = { _, _ -> },
-    onEdit: (ListItemId) -> Unit = {},
     onAdd: () -> Unit = {},
     onFinish: () -> Unit = {},
-    onClear: () -> Unit = {},
+    onChange: () -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
@@ -208,53 +232,58 @@ fun ListContent(
                 when (uiState) {
                     ListUiState.Loading -> Unit
                     ListUiState.Empty -> EmptyList()
-                    is ListUiState.Content -> Sheet(uiState.sections, onToggleCheck, onEdit, onClear)
+                    is ListUiState.Content -> Sheet(uiState.sections, onToggleCheck, onChange)
                 }
             }
         }
     }
 }
 
+/**
+ * A folha: seções com o que falta e "Já peguei" no fim. Riscar move o produto de seção com
+ * animação, para a pessoa ver para onde ele foi.
+ */
 @Composable
-private fun Sheet(
-    sections: List<SectionUi>,
-    onToggleCheck: (ListItemId, Boolean) -> Unit,
-    onEdit: (ListItemId) -> Unit,
-    onClear: () -> Unit,
-) {
+private fun Sheet(sections: List<SectionUi>, onToggleCheck: (ListItemId, Boolean) -> Unit, onChange: () -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 16.dp),
     ) {
         sections.forEach { section ->
             item(key = "section-${section.id}", contentType = "section") {
-                SectionTitle(text = section.name, modifier = Modifier.padding(top = 16.dp, bottom = 6.dp))
+                SectionTitle(
+                    text = section.title(),
+                    modifier = Modifier.animateItem().padding(top = 16.dp, bottom = 6.dp),
+                )
             }
             items(section.rows, key = { it.id.value }, contentType = { "row" }) { row ->
                 ListItemRow(
                     row = row,
                     onToggleCheck = { onToggleCheck(row.id, row.checked) },
-                    onEdit = { onEdit(row.id) },
+                    modifier = Modifier.animateItem(),
                 )
             }
         }
-        // Longe do polegar, no fim da folha, como no protótipo: jogar fora é raro.
-        item(key = "clear", contentType = "clear") {
+        // Longe do polegar, no fim da folha: mudar a lista é raro.
+        item(key = "change", contentType = "change") {
             SecondaryButton(
-                text = stringResource(R.string.list_clear),
-                onClick = onClear,
-                // O mesmo cesto de lixo do produto "Lixeira" do catálogo, colorido.
-                icon = painterResource(R.drawable.catalog_fluent_wastebasket),
-                tintIcon = false,
-                modifier = Modifier.fillMaxWidth().padding(top = 36.dp, end = 4.dp, bottom = 4.dp),
+                text = stringResource(R.string.list_change),
+                onClick = onChange,
+                icon = painterResource(R.drawable.ic_edit),
+                modifier = Modifier.animateItem().fillMaxWidth().padding(top = 36.dp, end = 4.dp, bottom = 4.dp),
             )
         }
     }
 }
 
+/** Nome da seção; a dos riscados é "Já peguei". */
+@Composable
+internal fun SectionUi.title(): String = if (bought) stringResource(R.string.list_bought_section) else name
+
 /**
- * "Sua lista está vazia. Toque em **Adicionar** para começar." (guia de linguagem). O texto todo já
- * é Lexend negrito, então o trecho em `<b>` ganha a cor de destaque para se distinguir.
+ * Título **Lista de Compras** e "Toque em **Adicionar** para começar sua lista." (guia de
+ * linguagem). O texto todo já é Lexend negrito, então o trecho em `<b>` ganha a cor de destaque para
+ * se distinguir.
  */
 @Composable
 private fun EmptyList() {
@@ -264,7 +293,17 @@ private fun EmptyList() {
         append(html.text)
         html.spanStyles.forEach { addStyle(accent, it.start, it.end) }
     }
-    Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        UppercaseText(
+            text = stringResource(R.string.list_title),
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.fillMaxWidth().semantics { heading() },
+        )
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,

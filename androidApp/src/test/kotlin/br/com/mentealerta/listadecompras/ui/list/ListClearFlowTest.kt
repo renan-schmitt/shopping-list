@@ -55,7 +55,10 @@ class ListClearFlowTest {
 
     private fun button(text: String) = compose.onNode(hasText(text) and hasClickAction())
 
+    /** "Jogar a lista fora" fica no fim do modo "Mudar a lista" (#121). */
     private fun tapClear() {
+        compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Mudar a lista"))
+        button("Mudar a lista").performClick()
         compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Jogar a lista fora"))
         button("Jogar a lista fora").performClick()
     }
@@ -96,6 +99,8 @@ class ListClearFlowTest {
 
         compose.onNode(isDialog()).assertDoesNotExist()
         assertEquals(listOf(banana, kale), fixture.items)
+        // Continua no modo de mudar.
+        compose.onNodeWithText("Toque no produto que quer mudar.").assertExists()
         compose.onNodeWithText("Couve").assertExists()
     }
 
@@ -109,8 +114,9 @@ class ListClearFlowTest {
         compose.onNode(isDialog()).assertDoesNotExist()
         assertTrue(fixture.items.isEmpty())
         assertNoticeShown("A lista foi jogada fora.")
-        compose.onNodeWithText("Sua lista está vazia. Toque em Adicionar para começar.").assertExists()
-        // Lista vazia não tem o que jogar fora.
+        // Volta para a lista, vazia: sem o que mudar nem jogar fora.
+        compose.onNodeWithText("Toque em Adicionar para começar sua lista.").assertExists()
+        compose.onAllNodesWithText("Mudar a lista").assertCountEquals(0)
         compose.onAllNodesWithText("Jogar a lista fora").assertCountEquals(0)
     }
 

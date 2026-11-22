@@ -42,8 +42,18 @@ sealed interface ListUiState {
     }
 }
 
-/** Seção com título e os produtos dela, na ordem em que entraram. */
-data class SectionUi(val id: String, val name: String, val rows: List<ListRowUi>)
+/**
+ * Seção com título e os produtos dela, na ordem em que entraram. A seção dos riscados ([bought]) vem
+ * sempre por último e não tem nome aqui: a tela mostra "Já peguei" (#121), do `strings.xml`.
+ */
+data class SectionUi(val id: String, val name: String, val rows: List<ListRowUi>, val bought: Boolean = false) {
+    companion object {
+        const val BOUGHT_ID = "bought"
+
+        /** "Já peguei": os riscados de todas as seções, na ordem das seções. */
+        fun bought(rows: List<ListRowUi>) = SectionUi(BOUGHT_ID, name = "", rows = rows, bought = true)
+    }
+}
 
 /** Linha do produto: marca de riscar → nome (com detalhe e quantidade) → ícone. */
 data class ListRowUi(
@@ -65,7 +75,8 @@ sealed interface ListNotice {
 }
 
 /**
- * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. Riscar e tirar
+ * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. As seções
+ * mostram só o que falta; os riscados descem para "Já peguei", no fim (#121, plano §1.1). Riscar e tirar
  * o risco (#51), o "Terminei" (#57) e o "Jogar a lista fora" (#58) entram na pilha do "Ops, voltar";
  * [onUndo] desfaz a última ação.
  */
@@ -87,11 +98,13 @@ class ListViewModel(
             if (sections.isEmpty()) {
                 ListUiState.Empty
             } else {
-                ListUiState.Content(
-                    sections.map { (section, items) ->
-                        SectionUi(section.id, section.name, items.map { it.toRow(catalogIndex) })
-                    },
-                )
+                val pending = sections.mapNotNull { (section, items) ->
+                    items.filterNot { it.checked }
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { rows -> SectionUi(section.id, section.name, rows.map { it.toRow(catalogIndex) }) }
+                }
+                val bought = sections.flatMap { it.items }.filter { it.checked }.map { it.toRow(catalogIndex) }
+                ListUiState.Content(if (bought.isEmpty()) pending else pending + SectionUi.bought(bought))
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), ListUiState.Loading)

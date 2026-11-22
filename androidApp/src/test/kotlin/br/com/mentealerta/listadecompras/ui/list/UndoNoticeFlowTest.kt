@@ -89,6 +89,8 @@ class UndoNoticeFlowTest {
         button("Terminei").performClick()
         notice(finished).assertExists()
 
+        compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Mudar a lista"))
+        button("Mudar a lista").performClick()
         compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Jogar a lista fora"))
         button("Jogar a lista fora").performClick()
         button("Sim, jogar fora").performClick()

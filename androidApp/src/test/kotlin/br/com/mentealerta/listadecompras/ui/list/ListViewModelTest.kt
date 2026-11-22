@@ -149,14 +149,6 @@ class ListViewModelTest {
                             "Hortifrúti",
                             listOf(
                                 ListRowUi(
-                                    ListItemId("1"),
-                                    "bananas",
-                                    null,
-                                    Quantity(6.0),
-                                    true,
-                                    R.drawable.catalog_fluent_banana,
-                                ),
-                                ListRowUi(
                                     ListItemId("2"),
                                     "Couve",
                                     "mineira",
@@ -177,10 +169,52 @@ class ListViewModelTest {
                                 ),
                             ),
                         ),
+                        // Riscados descem para "Já peguei", no fim (#121).
+                        SectionUi.bought(
+                            listOf(
+                                ListRowUi(
+                                    ListItemId("1"),
+                                    "bananas",
+                                    null,
+                                    Quantity(6.0),
+                                    true,
+                                    R.drawable.catalog_fluent_banana,
+                                ),
+                            ),
+                        ),
                     ),
                 ),
                 awaitItem(),
             )
+        }
+    }
+
+    @Test
+    fun boughtSectionComesLastInSectionOrderAndEmptySectionsDisappear() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce", checked = true)
+        val kale = ListItem(ListItemId("2"), "Couve", null, "produce", checked = true)
+        val bergamot = ListItem(ListItemId("3"), "Bergamota", null, CatalogSection.OTHER_ID)
+        val tea = ListItem(ListItemId("4"), "Chá", null, CatalogSection.OTHER_ID, checked = true)
+
+        viewModel().uiState.test {
+            skipItems(1)
+            sections.emit(listOf(ListSection(produce, listOf(tomato, kale)), ListSection(other, listOf(bergamot, tea))))
+            val content = awaitItem() as ListUiState.Content
+            assertEquals(listOf(CatalogSection.OTHER_ID, SectionUi.BOUGHT_ID), content.sections.map { it.id })
+            assertEquals(listOf("Tomate", "Couve", "Chá"), content.sections.last().rows.map { it.name })
+            assertTrue(content.sections.last().bought)
+            assertEquals(1, content.remaining)
+            assertEquals(4, content.total)
+        }
+    }
+
+    @Test
+    fun withNothingCheckedThereIsNoBoughtSection() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
+        viewModel().uiState.test {
+            skipItems(1)
+            sections.emit(listOf(ListSection(produce, listOf(tomato))))
+            assertEquals(false, (awaitItem() as ListUiState.Content).sections.any { it.bought })
         }
     }
 

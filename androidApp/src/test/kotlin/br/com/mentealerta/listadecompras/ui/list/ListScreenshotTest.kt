@@ -15,7 +15,7 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Screenshots da tela da lista com a fonte do sistema em 100%, 150% e 200%, no modo claro e no
  * escuro (plano §4.6), comprando (com riscados, rodapé com "Terminei") e antes de riscar (só o
- * "Adicionar" grande, #52), e da lista vazia.
+ * "Adicionar" grande, #52), da lista vazia e do modo "Mudar a lista" (#121).
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -72,8 +72,30 @@ class ListScreenshotTest {
     @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.0f)
     fun empty_light_font100() = capture("empty_light_font100", ListUiState.Empty)
 
+    @Test
+    @Config(fontScale = 1.0f)
+    fun change_light_font100() = captureChange("light_font100")
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun change_light_font200() = captureChange("light_font200")
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun change_dark_font100() = captureChange("dark_font100")
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 2.0f)
+    fun change_dark_font200() = captureChange("dark_font200")
+
     private fun capture(name: String, state: ListUiState = SampleListState) {
         compose.setContent { ShoppingListTheme { ListContent(state) } }
         compose.onRoot().captureRoboImage("src/test/screenshots/list_$name.png")
+    }
+
+    /** Modo "Mudar a lista" (#121). */
+    private fun captureChange(name: String) {
+        compose.setContent { ShoppingListTheme { ChangeListContent(SampleListState) } }
+        compose.onRoot().captureRoboImage("src/test/screenshots/list_change_$name.png")
     }
 }

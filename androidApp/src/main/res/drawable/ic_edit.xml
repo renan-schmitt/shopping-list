@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lápis do "Mudar a lista" (#121), no mesmo traço grosso dos outros ícones dos botões. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="30dp"
+    android:height="30dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M15,5l4,4M4,20l1,-5L16,4l4,4L9,19z"
+        android:strokeWidth="2.6"
+        android:strokeColor="#FF141414"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

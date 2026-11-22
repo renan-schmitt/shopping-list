@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -46,9 +45,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.text
@@ -72,7 +69,7 @@ private val StrikeWidth = 4.dp
 private val DividerWidth = 2.dp
 private val DividerDash = 8.dp
 
-/** Área de toque da marca, maior que o desenho dela (plano §1.7). */
+/** Espaço da marca, maior que o desenho dela. */
 private val MarkTouchSize = 56.dp
 
 /** Passar o dedo risca quando a linha anda pelo menos isto… */
@@ -91,23 +88,20 @@ private const val CHECKED_ICON_ALPHA = 0.5f
  * na cor. Para o TalkBack a linha é um item só, lido em caixa normal ("Leite desnatado, 2 litros"),
  * com o estado "Comprado" quando riscada.
  *
- * Riscar e tirar o risco (#51): tocando na marca ou passando o dedo na linha, para qualquer lado. A
- * linha acompanha o dedo e volta ao lugar; o celular vibra e não aparece mensagem (guia de
- * linguagem). No TalkBack, tocar duas vezes na linha faz o mesmo ("Marcar como comprado" /
- * "Tirar o risco").
- *
- * Tocar no resto da linha abre a edição (#55, [onEdit]); no TalkBack, é a ação "Editar" da linha.
+ * Riscar e tirar o risco (#51): tocando em qualquer parte da linha ou passando o dedo nela, para
+ * qualquer lado. A linha acompanha o dedo e volta ao lugar; o celular vibra e não aparece mensagem
+ * (guia de linguagem). No TalkBack, tocar duas vezes na linha faz o mesmo ("Marcar como comprado" /
+ * "Tirar o risco"). Tocar não abre a edição, para evitar toques acidentais: ela fica no modo "Mudar
+ * a lista" (#121).
  */
 @Composable
-fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, onEdit: () -> Unit, modifier: Modifier = Modifier) {
+fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     val name = row.detail?.let { stringResource(R.string.list_item_name_with_detail, row.name, it) } ?: row.name
     val quantity = row.quantity?.format(LocalContext.current.resources)
     val label = quantity?.let { stringResource(R.string.list_item_with_quantity, name, it.spoken) } ?: name
     val checkedDescription = stringResource(R.string.list_item_checked)
     val toggleLabel = stringResource(if (row.checked) R.string.list_item_unmark else R.string.list_item_mark_bought)
-    val editLabel = stringResource(R.string.list_item_edit)
-    val edit by rememberUpdatedState(onEdit)
     val dividerColor = colors.outlineVariant
 
     val haptic = LocalHapticFeedback.current
@@ -153,22 +147,16 @@ fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, onEdit: () -> Unit, m
                     toggle()
                     true
                 }
-                customActions = listOf(
-                    CustomAccessibilityAction(editLabel) {
-                        edit()
-                        true
-                    },
-                )
             }
-            // Depois do clearAndSetSemantics, para o TalkBack ficar só com as ações acima.
-            .clickable(onClick = { edit() })
+            // Depois do clearAndSetSemantics, para o TalkBack ficar só com a ação acima.
+            .clickable(onClick = { toggle() })
             // O conteúdo acompanha o dedo; o pontilhado de baixo fica parado.
             .offset { IntOffset(dragOffset.roundToInt(), 0) }
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CheckMark(checked = row.checked, onClick = { toggle() })
+        CheckMark(checked = row.checked)
         FlowRow(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -189,16 +177,13 @@ fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, onEdit: () -> Unit, m
 }
 
 /**
- * Marca redonda: vazia antes de riscar; verde com ✓ e sombra depois. A área de toque é maior que a
- * marca, para acertar com folga.
+ * Marca redonda: vazia antes de riscar; verde com ✓ e sombra depois. O toque é da linha inteira; a
+ * marca só reserva o espaço dela.
  */
 @Composable
-private fun CheckMark(checked: Boolean, onClick: () -> Unit) {
+private fun CheckMark(checked: Boolean) {
     Box(
-        modifier = Modifier
-            .sizeIn(minWidth = MarkTouchSize, minHeight = MarkTouchSize)
-            .clip(CircleShape)
-            .clickable(onClick = onClick),
+        modifier = Modifier.sizeIn(minWidth = MarkTouchSize, minHeight = MarkTouchSize),
         contentAlignment = Alignment.Center,
     ) {
         CheckMarkShape(checked)
@@ -235,7 +220,7 @@ private fun CheckMarkShape(checked: Boolean) {
  * a linha, sem reticências. Riscado: traço grosso na cor da tinta por cima de cada linha do texto.
  */
 @Composable
-private fun ItemName(text: String, checked: Boolean) {
+internal fun ItemName(text: String, checked: Boolean) {
     val colors = MaterialTheme.colorScheme
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     val strikeColor = colors.outline
@@ -265,7 +250,7 @@ private fun Modifier.strikeThrough(layout: () -> TextLayoutResult?, color: Color
 
 /** Quantidade em letra menor, num selo com contorno, só quando a pessoa informou. */
 @Composable
-private fun QuantityBadge(text: String, checked: Boolean) {
+internal fun QuantityBadge(text: String, checked: Boolean) {
     val colors = MaterialTheme.colorScheme
     val color = if (checked) colors.onSurfaceVariant else colors.onSurface
     Text(

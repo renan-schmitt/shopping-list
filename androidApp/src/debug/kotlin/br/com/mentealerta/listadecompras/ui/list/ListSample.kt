@@ -8,28 +8,26 @@ import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 
+private val banana = row("banana", "Banana", R.drawable.catalog_fluent_banana, Quantity(6.0))
+private val bread = row("bread", "Pão francês", R.drawable.catalog_fluent_baguette_bread, Quantity(10.0))
+
 /**
- * Lista de exemplo para preview e screenshot (#50): nomes curtos e longos, detalhe, quantidades e
- * produtos riscados. Fica no source set `debug` para não entrar na versão publicada.
+ * Lista de exemplo antes de riscar o primeiro produto (#50, #52): nomes curtos e longos, detalhe e
+ * quantidades; rodapé só com o "Adicionar" grande. Fica no source set `debug` para não entrar na
+ * versão publicada.
  */
-val SampleListState = ListUiState.Content(
+val SampleListStateNotShopping = ListUiState.Content(
     listOf(
         SectionUi(
             id = "produce",
             name = "Hortifrúti",
             rows = listOf(
-                row("banana", "Banana", R.drawable.catalog_fluent_banana, Quantity(6.0), checked = true),
+                banana,
                 row("tomato", "Tomate", R.drawable.catalog_fluent_tomato),
                 row("lettuce", "Alface", R.drawable.catalog_fluent_leafy_green),
             ),
         ),
-        SectionUi(
-            id = "bakery",
-            name = "Padaria",
-            rows = listOf(
-                row("bread", "Pão francês", R.drawable.catalog_fluent_baguette_bread, Quantity(10.0), checked = true),
-            ),
-        ),
+        SectionUi(id = "bakery", name = "Padaria", rows = listOf(bread)),
         SectionUi(
             id = "butcher",
             name = "Açougue",
@@ -67,9 +65,15 @@ val SampleListState = ListUiState.Content(
     ),
 )
 
-/** A mesma lista antes de riscar o primeiro produto: rodapé só com o "Adicionar" grande (#52). */
-val SampleListStateNotShopping = ListUiState.Content(
-    SampleListState.sections.map { section -> section.copy(rows = section.rows.map { it.copy(checked = false) }) },
+/**
+ * A mesma lista comprando: banana e pão riscados, em "Já peguei" no fim (#121); a Padaria, sem nada
+ * faltando, some.
+ */
+val SampleListState = ListUiState.Content(
+    SampleListStateNotShopping.sections
+        .map { section -> section.copy(rows = section.rows - banana - bread) }
+        .filter { it.rows.isNotEmpty() } +
+        SectionUi.bought(listOf(banana.copy(checked = true), bread.copy(checked = true))),
 )
 
 private fun row(
@@ -103,6 +107,12 @@ private fun ListFont200Preview() {
 @Composable
 private fun ListNotShoppingPreview() {
     ShoppingListTheme(darkTheme = false) { ListContent(SampleListStateNotShopping) }
+}
+
+@Preview(name = "Mudar a lista", widthDp = 411, heightDp = 1400)
+@Composable
+private fun ChangeListPreview() {
+    ShoppingListTheme(darkTheme = false) { ChangeListContent(SampleListState) }
 }
 
 @Preview(name = "Lista vazia", widthDp = 411, heightDp = 800)
