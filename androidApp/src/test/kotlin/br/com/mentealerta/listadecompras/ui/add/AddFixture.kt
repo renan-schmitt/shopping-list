@@ -13,19 +13,26 @@ import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
+import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
+import br.com.mentealerta.listadecompras.voice.VoiceEvent
+import br.com.mentealerta.listadecompras.voice.VoicePreferences
+import br.com.mentealerta.listadecompras.voice.VoiceRecognizer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 /**
  * Catálogo pequeno e repositório falso para os testes da tela de adicionar: guarda o que entrou na
- * lista em [added] e a lista como está em [items]. O "Ops, voltar" fica na [undoStack].
+ * lista em [added] e a lista como está em [items]. O "Ops, voltar" fica na [undoStack]. A voz é o
+ * [voice], que entrega o que o teste mandar.
  */
 class AddFixture {
     private val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -43,6 +50,9 @@ class AddFixture {
             retiredProductIds = emptySet(),
         ),
     )
+
+    val voice = FakeVoiceRecognizer()
+    val voicePreferences = FakeVoicePreferences()
 
     val added = mutableListOf<ListItem>()
     val items = mutableListOf<ListItem>()
@@ -83,6 +93,41 @@ class AddFixture {
         AddItemsUseCase(repository),
         FindSameItemUseCase(repository),
         EditItemUseCase(repository, undoStack),
+        ParseSpeechUseCase(ItemTextParser(index)),
+        voice,
+        voicePreferences,
         searchDispatcher,
     )
+}
+
+/**
+ * Voz falsa: cada [VoiceRecognizer.listen] entrega o que o teste mandar por [say] e termina com
+ * [finish] (o silêncio longo) ou com "Terminei" ([stop]).
+ */
+class FakeVoiceRecognizer(override val isAvailable: Boolean = true) : VoiceRecognizer {
+    private var events = Channel<VoiceEvent>(Channel.UNLIMITED)
+    var listens = 0
+        private set
+
+    override fun listen(): Flow<VoiceEvent> {
+        listens++
+        events = Channel(Channel.UNLIMITED)
+        return events.receiveAsFlow()
+    }
+
+    fun say(vararg event: VoiceEvent) = event.forEach { events.trySend(it) }
+
+    fun finish() {
+        events.close()
+    }
+
+    override fun stop() = finish()
+}
+
+class FakeVoicePreferences(var noticeShown: Boolean = false) : VoicePreferences {
+    override suspend fun wasNoticeShown() = noticeShown
+
+    override suspend fun setNoticeShown() {
+        noticeShown = true
+    }
 }

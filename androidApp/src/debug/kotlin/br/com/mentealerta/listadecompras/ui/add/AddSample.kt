@@ -39,6 +39,23 @@ val SampleAddRepeatedState = AddUiState(
     repeated = RepeatedUi("leite", option("Leite", R.drawable.catalog_fluent_glass_of_milk)),
 )
 
+/** Explicação do microfone, na primeira vez que a pessoa toca em "Falar" (#60). */
+val SampleAddVoiceNoticeState = AddUiState(voice = VoiceUi.Notice)
+
+/** Ouvindo (#60): dois trechos entendidos e o texto que está aparecendo. */
+val SampleAddListeningState = AddUiState(
+    voice = VoiceUi.Listening(
+        heard = listOf("arroz feijão e dois litros de leite", "biscoito água e sal"),
+        partial = "meio quilo de carne",
+    ),
+)
+
+/** Recado depois da escuta, com o aviso do que entrou antes (#60). */
+val SampleAddVoiceMessageState = AddUiState(
+    voice = VoiceUi.Message.NO_INTERNET,
+    lastAdded = AddedUi("arroz", count = 3),
+)
+
 private fun option(name: String, icon: Int, quantity: Quantity? = null) = AddOptionUi(
     item = ParsedItem(name, match = null, quantity, detail = null),
     name = name,
@@ -48,6 +65,12 @@ private fun option(name: String, icon: Int, quantity: Quantity? = null) = AddOpt
 
 @Preview(showBackground = true)
 @Composable
+private fun AddListeningPreview() {
+    ShoppingListTheme { AddContent(SampleAddListeningState, canSpeak = true) }
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun AddPreview() {
-    ShoppingListTheme { AddContent(SampleAddState) }
+    ShoppingListTheme { AddContent(SampleAddState, canSpeak = true) }
 }

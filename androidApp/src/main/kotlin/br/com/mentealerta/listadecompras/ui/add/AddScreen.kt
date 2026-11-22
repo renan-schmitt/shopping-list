@@ -1,6 +1,11 @@
 package br.com.mentealerta.listadecompras.ui.add
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,7 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -52,6 +59,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
@@ -68,46 +77,83 @@ private val PlusSize = 36.dp
 private val OptionIconSize = 44.dp
 
 /**
- * Tela de adicionar digitando (#53, plano §1.2): ocupa a tela toda, por cima da lista. [onClose]
- * volta para a lista, pelo botão "Voltar para a lista" ou pelo voltar do celular.
+ * Tela de adicionar digitando (#53, plano §1.2) ou falando (#60): ocupa a tela toda, por cima da
+ * lista. [onClose] volta para a lista, pelo botão "Voltar para a lista" ou pelo voltar do celular.
+ *
+ * O pedido de microfone do Android sai daqui, quando o [AddViewModel] pede ([VoiceUi.AskingPermission]).
+ * Se o app sai da tela durante a escuta, o microfone fecha.
  */
 @Composable
 fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: AddViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val close = {
         viewModel.onClose()
         onClose()
     }
     BackHandler(onBack = close)
+    val askMicrophone = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+        viewModel::onMicrophonePermission,
+    )
+    LaunchedEffect(uiState.voice) {
+        if (uiState.voice == VoiceUi.AskingPermission) askMicrophone.launch(Manifest.permission.RECORD_AUDIO)
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onStopListening() }
     AddContent(
         uiState = uiState,
+        canSpeak = viewModel.canSpeak,
         onQueryChange = viewModel::onQueryChange,
         onAdd = viewModel::onAdd,
         onSubmit = viewModel::onSubmit,
         onAddMore = viewModel::onAddMore,
         onKeepAsIs = viewModel::onKeepAsIs,
+        onSpeak = { viewModel.onSpeak(context.hasMicrophone()) },
+        onAcceptNotice = { viewModel.onAcceptNotice(context.hasMicrophone()) },
+        onDeclineNotice = viewModel::onDeclineNotice,
+        onStopListening = viewModel::onStopListening,
         onClose = close,
         modifier = modifier,
     )
 }
 
+private fun Context.hasMicrophone(): Boolean =
+    checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+
 /**
- * Topo verde com "Voltar para a lista" e o campo "Procurar produto" (protótipo navegável); embaixo,
- * no papel, o aviso do que entrou e as opções da busca. O campo abre com o teclado. Com o produto
- * repetido (#54), a pergunta toma o lugar do aviso e das opções até a pessoa responder.
+ * Topo verde com "Voltar para a lista", o campo "Procurar produto" (protótipo navegável) e, se o
+ * celular tem voz ([canSpeak]), o botão **Falar**; embaixo, no papel, o aviso do que entrou e as
+ * opções da busca. O campo abre com o teclado. Com o produto repetido (#54), a pergunta toma o lugar
+ * do aviso e das opções até a pessoa responder; o mesmo vale para a explicação do microfone e a
+ * escuta (#60), que escondem o teclado. Depois de um recado que sugere escrever, o teclado volta.
  */
 @Composable
 fun AddContent(
     uiState: AddUiState,
     modifier: Modifier = Modifier,
+    canSpeak: Boolean = false,
     onQueryChange: (String) -> Unit = {},
     onAdd: (AddOptionUi) -> Unit = {},
     onSubmit: () -> Unit = {},
     onAddMore: () -> Unit = {},
     onKeepAsIs: () -> Unit = {},
+    onSpeak: () -> Unit = {},
+    onAcceptNotice: () -> Unit = {},
+    onDeclineNotice: () -> Unit = {},
+    onStopListening: () -> Unit = {},
     onClose: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
+    val voice = uiState.voice
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    LaunchedEffect(voice) {
+        when (voice) {
+            null, VoiceUi.Message.NOT_UNDERSTOOD -> Unit
+            is VoiceUi.Message -> focusRequester.requestFocus()
+            else -> focusManager.clearFocus()
+        }
+    }
     Column(modifier = modifier.fillMaxSize().background(colors.surface)) {
         Column(
             modifier = Modifier
@@ -122,7 +168,20 @@ fun AddContent(
                 onClick = onClose,
                 icon = painterResource(R.drawable.ic_arrow_back),
             )
-            SearchField(query = uiState.query, onQueryChange = onQueryChange, onSubmit = onSubmit)
+            SearchField(
+                query = uiState.query,
+                onQueryChange = onQueryChange,
+                onSubmit = onSubmit,
+                focusRequester = focusRequester,
+            )
+            if (canSpeak && voice !is VoiceUi.Listening && voice != VoiceUi.Notice) {
+                SecondaryButton(
+                    text = stringResource(R.string.add_speak),
+                    onClick = onSpeak,
+                    icon = painterResource(R.drawable.ic_mic),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
         LazyColumn(
             modifier = Modifier.weight(1f).fillMaxWidth().imePadding(),
@@ -130,13 +189,23 @@ fun AddContent(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             val repeated = uiState.repeated
-            if (repeated != null) {
-                item(key = "repeated", contentType = "repeated") {
+            when {
+                voice == VoiceUi.Notice -> item(key = "voice-notice", contentType = "voice-notice") {
+                    VoiceNotice(onAccept = onAcceptNotice, onDecline = onDeclineNotice)
+                }
+                voice is VoiceUi.Listening -> item(key = "listening", contentType = "listening") {
+                    Listening(listening = voice, onStop = onStopListening)
+                }
+                repeated != null -> item(key = "repeated", contentType = "repeated") {
                     RepeatedQuestion(name = repeated.name, onAddMore = onAddMore, onKeepAsIs = onKeepAsIs)
                 }
-            } else {
-                item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
-                options(uiState, onAdd)
+                else -> {
+                    if (voice is VoiceUi.Message) {
+                        item(key = "voice-message", contentType = "voice-message") { VoiceMessage(voice) }
+                    }
+                    item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
+                    options(uiState, onAdd)
+                }
             }
             item(key = "bottom", contentType = "bottom") { Box(Modifier.navigationBarsPadding()) }
         }
@@ -163,8 +232,12 @@ private fun LazyListScope.options(uiState: AddUiState, onAdd: (AddOptionUi) -> U
 
 /** Campo "Procurar produto", que abre com o teclado. Tecla "pronto" põe a primeira opção na lista. */
 @Composable
-private fun SearchField(query: String, onQueryChange: (String) -> Unit, onSubmit: () -> Unit) {
-    val focusRequester = remember { FocusRequester() }
+private fun SearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+    focusRequester: FocusRequester,
+) {
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
     LabeledTextField(
         label = stringResource(R.string.add_search_label),
@@ -182,9 +255,12 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit, onSubmit
  */
 @Composable
 private fun AddedNotice(added: AddedUi?) {
-    val text = added?.let {
-        stringResource(if (it.again) R.string.add_added_again else R.string.add_added, it.name.capitalized())
-    }.orEmpty()
+    val text = when {
+        added == null -> ""
+        added.count > 1 -> pluralStringResource(R.plurals.add_added_many, added.count, added.count)
+        added.again -> stringResource(R.string.add_added_again, added.name.capitalized())
+        else -> stringResource(R.string.add_added, added.name.capitalized())
+    }
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
@@ -227,6 +303,92 @@ private fun RepeatedQuestion(name: String, onAddMore: () -> Unit, onKeepAsIs: ()
             }
         }
     }
+}
+
+/**
+ * Explicação antes do pedido de microfone, só na primeira vez (#60, plano §3.3): **Usar o microfone**
+ * e **Não, vou escrever**, um embaixo do outro, em largura total.
+ */
+@Composable
+private fun VoiceNotice(onAccept: () -> Unit, onDecline: () -> Unit) {
+    val tokens = ComicTheme.tokens
+    ComicCard(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = tokens.largeShadow)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                text = stringResource(R.string.add_voice_notice),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
+            )
+            PrimaryButton(
+                text = stringResource(R.string.add_voice_notice_yes),
+                onClick = onAccept,
+                icon = painterResource(R.drawable.ic_mic),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            SecondaryButton(
+                text = stringResource(R.string.add_voice_notice_no),
+                onClick = onDecline,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+/**
+ * Microfone aberto: "Estou ouvindo. Pode falar.", cada trecho entendido numa linha e, por último, o
+ * texto que está aparecendo. **Terminei** fecha o microfone. Só o "Estou ouvindo" é lido pelo
+ * TalkBack: ler o que aparece faria o microfone ouvir o próprio celular.
+ */
+@Composable
+private fun Listening(listening: VoiceUi.Listening, onStop: () -> Unit) {
+    val tokens = ComicTheme.tokens
+    val colors = MaterialTheme.colorScheme
+    ComicCard(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = tokens.largeShadow)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(
+                text = stringResource(R.string.add_voice_listening),
+                style = MaterialTheme.typography.bodyLarge,
+                color = colors.primary,
+                modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
+            )
+            listening.heard.forEach {
+                Text(text = it, style = MaterialTheme.typography.bodyLarge, color = colors.onSurface)
+            }
+            if (listening.partial.isNotEmpty()) {
+                Text(
+                    text = listening.partial,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.onSurfaceVariant,
+                )
+            }
+            PrimaryButton(
+                text = stringResource(R.string.add_voice_done),
+                onClick = onStop,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+/** Recado depois da escuta, lido pelo TalkBack assim que aparece. */
+@Composable
+private fun VoiceMessage(message: VoiceUi.Message) {
+    val text = when (message) {
+        VoiceUi.Message.NOT_UNDERSTOOD -> R.string.add_voice_not_understood
+        VoiceUi.Message.NO_INTERNET -> R.string.add_voice_no_internet
+        VoiceUi.Message.NO_MICROPHONE -> R.string.add_voice_no_microphone
+        VoiceUi.Message.UNAVAILABLE -> R.string.add_voice_unavailable
+    }
+    Text(
+        text = stringResource(text),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .semantics { liveRegion = LiveRegionMode.Polite },
+    )
 }
 
 @Composable

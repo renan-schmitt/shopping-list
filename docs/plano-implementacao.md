@@ -147,6 +147,13 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 - Aviso uma vez, junto da explicação antes de pedir o microfone: "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." Depois fica na tela de privacidade das configurações.
 - O texto reconhecido nunca vai para logs, crashes ou analytics. Só o evento `item_adicionado { origem: voz }` (seção 4.5).
 
+**Na tela (2026-11-22, #60):**
+- Botão **Falar** (com microfone) na tela de adicionar, logo abaixo de "Procurar produto". Fora do rodapé da lista, para não competir com "Adicionar" e "Terminei". Some se o celular não tiver serviço de voz.
+- A explicação vem antes do pedido de microfone do Android, com **Usar o microfone** e **Não, vou escrever**. Respondendo "Não", ela volta na próxima vez.
+- Ouvindo: "Estou ouvindo. Pode falar.", cada trecho entendido numa linha e **Terminei**. O TalkBack lê só o "Estou ouvindo", para o microfone não ouvir o próprio celular.
+- Recados: os do guia, mais "Sem o microfone, não consigo ouvir. Você pode escrever." (permissão negada) e "Não deu certo ouvir agora. Você pode escrever." (microfone ou serviço com problema). Os que sugerem escrever abrem o teclado.
+- Até a conferência (#61), o que foi falado entra direto na lista, sem a pergunta de produto repetido, com o aviso "3 produtos entraram na lista."
+
 **Prova de conceito:** não haverá uma separada. A primeira issue da tela de voz começa medindo num celular de entrada:
 - se a escuta reabre sem bipe nem atraso incômodo;
 - se ~8 s de silêncio é um bom limite;

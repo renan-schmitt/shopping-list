@@ -8,10 +8,14 @@ import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
+import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
 import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
+import br.com.mentealerta.listadecompras.voice.VoiceEvent
+import br.com.mentealerta.listadecompras.voice.VoicePreferences
+import br.com.mentealerta.listadecompras.voice.VoiceRecognizer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,10 +40,30 @@ data class AddUiState(
     val lastAdded: AddedUi? = null,
     /** Produto que já estava na lista, para a pergunta "Leite já está na lista. Quer mais um?" (#54). */
     val repeated: RepeatedUi? = null,
+    /** Falar os produtos (#60): explicação, escuta ou recado; `null` quando a voz não está em uso. */
+    val voice: VoiceUi? = null,
 )
 
-/** O que entrou na lista: [again] quando a pessoa respondeu "Sim, mais um". */
-data class AddedUi(val name: String, val again: Boolean = false)
+/**
+ * O que entrou na lista: [again] quando a pessoa respondeu "Sim, mais um". Pela voz podem entrar
+ * vários de uma vez: com [count] maior que 1, o aviso diz quantos ("3 produtos entraram na lista.").
+ */
+data class AddedUi(val name: String, val again: Boolean = false, val count: Int = 1)
+
+/** Etapas de falar os produtos (#60, plano §3.3). */
+sealed interface VoiceUi {
+    /** Explicação do microfone e do envio do som ao Google, na primeira vez. */
+    data object Notice : VoiceUi
+
+    /** Esperando a pessoa responder ao pedido de microfone do Android. */
+    data object AskingPermission : VoiceUi
+
+    /** Ouvindo: os trechos já entendidos ([heard]) e o que está aparecendo agora ([partial]). */
+    data class Listening(val heard: List<String> = emptyList(), val partial: String = "") : VoiceUi
+
+    /** Recados depois da escuta, acima do botão "Falar". */
+    enum class Message : VoiceUi { NOT_UNDERSTOOD, NO_INTERNET, NO_MICROPHONE, UNAVAILABLE }
+}
 
 /** A pergunta do produto repetido: [name] é o nome do item que já está na lista; [option], a tocada. */
 data class RepeatedUi(val name: String, val option: AddOptionUi)
@@ -62,6 +86,11 @@ data class AddOptionUi(
  * na quantidade do item que já está, pelo [EditItemUseCase] (o "Ops, voltar" desfaz); "Não" deixa
  * como está. Voltar a digitar também conta como "Não".
  *
+ * Falar (#60): na primeira vez, a explicação do microfone ([VoicePreferences]); depois, o pedido de
+ * microfone do Android, se faltar. O [VoiceRecognizer] escuta até "Terminei" ou o silêncio longo; o
+ * [ParseSpeechUseCase] separa os produtos, que entram direto na lista. (A conferência antes de pôr
+ * na lista é a #61.)
+ *
  * A busca roda fora da thread principal ([searchDispatcher]) e só a da última letra vale. Pôr na
  * lista passa por um cadeado, para dois toques seguidos não criarem duas linhas.
  */
@@ -71,17 +100,28 @@ class AddViewModel(
     private val addItems: AddItemsUseCase,
     private val findSameItem: FindSameItemUseCase,
     private val editItem: EditItemUseCase,
+    private val parseSpeech: ParseSpeechUseCase,
+    private val voiceRecognizer: VoiceRecognizer,
+    private val voicePreferences: VoicePreferences,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddUiState())
     val uiState: StateFlow<AddUiState> = _uiState.asStateFlow()
 
+    /** Sem serviço de voz no celular, o botão "Falar" não aparece. */
+    val canSpeak: Boolean = voiceRecognizer.isAvailable
+
     private var searchJob: Job? = null
+    private var voiceJob: Job? = null
     private val addMutex = Mutex()
 
     /** O campo mudou: o texto entra na hora (o campo não pode esperar a busca) e a busca vem depois. */
     fun onQueryChange(text: String) {
-        _uiState.update { it.copy(query = text, lastAdded = null, repeated = null) }
+        _uiState.update {
+            // Escrever tira o recado da voz; a escuta continua
+            val voice = it.voice.takeIf { voice -> voice is VoiceUi.Listening }
+            it.copy(query = text, lastAdded = null, repeated = null, voice = voice)
+        }
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             val options = withContext(searchDispatcher) { searchProducts(text) }
@@ -150,10 +190,88 @@ class AddViewModel(
         (state.found.firstOrNull() ?: state.unknown)?.let(::onAdd)
     }
 
+    /**
+     * Botão "Falar": a explicação na primeira vez; depois, o pedido de microfone se ainda não houver
+     * permissão ([hasMicrophone]), ou a escuta.
+     */
+    fun onSpeak(hasMicrophone: Boolean) {
+        if (_uiState.value.voice is VoiceUi.Listening) return
+        viewModelScope.launch {
+            if (voicePreferences.wasNoticeShown()) {
+                listenOrAsk(hasMicrophone)
+            } else {
+                _uiState.update { it.copy(voice = VoiceUi.Notice, lastAdded = null, repeated = null) }
+            }
+        }
+    }
+
+    /** "Usar o microfone" na explicação: ela não aparece mais. */
+    fun onAcceptNotice(hasMicrophone: Boolean) {
+        viewModelScope.launch {
+            voicePreferences.setNoticeShown()
+            listenOrAsk(hasMicrophone)
+        }
+    }
+
+    /** "Não, vou escrever" na explicação: na próxima vez ela aparece de novo. */
+    fun onDeclineNotice() {
+        _uiState.update { it.copy(voice = null) }
+    }
+
+    /** Resposta ao pedido de microfone do Android. */
+    fun onMicrophonePermission(granted: Boolean) {
+        if (granted) listen() else _uiState.update { it.copy(voice = VoiceUi.Message.NO_MICROPHONE) }
+    }
+
+    /** "Terminei" durante a escuta: o último trecho ainda entra. */
+    fun onStopListening() {
+        voiceRecognizer.stop()
+    }
+
     /** Saindo da tela: na próxima vez ela abre com o campo vazio. */
     fun onClose() {
         searchJob?.cancel()
+        voiceJob?.cancel()
         _uiState.value = AddUiState()
+    }
+
+    private fun listenOrAsk(hasMicrophone: Boolean) {
+        if (hasMicrophone) listen() else _uiState.update { it.copy(voice = VoiceUi.AskingPermission) }
+    }
+
+    private fun listen() {
+        voiceJob?.cancel()
+        _uiState.update { it.copy(voice = VoiceUi.Listening(), lastAdded = null, repeated = null) }
+        voiceJob = viewModelScope.launch {
+            val segments = mutableListOf<List<String>>()
+            var problem: VoiceUi.Message? = null
+            voiceRecognizer.listen().collect { event ->
+                when (event) {
+                    is VoiceEvent.Partial -> updateListening { it.copy(partial = event.text) }
+                    is VoiceEvent.Heard -> {
+                        segments += event.alternatives
+                        updateListening { it.copy(heard = it.heard + event.alternatives.first(), partial = "") }
+                    }
+                    VoiceEvent.NoInternet -> problem = VoiceUi.Message.NO_INTERNET
+                    VoiceEvent.Unavailable -> problem = VoiceUi.Message.UNAVAILABLE
+                }
+            }
+            val items = parseSpeech(segments)
+            if (items.isEmpty()) {
+                _uiState.update { it.copy(voice = problem ?: VoiceUi.Message.NOT_UNDERSTOOD) }
+            } else {
+                addMutex.withLock { addItems(items) }
+                val added = AddedUi(name = items.first().name, count = items.size)
+                _uiState.update { it.copy(voice = problem, lastAdded = added) }
+            }
+        }
+    }
+
+    private fun updateListening(change: (VoiceUi.Listening) -> VoiceUi.Listening) {
+        _uiState.update { state ->
+            val listening = state.voice as? VoiceUi.Listening ?: return@update state
+            state.copy(voice = change(listening))
+        }
     }
 
     private fun ParsedItem.toOption(): AddOptionUi {

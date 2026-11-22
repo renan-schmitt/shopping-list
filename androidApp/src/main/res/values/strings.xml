@@ -81,6 +81,29 @@
     <!-- Aviso depois do "Sim, mais um" -->
     <string name="add_added_again">%1$s entrou de novo na lista.</string>
 
+    <!-- Falar os produtos (#60, plano §3.3) -->
+    <string name="add_speak">Falar</string>
+    <!-- Explicação antes do pedido de microfone, uma vez (guia de linguagem) -->
+    <string name="add_voice_notice">Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google.</string>
+    <string name="add_voice_notice_yes">Usar o microfone</string>
+    <string name="add_voice_notice_no">Não, vou escrever</string>
+    <!-- Enquanto o microfone está aberto, lido também pelo TalkBack -->
+    <string name="add_voice_listening">Estou ouvindo. Pode falar.</string>
+    <!-- Fecha o microfone; o que já foi falado entra na lista -->
+    <string name="add_voice_done">Terminei</string>
+    <string name="add_voice_not_understood">Não entendi. Pode falar de novo?</string>
+    <string name="add_voice_no_internet">Sem internet, não consigo ouvir agora. Você pode escrever.</string>
+    <!-- A pessoa não deixou usar o microfone -->
+    <string name="add_voice_no_microphone">Sem o microfone, não consigo ouvir. Você pode escrever.</string>
+    <!-- O microfone ou o serviço de voz não funcionaram (ocupado, outro erro) -->
+    <string name="add_voice_unavailable">Não deu certo ouvir agora. Você pode escrever.</string>
+    <!-- Aviso depois de falar vários produtos de uma vez (com um só, vale o add_added) -->
+    <plurals name="add_added_many">
+        <item quantity="one">%d produto entrou na lista.</item>
+        <item quantity="many">%d produtos entraram na lista.</item>
+        <item quantity="other">%d produtos entraram na lista.</item>
+    </plurals>
+
     <!-- Edição do produto (#55): tudo é salvo sozinho, não existe "Salvar" -->
     <string name="edit_name_label">Nome</string>
     <string name="edit_quantity_label">Quantidade</string>

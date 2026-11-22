@@ -21,12 +21,14 @@ import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 import br.com.mentealerta.listadecompras.ui.theme.ThemeScreenshotTest
+import br.com.mentealerta.listadecompras.voice.VoiceEvent
 import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -171,5 +173,58 @@ class AddFlowTest {
         compose.setContent { ShoppingListTheme(darkTheme = false) { AddContent(SampleAddState) } }
         compose.onNode(hasText("Leite condensado de caixinha da marca preferida, 2 litros") and hasClickAction())
             .assertHeightIsAtLeast(72.dp)
+    }
+
+    private fun grantMicrophone() {
+        shadowOf(compose.activity.application).grantPermissions(android.Manifest.permission.RECORD_AUDIO)
+    }
+
+    @Test
+    fun speakingExplainsTheMicrophoneThenPutsWhatWasSaidOnTheList() {
+        grantMicrophone()
+        show()
+
+        compose.onNode(hasText("Falar") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
+        compose.onNodeWithText(
+            "Para você falar os produtos, o app precisa usar o microfone. " +
+                "Para entender o que você fala, o celular pode enviar o som ao Google.",
+        ).assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+        compose.onNode(hasText("Usar o microfone") and hasClickAction()).performClick()
+
+        compose.onNodeWithText("Estou ouvindo. Pode falar.")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+        compose.onAllNodesWithText("Falar").assertCountEquals(0)
+        fixture.voice.say(VoiceEvent.Heard(listOf("banana e maçã")))
+        compose.onNodeWithText("banana e maçã").assertExists()
+        compose.onNode(hasText("Terminei") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
+
+        assertEquals(listOf("banana", "apple"), fixture.added.map { it.productId })
+        compose.onNodeWithText("2 produtos entraram na lista.")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+    }
+
+    @Test
+    fun noticeAnsweredNoGoesBackToWriting() {
+        show()
+        compose.onNode(hasText("Falar") and hasClickAction()).performClick()
+
+        compose.onNode(hasText("Não, vou escrever") and hasClickAction()).performClick()
+
+        assertEquals(0, fixture.voice.listens)
+        compose.onNode(hasText("Falar") and hasClickAction()).assertExists()
+    }
+
+    @Test
+    fun notUnderstoodAsksToSpeakAgain() {
+        grantMicrophone()
+        fixture.voicePreferences.noticeShown = true
+        show()
+        compose.onNode(hasText("Falar") and hasClickAction()).performClick()
+
+        fixture.voice.finish()
+
+        compose.onNodeWithText("Não entendi. Pode falar de novo?")
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+        compose.onNode(hasText("Falar") and hasClickAction()).assertExists()
     }
 }
