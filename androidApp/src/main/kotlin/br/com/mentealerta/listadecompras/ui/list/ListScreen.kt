@@ -11,10 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +43,7 @@ import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.UndoNotice
 import br.com.mentealerta.listadecompras.ui.components.halftone
+import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
 import br.com.mentealerta.listadecompras.ui.edit.EditScreen
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -56,6 +56,7 @@ import org.koin.compose.viewmodel.koinViewModel
  * Produto tirado da lista na edição mostra o aviso "Feijão saiu da lista." com **Ops, voltar**; o
  * "Terminei" (#57), "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez.". "Jogar a
  * lista fora" (#58) pergunta antes e, depois, mostra "A lista foi jogada fora." com **Ops, voltar**.
+ * Cada aviso fica 15 s na tela (#59) e um novo tira o anterior; riscar não mostra aviso (guia).
  * [editScreen] é a tela de edição; os testes trocam por uma com o ViewModel deles.
  */
 @Composable
@@ -75,25 +76,26 @@ fun ListScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalContext.current.resources
 
-    // A duração definitiva do aviso fica para a #59.
+    val accessibilityManager = LocalAccessibilityManager.current
+
     LaunchedEffect(removedName) {
         val name = removedName ?: return@LaunchedEffect
-        val result = snackbarHostState.showSnackbar(
+        val undo = snackbarHostState.showUndoNotice(
             message = resources.getString(R.string.list_item_removed, name.replaceFirstChar { it.titlecase() }),
             actionLabel = resources.getString(R.string.undo),
-            duration = SnackbarDuration.Long,
+            accessibilityManager = accessibilityManager,
         )
-        if (result == SnackbarResult.ActionPerformed) viewModel.onUndo()
+        if (undo) viewModel.onUndo()
         removedName = null
     }
     LaunchedEffect(notice) {
         val current = notice ?: return@LaunchedEffect
-        val result = snackbarHostState.showSnackbar(
+        val undo = snackbarHostState.showUndoNotice(
             message = noticeMessage(resources, current),
             actionLabel = resources.getString(R.string.undo),
-            duration = SnackbarDuration.Long,
+            accessibilityManager = accessibilityManager,
         )
-        if (result == SnackbarResult.ActionPerformed) viewModel.onUndo()
+        if (undo) viewModel.onUndo()
         viewModel.onNoticeShown()
     }
 
