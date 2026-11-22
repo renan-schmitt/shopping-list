@@ -18,6 +18,7 @@ import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
+import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
@@ -76,7 +77,10 @@ class ListViewModelTest {
             return previous
         }
 
-        override suspend fun remove(id: ListItemId) = RemovedItems.NONE
+        override suspend fun remove(id: ListItemId): RemovedItems {
+            val item = stored.remove(id) ?: return RemovedItems.NONE
+            return RemovedItems.of(listOf(item to Instant.fromEpochSeconds(0)))
+        }
 
         override suspend fun clear(): RemovedItems {
             val all = stored.values.toList().takeIf { it.isNotEmpty() } ?: return RemovedItems.NONE
@@ -113,6 +117,7 @@ class ListViewModelTest {
         SetItemCheckedUseCase(repository, undoStack),
         FinishShoppingUseCase(repository, undoStack),
         ClearListUseCase(repository, undoStack),
+        RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
     )
 
@@ -318,6 +323,30 @@ class ListViewModelTest {
         assertTrue(stored.isEmpty())
         viewModel.onUndo()
         assertEquals(setOf(tomato, beans), stored.values.toSet())
+    }
+
+    @Test
+    fun removingFromTheRowShowsTheNoticeAndCanBeUndone() = runTest {
+        val beans = ListItem(ListItemId("1"), "Feijão", null, "produce")
+        stored[beans.id] = beans
+        val viewModel = viewModel()
+
+        viewModel.onRemove(beans.id, "Feijão")
+
+        assertEquals(ListNotice.Removed("Feijão"), viewModel.notice.value)
+        assertTrue(stored.isEmpty())
+        viewModel.onUndo()
+        assertEquals(listOf(beans), stored.values.toList())
+    }
+
+    @Test
+    fun removingAnItemThatIsGoneShowsNothing() = runTest {
+        val viewModel = viewModel()
+
+        viewModel.onRemove(ListItemId("1"), "Feijão")
+
+        assertNull(viewModel.notice.value)
+        assertNull(undoStack.lastAction.value)
     }
 
     @Test

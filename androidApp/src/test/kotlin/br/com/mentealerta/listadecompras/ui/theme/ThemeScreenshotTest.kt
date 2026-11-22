@@ -56,7 +56,10 @@ class ThemeScreenshotTest {
     }
 
     companion object {
-        /** Celular comum de 411dp de largura, alto o bastante para a fonte em 200%. */
-        const val SCREEN = "w411dp-h2200dp-xhdpi"
+        /**
+         * Celular comum de 411dp de largura, alto o bastante para a fonte em 200%, em português do
+         * Brasil: a caixa alta e a separação de sílabas seguem o idioma do celular (#71).
+         */
+        const val SCREEN = "pt-rBR-w411dp-h2200dp-xhdpi"
     }
 }

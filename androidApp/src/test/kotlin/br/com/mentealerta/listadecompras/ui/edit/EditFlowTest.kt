@@ -72,7 +72,9 @@ class EditFlowTest {
         compose.onNodeWithText("Feijão").performClick()
     }
 
-    private fun field(label: String) = compose.onNode(hasSetTextAction() and hasContentDescription(label))
+    /** Campo pelo rótulo; vazio, o TalkBack ouve também o exemplo depois dele. */
+    private fun field(label: String) =
+        compose.onNode(hasSetTextAction() and hasContentDescription(label, substring = true))
 
     private fun button(text: String) = compose.onNode(hasText(text) and hasClickAction())
 
@@ -140,8 +142,11 @@ class EditFlowTest {
     @Test
     fun fieldsAreLabeledForTalkBack() {
         showAndOpenBeans()
-        field("Nome").assertExists()
-        field("Detalhe").assertExists()
+        compose.onNode(hasSetTextAction() and hasContentDescription("Nome")).assertExists()
+        // Vazio, o detalhe é lido com o exemplo que aparece dentro dele; preenchido, só o rótulo.
+        compose.onNode(hasSetTextAction() and hasContentDescription("Detalhe, Ex.: desnatado, da marca X"))
+            .performTextReplacement("tipo 1")
+        compose.onNode(hasSetTextAction() and hasContentDescription("Detalhe")).assertExists()
         button("Tirar da lista").performScrollTo().assertHeightIsAtLeast(64.dp)
         // Rótulos em caixa alta só na tela; o TalkBack ouve "Nome", em caixa normal.
         compose.onAllNodesWithText("NOME").assertCountEquals(0)

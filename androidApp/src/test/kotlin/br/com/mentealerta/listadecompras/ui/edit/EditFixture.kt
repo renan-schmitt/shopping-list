@@ -140,6 +140,7 @@ class EditFixture {
         SetItemCheckedUseCase(repository, undoStack),
         FinishShoppingUseCase(repository, undoStack),
         ClearListUseCase(repository, undoStack),
+        RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
     )
 }

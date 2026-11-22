@@ -30,7 +30,8 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Riscar e tirar o risco (#51): tocando em qualquer parte da linha (#121), passando o dedo para
  * qualquer lado ou pela ação do TalkBack, sempre com vibração. Tocar não abre a edição (fica no modo
- * "Mudar a lista") e um arrasto curto volta sem riscar.
+ * "Mudar a lista"; no TalkBack, também nas ações da linha, ver `ListTalkBackActionsTest`) e um
+ * arrasto curto volta sem riscar.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -97,13 +98,6 @@ class ListCheckGestureTest {
         show()
         compose.onNodeWithText("Tomate").performTouchInput { click(Offset(right - 8.dp.toPx(), centerY)) }
         assertEquals(listOf(idOf("Tomate") to false), toggles)
-    }
-
-    @Test
-    fun talkBackHasNoEditAction() {
-        show()
-        val node = compose.onNodeWithText("Tomate").fetchSemanticsNode()
-        assertEquals(null, node.config.getOrElseNullable(SemanticsActions.CustomActions) { null })
     }
 
     @Test

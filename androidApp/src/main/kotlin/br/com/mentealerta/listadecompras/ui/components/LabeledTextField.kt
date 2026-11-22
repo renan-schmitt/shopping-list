@@ -20,6 +20,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
+import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 
 private val FieldMinHeight = 68.dp
@@ -35,9 +37,9 @@ private val FieldMinHeight = 68.dp
 /**
  * Campo grande com o rótulo em cima, em caixa alta (protótipo navegável); rótulo que é frase fica
  * em caixa normal ([uppercaseLabel] falso). O TalkBack ouve o rótulo pelo próprio campo, em caixa
- * normal. [placeholder] aparece com o campo vazio, só na tela (ex.:
- * "Ex.: desnatado"). A tecla do teclado ([imeAction]) chama [onImeAction]; [focusRequester] permite
- * abrir a tela com o teclado.
+ * normal. [placeholder] aparece com o campo vazio (ex.: "Ex.: desnatado"); o TalkBack ouve depois
+ * do rótulo, enquanto o campo estiver vazio (#71). A tecla do teclado ([imeAction]) chama
+ * [onImeAction]; [focusRequester] permite abrir a tela com o teclado.
  */
 @Composable
 fun LabeledTextField(
@@ -55,6 +57,11 @@ fun LabeledTextField(
     val colors = MaterialTheme.colorScheme
     val tokens = ComicTheme.tokens
     val textStyle = MaterialTheme.typography.bodyLarge
+    val spokenLabel = if (value.isEmpty() && placeholder != null) {
+        stringResource(R.string.field_label_with_hint, label, placeholder)
+    } else {
+        label
+    }
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
             text = if (uppercaseLabel) label.toUpperCase(LocaleList.current) else label,
@@ -76,7 +83,7 @@ fun LabeledTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
-                .semantics { contentDescription = label }
+                .semantics { contentDescription = spokenLabel }
                 .border(tokens.thickOutline, colors.outline, MaterialTheme.shapes.medium)
                 .background(colors.surface, MaterialTheme.shapes.medium)
                 .heightIn(min = FieldMinHeight)

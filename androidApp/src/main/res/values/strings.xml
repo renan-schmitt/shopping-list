@@ -48,8 +48,10 @@
     <string name="list_change">Mudar a lista</string>
     <!-- No topo do modo "Mudar a lista" -->
     <string name="list_change_hint">Toque no produto que quer mudar.</string>
-    <!-- Ação do TalkBack num produto do modo "Mudar a lista" -->
+    <!-- Ação do TalkBack num produto: abre a edição (modo "Mudar a lista" e linha da lista, #71) -->
     <string name="list_item_change">Mudar</string>
+    <!-- Ação do TalkBack na linha da lista: tira o produto, com o aviso e "Ops, voltar" (#71) -->
+    <string name="list_item_remove">Tirar da lista</string>
     <!-- No fim do modo "Mudar a lista" (#58, #121): a única ação que pede confirmação (guia de linguagem) -->
     <string name="list_clear">Jogar a lista fora</string>
     <!-- Título da confirmação de jogar a lista fora -->
@@ -135,6 +137,8 @@
     <string name="edit_detail_label">Detalhe</string>
     <!-- Aparece no campo vazio; o TalkBack lê só o rótulo -->
     <string name="edit_detail_hint">Ex.: desnatado, da marca X</string>
+    <!-- TalkBack num campo vazio: o rótulo e o exemplo que aparece dentro dele, ex.: "Detalhe, Ex.: desnatado" (#71) -->
+    <string name="field_label_with_hint">%1$s, %2$s</string>
     <string name="edit_remove">Tirar da lista</string>
 
     <!--

@@ -140,6 +140,8 @@ fun ListScreen(
         else -> ListContent(
             uiState = uiState,
             onToggleCheck = viewModel::onToggleCheck,
+            onEdit = { editingId = it.value },
+            onRemove = viewModel::onRemove,
             onAdd = { adding = true },
             onFinish = viewModel::onFinish,
             onChange = { changing = true },
@@ -169,6 +171,12 @@ fun ListScreen(
  */
 private fun noticeMessage(resources: Resources, notice: ListNotice): String = when (notice) {
     ListNotice.Cleared -> resources.getString(R.string.list_cleared)
+    is ListNotice.Removed -> resources.getString(
+        R.string.list_item_removed,
+        notice.name.replaceFirstChar {
+            it.titlecase()
+        },
+    )
     is ListNotice.Finished -> {
         val bought = resources.getQuantityString(R.plurals.list_finished_bought, notice.bought, notice.bought)
         if (notice.remaining == 0) {
@@ -187,14 +195,17 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
 /**
  * Fundo com retícula, a folha da lista (plano §4.8) e o rodapé que se adapta (#52). [onToggleCheck]
  * recebe o produto e o estado atual dele, para riscar ou tirar o risco. [onChange] é o "Mudar a
- * lista", no fim da folha. [snackbarHost] mostra os avisos com "Ops, voltar" acima do rodapé.
- * Comprando, a tela não apaga.
+ * lista", no fim da folha. [onEdit] e [onRemove] são as ações "Mudar" e "Tirar da lista" do TalkBack
+ * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. [snackbarHost] mostra os
+ * avisos com "Ops, voltar" acima do rodapé. Comprando, a tela não apaga.
  */
 @Composable
 fun ListContent(
     uiState: ListUiState,
     modifier: Modifier = Modifier,
     onToggleCheck: (ListItemId, Boolean) -> Unit = { _, _ -> },
+    onEdit: (ListItemId) -> Unit = {},
+    onRemove: (ListItemId, String) -> Unit = { _, _ -> },
     onAdd: () -> Unit = {},
     onFinish: () -> Unit = {},
     onChange: () -> Unit = {},
@@ -232,19 +243,30 @@ fun ListContent(
                 when (uiState) {
                     ListUiState.Loading -> Unit
                     ListUiState.Empty -> EmptyList()
-                    is ListUiState.Content -> Sheet(uiState.sections, onToggleCheck, onChange)
+                    is ListUiState.Content -> Sheet(
+                        uiState.sections,
+                        SheetActions(onToggleCheck, onEdit, onRemove, onChange),
+                    )
                 }
             }
         }
     }
 }
 
+/** O que a folha faz com os produtos e o "Mudar a lista". */
+private class SheetActions(
+    val onToggleCheck: (ListItemId, Boolean) -> Unit,
+    val onEdit: (ListItemId) -> Unit,
+    val onRemove: (ListItemId, String) -> Unit,
+    val onChange: () -> Unit,
+)
+
 /**
  * A folha: seções com o que falta e "Já peguei" no fim. Riscar move o produto de seção com
  * animação, para a pessoa ver para onde ele foi.
  */
 @Composable
-private fun Sheet(sections: List<SectionUi>, onToggleCheck: (ListItemId, Boolean) -> Unit, onChange: () -> Unit) {
+private fun Sheet(sections: List<SectionUi>, actions: SheetActions) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 16.dp),
@@ -259,7 +281,9 @@ private fun Sheet(sections: List<SectionUi>, onToggleCheck: (ListItemId, Boolean
             items(section.rows, key = { it.id.value }, contentType = { "row" }) { row ->
                 ListItemRow(
                     row = row,
-                    onToggleCheck = { onToggleCheck(row.id, row.checked) },
+                    onToggleCheck = { actions.onToggleCheck(row.id, row.checked) },
+                    onEdit = { actions.onEdit(row.id) },
+                    onRemove = { actions.onRemove(row.id, row.name) },
                     modifier = Modifier.animateItem(),
                 )
             }
@@ -268,7 +292,7 @@ private fun Sheet(sections: List<SectionUi>, onToggleCheck: (ListItemId, Boolean
         item(key = "change", contentType = "change") {
             SecondaryButton(
                 text = stringResource(R.string.list_change),
-                onClick = onChange,
+                onClick = actions.onChange,
                 icon = painterResource(R.drawable.ic_edit),
                 modifier = Modifier.animateItem().fillMaxWidth().padding(top = 36.dp, end = 4.dp, bottom = 4.dp),
             )

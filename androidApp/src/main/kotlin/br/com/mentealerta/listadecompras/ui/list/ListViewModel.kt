@@ -10,6 +10,7 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
+import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.ui.catalog.iconRes
@@ -72,13 +73,16 @@ sealed interface ListNotice {
 
     /** "Jogar a lista fora" (#58). */
     data object Cleared : ListNotice
+
+    /** "Tirar da lista" pela ação do TalkBack na linha (#71): "Feijão saiu da lista.". */
+    data class Removed(val name: String) : ListNotice
 }
 
 /**
  * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. As seções
  * mostram só o que falta; os riscados descem para "Já peguei", no fim (#121, plano §1.1). Riscar e tirar
- * o risco (#51), o "Terminei" (#57) e o "Jogar a lista fora" (#58) entram na pilha do "Ops, voltar";
- * [onUndo] desfaz a última ação.
+ * o risco (#51), o "Terminei" (#57), o "Jogar a lista fora" (#58) e o "Tirar da lista" do TalkBack
+ * (#71) entram na pilha do "Ops, voltar"; [onUndo] desfaz a última ação.
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
@@ -86,6 +90,7 @@ class ListViewModel(
     private val setItemChecked: SetItemCheckedUseCase,
     private val finishShopping: FinishShoppingUseCase,
     private val clearList: ClearListUseCase,
+    private val removeItem: RemoveItemUseCase,
     private val undoLastAction: UndoLastActionUseCase,
 ) : ViewModel() {
     private val mutableNotice = MutableStateFlow<ListNotice?>(null)
@@ -125,6 +130,13 @@ class ListViewModel(
     fun onClearList() {
         viewModelScope.launch {
             if (clearList()) mutableNotice.value = ListNotice.Cleared
+        }
+    }
+
+    /** "Tirar da lista", ação do TalkBack na linha (#71): tira o produto e mostra o aviso com [name]. */
+    fun onRemove(id: ListItemId, name: String) {
+        viewModelScope.launch {
+            if (removeItem(id)) mutableNotice.value = ListNotice.Removed(name)
         }
     }
 

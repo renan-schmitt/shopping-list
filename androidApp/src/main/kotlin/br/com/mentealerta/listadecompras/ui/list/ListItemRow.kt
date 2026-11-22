@@ -45,7 +45,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.text
@@ -93,15 +95,28 @@ private const val CHECKED_ICON_ALPHA = 0.5f
  * (guia de linguagem). No TalkBack, tocar duas vezes na linha faz o mesmo ("Marcar como comprado" /
  * "Tirar o risco"). Tocar não abre a edição, para evitar toques acidentais: ela fica no modo "Mudar
  * a lista" (#121).
+ *
+ * No TalkBack, as ações da linha também trazem "Mudar" ([onEdit], abre a edição) e "Tirar da
+ * lista" ([onRemove]), sem passar pelo modo de mudar (#71). Ficam num menu, sem toque acidental.
  */
 @Composable
-fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, modifier: Modifier = Modifier) {
+fun ListItemRow(
+    row: ListRowUi,
+    onToggleCheck: () -> Unit,
+    modifier: Modifier = Modifier,
+    onEdit: () -> Unit = {},
+    onRemove: () -> Unit = {},
+) {
     val colors = MaterialTheme.colorScheme
     val name = row.detail?.let { stringResource(R.string.list_item_name_with_detail, row.name, it) } ?: row.name
     val quantity = row.quantity?.format(LocalContext.current.resources)
     val label = quantity?.let { stringResource(R.string.list_item_with_quantity, name, it.spoken) } ?: name
     val checkedDescription = stringResource(R.string.list_item_checked)
     val toggleLabel = stringResource(if (row.checked) R.string.list_item_unmark else R.string.list_item_mark_bought)
+    val editLabel = stringResource(R.string.list_item_change)
+    val removeLabel = stringResource(R.string.list_item_remove)
+    val currentOnEdit by rememberUpdatedState(onEdit)
+    val currentOnRemove by rememberUpdatedState(onRemove)
     val dividerColor = colors.outlineVariant
 
     val haptic = LocalHapticFeedback.current
@@ -147,8 +162,18 @@ fun ListItemRow(row: ListRowUi, onToggleCheck: () -> Unit, modifier: Modifier = 
                     toggle()
                     true
                 }
+                customActions = listOf(
+                    CustomAccessibilityAction(editLabel) {
+                        currentOnEdit()
+                        true
+                    },
+                    CustomAccessibilityAction(removeLabel) {
+                        currentOnRemove()
+                        true
+                    },
+                )
             }
-            // Depois do clearAndSetSemantics, para o TalkBack ficar só com a ação acima.
+            // Depois do clearAndSetSemantics, para o TalkBack ficar só com as ações acima.
             .clickable(onClick = { toggle() })
             // O conteúdo acompanha o dedo; o pontilhado de baixo fica parado.
             .offset { IntOffset(dragOffset.roundToInt(), 0) }

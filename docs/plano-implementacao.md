@@ -82,11 +82,13 @@ O que precisa existir na primeira versão publicada.
 - [ ] Colar uma lista recebida (texto) e transformar em itens
 
 ### 1.7 Acessibilidade
-- [ ] Letras grandes por padrão (nome do produto ~28sp, linhas ≥ 72dp) e respeito ao tamanho de fonte do sistema
-- [ ] Áreas de toque ≥ 64dp
-- [ ] Alto contraste; estado nunca indicado só por cor
-- [ ] Compatível com TalkBack
-- [ ] Tela não apaga enquanto a pessoa está comprando (após riscar o primeiro produto)
+- [x] Letras grandes por padrão (nome do produto ~28sp, linhas ≥ 72dp) e respeito ao tamanho de fonte do sistema — 2026-11-22, #71: fonte até 200% sem texto cortado; palavra que não cabe quebra com hífen, na separação de sílabas do português ("DESNA-TADO"), em vez de partir em qualquer letra
+- [x] Áreas de toque ≥ 64dp
+- [x] Alto contraste; estado nunca indicado só por cor
+- [ ] Compatível com TalkBack — 2026-11-22, #71: na linha da lista, além de riscar, as ações "Mudar" (abre a edição) e "Tirar da lista" (com aviso e "Ops, voltar"), sem passar pelo "Mudar a lista"; quem enxerga não vê diferença (o motivo da #121 era o toque acidental, que não existe num menu de ações). Campo vazio lê o exemplo depois do rótulo. Falta o teste manual ([roteiro](teste-usuarios/talkback.md))
+- [x] Tela não apaga enquanto a pessoa está comprando (após riscar o primeiro produto)
+
+Checks automáticos (#71): `ScreensAccessibilityTest` confere, em todas as telas e estados, com fonte em 100% e 200%, que todo tocável tem nome e 64dp, que nenhum texto é cortado nem palavra partida sem hífen e que só campo de texto tem descrição própria. Substitui o Accessibility Test Framework, que não roda no Robolectric. Os testes rodam em pt-BR, como o celular.
 
 ### 1.8 Segurança dos dados
 - [x] Android Auto Backup ativado (salva no Google Drive do celular, sem login no app) — 2026-11-22, #73: só o banco e as preferências entram no backup e na troca de celular; sem exigir bloqueio de tela (quem não tem ficaria sem backup)
@@ -367,7 +369,7 @@ shopping-list/
 | Unitários | `kotlin.test` + Turbine | Normalização, busca, previsão, regras da lista |
 | Interface | Compose UI Test | Fluxos: adicionar, riscar, Terminei, jogar fora, voltar |
 | Screenshots | Roborazzi | Cada tela com fonte do sistema em 100%, 150% e 200%, claro e escuro |
-| Acessibilidade | Accessibility Test Framework (checks no Compose UI Test) | Área de toque, contraste, rótulos para TalkBack |
+| Acessibilidade | Checks próprios no Compose UI Test (`AccessibilityChecks`; o Accessibility Test Framework não roda no Robolectric) e `ContrastTest` | Área de toque, contraste, rótulos para TalkBack, texto cortado (#71) |
 | Estilo/estática | ktlint + detekt | Formatação (estilo `intellij_idea`, regras de Compose) e análise estática, sem baseline; `./gradlew lint`. detekt 2.0 (alpha), o único compatível com Kotlin 2.4 (2026-11-11) |
 | CI | GitHub Actions | Build, testes e lint a cada push |
 

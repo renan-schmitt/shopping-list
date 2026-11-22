@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import br.com.mentealerta.listadecompras.R
@@ -24,6 +25,7 @@ private fun bangers(size: Int) = TextStyle(
     fontSize = size.sp,
     lineHeight = (size * 1.1).sp,
     letterSpacing = BangersLetterSpacing,
+    hyphens = Hyphens.Auto,
 )
 
 private fun lexend(size: Int, lineHeightFactor: Double = 1.2) = TextStyle(
@@ -32,6 +34,7 @@ private fun lexend(size: Int, lineHeightFactor: Double = 1.2) = TextStyle(
     fontSize = size.sp,
     lineHeight = (size * lineHeightFactor).sp,
     letterSpacing = LexendLetterSpacing,
+    hyphens = Hyphens.Auto,
 )
 
 /**
@@ -45,6 +48,9 @@ private fun lexend(size: Int, lineHeightFactor: Double = 1.2) = TextStyle(
  * - `bodyMedium`: quantidade e textos de apoio maiores
  * - `labelLarge`: botões secundários
  * - `bodySmall`: textos pequenos ("Mente Alerta" acima do logo)
+ *
+ * Palavra que não cabe na linha (ex.: "DESNATADO" com fonte em 200%) quebra com hífen, na
+ * separação de sílabas do idioma do celular, em vez de partir em qualquer letra (#71).
  *
  * Caixa alta não fica aqui: é aplicada pelos componentes, mantendo o texto
  * original para o TalkBack (CLAUDE.md).
