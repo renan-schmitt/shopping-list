@@ -40,7 +40,7 @@ Resultado: ✅ sozinha · 🟡 com ajuda · ❌ não conseguiu · — não obser
 - Passar o dedo: não observado
 - Voz: não chegou a ouvir (ver tarefa 4)
 - Palavras próprias da pessoa: "Já peguei"
-- Aparelho: o app abria numa janela flutuante do tablet
+- Aparelho: o app abria numa janela flutuante do tablet (modo lembrado pelo Samsung, não do app; ver abaixo)
 
 ## Problemas encontrados e decisões
 
@@ -50,6 +50,6 @@ Todos decididos no mesmo dia e registrados no plano (seções 1.1 e 3.3) e no gu
 - [2, 5] Tela de adicionar: "Digite ou fale o que quer comprar.", "Adicionar na lista de compras", busca em fundo verde, lista "Adicionados", aviso "Adicionado: Farinha.", "Não" na mesma letra do "Sim" e seta curva para voltar (#122) — médio
 - [4] Voz: segurar para falar, reconhecedor do próprio celular (sem internet) e "Sem internet" só em erro de rede (#123) — grave
 - [6, 7] Edição: **Tirar da lista** em destaque com a lixeira; − / + em verde (#124) — médio
-- Janela flutuante no tablet Samsung (#126) — leve
+- Janela flutuante no tablet Samsung (#126): não é do app. O Samsung lembra o último modo de janela de cada app; depois de pôr em tela cheia uma vez, o app abriu em tela cheia pelo ícone, pelo `adb`, depois de fechar à força e depois de reinstalar. O roteiro passou a conferir isso antes da sessão.
 
 Não observado nesta sessão: caixa alta e estilo quadrinhos, passar o dedo, **Terminei**, a voz nova e o "Ops, voltar". Sem segunda rodada antes do lançamento (decidido em 2026-11-22).

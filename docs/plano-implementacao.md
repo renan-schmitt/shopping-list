@@ -230,7 +230,7 @@ Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
   - Por tarefa: ✅ sozinha / 🟡 com ajuda / ❌; nota final de 1 a 5 com carinhas (sem SUS). Problema em 2 ou mais pessoas é corrigido antes do lançamento.
 - **Resultado da primeira sessão (2026-11-22, #33, #34):** [sessao-1.md](teste-usuarios/sessao-1.md), retorno por escrito do primeiro uso num tablet, fora do roteiro.
   - Achados e decisões: lista (tocar risca, "Já peguei", **Mudar a lista**, #121), tela de adicionar ("Adicionados", busca em verde, #122), voz (segurar para falar, sem internet, #123) e edição (**Tirar da lista** em destaque, #124). Registrados nas seções 1.1 e 3.3 e no guia de linguagem; riscados no fim fecha a #32.
-  - Janela flutuante no tablet Samsung: #126.
+  - Janela flutuante no tablet Samsung (#126): era o modo de janela lembrado pelo aparelho, não o app. Sem mudança no app; o roteiro confere a tela cheia antes da sessão.
   - Não observados: caixa alta e estilo quadrinhos, passar o dedo, **Terminei**, a voz nova e o "Ops, voltar". Sem segunda rodada antes do lançamento: o teste fica fechado com esta sessão.
 
 ---

@@ -28,6 +28,7 @@ Descobrir, antes do lançamento, onde pessoas 60+ travam no app. Pontos que o pl
 ## Preparação
 
 - O teste roda no **app de verdade** (APK de teste), **no aparelho de quem conduz** (tablet ou celular Android). Se der, fazer pelo menos uma sessão num celular: é nele que o app vai ser usado, e no tablet a letra fica maior e o gesto de passar o dedo é mais longo. Anotar o aparelho no modelo.
+- Abrir o app pelo ícone e conferir que ocupa a tela toda. Se abrir numa janela flutuante (o Samsung lembra o último modo de cada app), tocar no botão de tela cheia da barra da janela.
 - Antes de cada sessão, deixar a lista vazia: Configurações → Apps → Lista de Compras → Armazenamento → **Limpar dados** (ou `adb shell pm clear br.com.mentealerta.listadecompras`).
 - Perguntar à pessoa (ou olhar no celular dela) o tamanho de letra que ela usa e deixar o mesmo no aparelho do teste.
 - Conferir internet e microfone (a voz precisa deles).
