@@ -21,9 +21,10 @@ O que precisa existir na primeira versão publicada.
 - [ ] Linha do produto: marca de riscar → nome → ícone no fim da linha
 - [ ] Quantidade opcional ("2 leites", "1 kg de carne moída"): só aparece se a pessoa informou, em letra menor
 - [ ] Detalhe livre junto ao nome ("leite **desnatado**", "café da marca X")
-- [ ] Tocar no produto abre edição simples: nome, botões grandes − / + para quantidade, campo de detalhe (sem teclado numérico nem lista de unidades)
+- [ ] Edição simples do produto: nome, botões grandes − / + para quantidade (fundo verde), campo de detalhe (sem teclado numérico nem lista de unidades) e **Tirar da lista** em destaque, com lixeira. Abre pelo modo **Mudar a lista**, não pelo toque na lista (2026-11-22, retorno do primeiro uso)
+- [ ] Botão **Mudar a lista** no fim da folha: abre a lista inteira em modo de mudança; tocar num produto abre a edição. **Jogar a lista fora** fica no fim desse modo, com a confirmação de sempre (2026-11-22)
 - [ ] Produto repetido não duplica: "Leite já está na lista. Quer mais um?"
-- [ ] Marcar como comprado **deslizando ou tocando** — item fica riscado e cinza, com vibração
+- [ ] Marcar como comprado **deslizando ou tocando** — item fica riscado e cinza, com vibração. Tocar só risca: não abre a edição, para evitar toques acidentais (2026-11-22)
 - [ ] "Ops, voltar" para desfazer qualquer ação (marcar, remover, jogar fora)
 - [ ] Botão **Terminei**: tira da lista o que foi comprado e grava no histórico
 - [ ] **Tela única que se adapta** (sem "modo No mercado"):
@@ -31,10 +32,17 @@ O que precisa existir na primeira versão publicada.
   - Depois de riscar o primeiro produto: botão grande **Terminei** com contador "Faltam 5"; "Adicionar" continua disponível, menor; tela para de apagar
   - Depois do "Terminei": volta ao estado inicial; produtos não riscados ficam para a próxima vez
 - [ ] Lista sempre agrupada por seção na ordem típica do mercado
-- [ ] Produto riscado fica no lugar (como no papel)
-- [ ] Botão **Jogar a lista fora**: com confirmação e possibilidade de voltar atrás
+- [ ] Produto riscado vai para a seção **Já peguei**, no fim da lista; as seções de cima ficam só com o que falta (2026-11-22, retorno do primeiro uso; antes ficava no lugar)
+- [ ] Topo da lista vazia: título **Lista de Compras** centralizado e "Toque em **Adicionar** para começar sua lista." (2026-11-22)
+- [ ] **Jogar a lista fora**: com confirmação e possibilidade de voltar atrás, dentro do modo **Mudar a lista**
 
 ### 1.2 Adicionar produtos
+- [ ] Tela de adicionar (2026-11-22, retorno do primeiro uso):
+  - Campo "Digite ou fale o que quer comprar."; botão de voltar com seta curva cheia que gira para trás ao abrir (opção A de `docs/prototipos/icone-voltar.html`), ao lado de "Voltar para a lista"
+  - Resultados da busca sob o título "Adicionar na lista de compras", em fundo verde-folha, cada produto numa caixa creme com contorno; ficam por cima da lista de adicionados enquanto abertos
+  - Lista **Adicionados**, sem seções, logo na tela: o que a pessoa acabou de pôr aparece ali, para ela ver que entrou. Ao voltar, a lista principal mostra tudo organizado, como sempre
+  - Aviso depois de pôr: "Adicionado: Farinha." (forma que serve para masculino e feminino)
+  - Produto repetido: "Sim, mais um" e "Não" com a mesma fonte
 - [ ] Digitando, com busca aproximada ("maca" encontra "maçã")
 - [ ] Falando — inclusive vários itens de uma vez ("arroz, feijão e dois litros de leite")
 - [ ] Escolhendo de sugestões (mais comprados / sugestões do histórico)
@@ -126,7 +134,9 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 
 **Decidido (2026-11-21, #29).** A interpretação de quantidades já foi feita (#45, #46, #47).
 
-**Reconhecedor:** `SpeechRecognizer` com o serviço de voz padrão do celular (quase sempre o do Google), pedindo offline com `EXTRA_PREFER_OFFLINE`. Sem o pacote pt-BR baixado, usa a internet.
+**Revisto em 2026-11-22 (retorno do primeiro uso):** a voz não depende de internet. No Android 12+, o app usa o reconhecedor do próprio celular (`createOnDeviceSpeechRecognizer`); sem a voz pt-BR, pede para baixar uma vez (Android 13+). Só sem esse caminho (Android 8–11, ou celular sem reconhecedor no aparelho) usa o serviço padrão, que pode precisar de internet. O "Sem internet" aparece só em erro de rede de verdade; "idioma não disponível" leva ao download da voz. **Segurar para falar, soltar para parar** (como no WhatsApp): sem "Terminei" e sem reabrir o microfone sozinho; o TalkBack ganha a ação de tocar para abrir e tocar para fechar.
+
+~~**Reconhecedor:** `SpeechRecognizer` com o serviço de voz padrão do celular (quase sempre o do Google), pedindo offline com `EXTRA_PREFER_OFFLINE`. Sem o pacote pt-BR baixado, usa a internet.~~
 - Pede até 5 alternativas e fica com a que mais bate com o catálogo.
 - Mostra o texto aparecendo enquanto a pessoa fala (resultados parciais).
 - A escuta não acaba numa pausa curta: o app reabre o microfone sozinho até a pessoa tocar em "Terminei" ou ficar uns 8 s em silêncio (valor provisório).
@@ -144,6 +154,7 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 
 **Sem internet e privacidade:**
 - Sem internet e sem pacote offline: "Sem internet, não consigo ouvir agora. Você pode escrever.", com a opção de escrever logo ali.
+- (2026-11-22) Com o reconhecedor do aparelho, o som não sai do celular e o aviso longo sai: fica só o pedido de microfone do Android. O aviso abaixo, com o botão **Escrever** (antes "Não, vou escrever"), só aparece quando o app cair no serviço padrão.
 - Aviso uma vez, junto da explicação antes de pedir o microfone: "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." Depois fica na tela de privacidade das configurações.
 - O texto reconhecido nunca vai para logs, crashes ou analytics. Só o evento `item_adicionado { origem: voz }` (seção 4.5).
 
@@ -206,7 +217,7 @@ Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 
 ### 3.8 Ordem das seções e produtos riscados
 - **Ordem personalizada das seções** ("no meu mercado a padaria fica no fundo"): candidata a premium na fase 2. Pode se integrar ao aviso perto do mercado (3.1), guardando a ordem por mercado.
-- **Mover riscados para o final da seção:** facilita ver o que falta, mas quebra a metáfora do papel. Testar com usuários na fase 0.
+- ~~**Mover riscados para o final da seção:** facilita ver o que falta, mas quebra a metáfora do papel. Testar com usuários na fase 0.~~ **Decidido (2026-11-22):** riscados vão para a seção "Já peguei", no fim da lista (seção 1.1).
 
 ### 3.9 Validação com usuários reais
 - Testes de usabilidade com pessoas 60+ antes do lançamento (gesto de deslizar, vocabulário, tamanho de fonte, entrada por voz).
@@ -341,7 +352,7 @@ shopping-list/
 **Obrigações:**
 - Política de privacidade publicada (exigência da Play Store).
 - Formulário de Segurança dos Dados da Play Store preenchido conforme as camadas acima.
-- Informar que o reconhecimento de voz pode enviar áudio ao Google quando o modo offline não estiver disponível. É a única exceção à promessa (o app em si nunca envia a lista). O aviso aparece antes do primeiro uso, junto da explicação do microfone (seção 3.3, 2026-11-21, #29).
+- Informar que o reconhecimento de voz pode enviar áudio ao Google quando o modo offline não estiver disponível (desde 2026-11-22, só quando o app cai no serviço padrão; ver 3.3). É a única exceção à promessa (o app em si nunca envia a lista). O aviso aparece antes do primeiro uso, junto da explicação do microfone (seção 3.3, 2026-11-21, #29).
 - Nomes de produtos podem revelar saúde (dado sensível pela LGPD) — por isso o conteúdo da lista nunca é enviado.
 
 ### 4.6 Qualidade e testes

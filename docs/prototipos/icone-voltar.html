@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ícone de voltar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Lexend+Deca:wght@400;700&display=swap">
+<style>
+  :root {
+    --papel: #FBF3DC; --fundo: #F4E7C2; --tinta: #141414; --verde: #2E6B3A;
+    --titulo: 'Bangers', cursive; --texto: 'Lexend Deca', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--tinta); font-family: var(--texto); padding: 24px 16px 48px; }
+  h1 { font-family: var(--titulo); font-size: 40px; letter-spacing: 1px; margin: 0 0 4px; }
+  p.intro { max-width: 760px; font-size: 17px; line-height: 1.5; margin: 0 0 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1100px; }
+  .opcao { background: var(--papel); border: 3px solid var(--tinta); border-radius: 14px; box-shadow: 5px 5px 0 var(--tinta); overflow: hidden; }
+  .opcao h2 { font-family: var(--titulo); font-size: 28px; margin: 0; padding: 14px 16px 0; letter-spacing: 1px; }
+  .opcao p { margin: 6px 16px 14px; font-size: 15px; line-height: 1.45; }
+  .topo { background: var(--verde); padding: 16px; }
+  .botao {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 18px 8px 10px;
+    background: var(--papel); color: var(--tinta); border: 3px solid var(--tinta); border-radius: 12px;
+    box-shadow: 4px 4px 0 var(--tinta); font-family: var(--texto); font-weight: 700; font-size: 19px; cursor: pointer;
+  }
+  .botao:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--tinta); }
+  .botao svg { width: 42px; height: 42px; flex: none; overflow: visible; }
+  .campo { margin-top: 12px; background: var(--papel); border: 3px solid var(--tinta); border-radius: 12px; padding: 14px; font-size: 18px; color: #66625A; }
+  .acoes { padding: 0 16px 16px; }
+  .acoes button { font-family: var(--texto); font-size: 14px; padding: 6px 10px; border: 2px solid var(--tinta); border-radius: 8px; background: var(--fundo); cursor: pointer; }
+  .grande { display: flex; justify-content: center; padding: 18px 0 4px; }
+  .grande svg { width: 120px; height: 120px; overflow: visible; }
+
+  /* A: gira para trás, como quem dá a volta */
+  .gira { transform-origin: 24px 26px; }
+  .anima .gira { animation: gira .7s cubic-bezier(.3,1.5,.5,1) both; }
+  @keyframes gira { 0% { transform: rotate(35deg); } 60% { transform: rotate(-10deg); } 100% { transform: rotate(0); } }
+
+  /* B: a curva se desenha e a ponta chega */
+  .traco { stroke-dasharray: 60; }
+  .anima .traco { animation: traco .55s ease-out both; }
+  .anima .ponta { animation: ponta .3s .4s cubic-bezier(.3,1.8,.5,1) both; transform-origin: 9px 17px; }
+  @keyframes traco { from { stroke-dashoffset: 60; } to { stroke-dashoffset: 0; } }
+  @keyframes ponta { from { transform: scale(0); } to { transform: scale(1); } }
+
+  /* C: tranco para a esquerda com linhas de velocidade */
+  .anima .empurra { animation: empurra .6s cubic-bezier(.3,1.6,.5,1) both; }
+  .vel line { stroke-dasharray: 10; }
+  .anima .vel line { animation: vel .45s ease-out both; }
+  .anima .vel line:nth-child(2) { animation-delay: .07s; }
+  @keyframes empurra { 0% { transform: translateX(9px); } 55% { transform: translateX(-4px); } 100% { transform: translateX(0); } }
+  @keyframes vel { from { stroke-dashoffset: 10; } to { stroke-dashoffset: 0; } }
+
+  @media (prefers-reduced-motion: reduce) { .anima * { animation: none !important; stroke-dashoffset: 0 !important; } }
+  .nota { max-width: 760px; margin-top: 28px; font-size: 16px; line-height: 1.5; background: var(--papel); border: 3px solid var(--tinta); border-radius: 12px; padding: 14px 16px; }
+</style>
+</head>
+<body>
+<h1>Ícone de voltar · seta curva</h1>
+<p class="intro">Seta curva de "responder", que faz a volta para a esquerda, no traço dos quadrinhos (contorno de tinta grosso, verde-folha). O ícone fica <b>ao lado</b> do texto "Voltar para a lista". O movimento acontece uma vez ao abrir a tela e de novo ao tocar. Com "remover animações" ligado no celular, fica parado. Toque no botão ou no ícone grande para repetir.</p>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Seta curva cheia: ponta à esquerda, corpo que sobe e faz a curva para baixo à direita -->
+    <path id="curva" d="M3 17 L15 6 L15 12 Q32 12 37 25 Q39 31 37 37 Q33 27 15 23 L15 29 Z"/>
+  </defs>
+</svg>
+
+<div class="grid">
+  <section class="opcao">
+    <h2>A · Curva que gira</h2>
+    <div class="topo">
+      <button class="botao anima" aria-label="Voltar para a lista">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><g class="gira">
+          <use href="#curva" fill="#2E6B3A" stroke="#141414" stroke-width="3" stroke-linejoin="round"/>
+        </g></svg>
+        Voltar para a lista
+      </button>
+      <div class="campo">Digite ou fale o que quer comprar.</div>
+    </div>
+    <div class="grande anima"><svg viewBox="0 0 40 40" aria-hidden="true"><g class="gira">
+      <use href="#curva" fill="#2E6B3A" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+    </g></svg></div>
+    <p>Seta curva cheia de verde. Ao abrir, ela gira para trás e assenta, como quem dá a volta.</p>
+    <div class="acoes"><button>Ver o movimento de novo</button></div>
+  </section>
+
+  <section class="opcao">
+    <h2>B · Curva que se desenha</h2>
+    <div class="topo">
+      <button class="botao anima" aria-label="Voltar para a lista">
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <path class="traco" d="M13 17 Q33 17 35 36" fill="none" stroke="#141414" stroke-width="9" stroke-linecap="round"/>
+          <path class="traco" d="M13 17 Q33 17 35 36" fill="none" stroke="#2E6B3A" stroke-width="4" stroke-linecap="round"/>
+          <path class="ponta" d="M2 17 L15 6 L15 28 Z" fill="#2E6B3A" stroke="#141414" stroke-width="2.6" stroke-linejoin="round"/>
+        </svg>
+        Voltar para a lista
+      </button>
+      <div class="campo">Digite ou fale o que quer comprar.</div>
+    </div>
+    <div class="grande anima"><svg viewBox="0 0 40 40" aria-hidden="true">
+      <path class="traco" d="M13 17 Q33 17 35 36" fill="none" stroke="#141414" stroke-width="9" stroke-linecap="round"/>
+      <path class="traco" d="M13 17 Q33 17 35 36" fill="none" stroke="#2E6B3A" stroke-width="4" stroke-linecap="round"/>
+      <path class="ponta" d="M2 17 L15 6 L15 28 Z" fill="#2E6B3A" stroke="#141414" stroke-width="2.2" stroke-linejoin="round"/>
+    </svg></div>
+    <p>Traço grosso curvo, como desenhado a pincel. Ao abrir, a curva se desenha e a ponta "estala" no fim.</p>
+    <div class="acoes"><button>Ver o movimento de novo</button></div>
+  </section>
+
+  <section class="opcao">
+    <h2>C · Curva com velocidade</h2>
+    <div class="topo">
+      <button class="botao anima" aria-label="Voltar para a lista">
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <g class="vel" stroke="#141414" stroke-width="3" stroke-linecap="round">
+            <line x1="40" y1="8" x2="32" y2="8"/><line x1="41" y1="15" x2="35" y2="15"/>
+          </g>
+          <g class="empurra"><use href="#curva" fill="#2E6B3A" stroke="#141414" stroke-width="3" stroke-linejoin="round"/></g>
+        </svg>
+        Voltar para a lista
+      </button>
+      <div class="campo">Digite ou fale o que quer comprar.</div>
+    </div>
+    <div class="grande anima"><svg viewBox="0 0 40 40" aria-hidden="true">
+      <g class="vel" stroke="#141414" stroke-width="2.4" stroke-linecap="round">
+        <line x1="40" y1="8" x2="32" y2="8"/><line x1="41" y1="15" x2="35" y2="15"/>
+      </g>
+      <g class="empurra"><use href="#curva" fill="#2E6B3A" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/></g>
+    </svg></div>
+    <p>A mesma seta cheia da A, mas o movimento é um tranco para a esquerda, deixando linhas de velocidade.</p>
+    <div class="acoes"><button>Ver o movimento de novo</button></div>
+  </section>
+</div>
+
+<div class="nota"><b>Recomendação: A.</b> A seta curva cheia lê bem em tamanho pequeno, e o giro reforça a ideia de "dar a volta". No app, vira um AnimatedVectorDrawable no lugar do <code>ic_arrow_back</code>. Se o exemplo que você mandou for outra coisa, mande um print e eu ajusto.</div>
+
+<script>
+  function replay(sec) {
+    sec.querySelectorAll('.anima').forEach(function (el) { el.classList.remove('anima'); void el.offsetWidth; el.classList.add('anima'); });
+  }
+  document.querySelectorAll('.opcao').forEach(function (sec) {
+    sec.querySelectorAll('button, .grande').forEach(function (b) { b.addEventListener('click', function () { replay(sec); }); });
+  });
+</script>
+</body>
+</html>

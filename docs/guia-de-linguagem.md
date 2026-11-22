@@ -46,15 +46,19 @@
 
 | Situação | Mensagem |
 |---|---|
-| Lista vazia | "Sua lista está vazia. Toque em **Adicionar** para começar." |
+| Lista vazia | Título **Lista de Compras** · "Toque em **Adicionar** para começar sua lista." (2026-11-22) |
+| Campo da tela de adicionar | "Digite ou fale o que quer comprar." · resultados sob **Adicionar na lista de compras** · lista **Adicionados** (2026-11-22) |
+| Produto posto na lista | "Adicionado: Farinha." (serve para masculino e feminino; 2026-11-22) |
+| Produtos riscados | Seção **Já peguei**, no fim da lista (2026-11-22) |
+| Mudar produtos da lista | Botão **Mudar a lista** (não "Corrigir": a pessoa não errou); **Jogar a lista fora** fica lá dentro (2026-11-22) |
 | Produto riscado | *(só o risco e a vibração, sem mensagem)* |
 | Produto tirado da lista | "Feijão saiu da lista." · **Ops, voltar** |
 | Jogar a lista fora | "Jogar a lista fora? Os 12 produtos serão tirados." · **Sim, jogar fora** · **Não** |
 | Lista jogada fora | "A lista foi jogada fora." · **Ops, voltar** |
 | Terminei | "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |
-| Voz sem internet (e sem a voz baixada) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
-| Antes de pedir o microfone (uma vez) | "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." |
+| Voz sem internet (só em erro de rede de verdade) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
+| Antes de pedir o microfone (uma vez) | "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." · **Usar o microfone** · **Escrever** — só quando o app cai no serviço de voz padrão (2026-11-22) |
 | Voz para usar sem internet (configurações, Android 13+) | **Baixar a voz para usar sem internet** |
 | Sugestão | "Faz 12 dias que você comprou café. Está faltando?" · **Sim, pôr na lista** · **Não** |
 | Lembrete | "Sua lista já tem 20 produtos. Que tal ir ao mercado?" |
