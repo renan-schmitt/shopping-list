@@ -79,4 +79,7 @@ dependencies {
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.roborazzi.junit.rule)
+    // Testes ponta a ponta abrem o banco de verdade na JVM do computador: o SQLite embarcado precisa da
+    // biblioteca nativa de desktop (o AAR só traz a do Android)
+    testImplementation(libs.sqlite.bundled.jvm)
 }
