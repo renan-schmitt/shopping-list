@@ -72,22 +72,24 @@
     <string name="list_item_with_quantity">%1$s, %2$s</string>
 
     <!-- Tela de adicionar (#53) -->
-    <!-- Rótulo do campo; o guia troca "buscar" por "procurar" -->
-    <string name="add_search_label">Procurar produto</string>
-    <!-- Título acima dos produtos achados pela busca -->
-    <string name="add_found">Achei estes</string>
+    <!-- Rótulo do campo (#122), em caixa normal por ser uma frase -->
+    <string name="add_search_label">Digite ou fale o que quer comprar.</string>
+    <!-- Título acima dos produtos achados pela busca (#122) -->
+    <string name="add_found">Adicionar na lista de compras</string>
+    <!-- Título da lista do que entrou desde que a tela abriu (#122) -->
+    <string name="add_added_title">Adicionados</string>
     <!-- Sem nenhum produto achado, acima da opção de pôr o texto como está -->
     <string name="add_nothing_found">Não achei esse produto. Pode pôr assim mesmo:</string>
     <!-- Opção do produto que o app não conhece, com o texto digitado -->
     <string name="add_unknown">Pôr “%1$s” na lista</string>
-    <!-- Aviso depois de pôr o produto na lista, lido também pelo TalkBack -->
-    <string name="add_added">%1$s entrou na lista.</string>
+    <!-- Aviso depois de pôr o produto na lista, lido também pelo TalkBack; serve para masculino e feminino (#122) -->
+    <string name="add_added">Adicionado: %1$s.</string>
     <!-- Produto repetido (#54): pergunta quando o produto já está na lista, lida também pelo TalkBack -->
     <string name="add_already_there">%1$s já está na lista. Quer mais um?</string>
     <string name="add_more_one">Sim, mais um</string>
     <string name="add_keep_as_is">Não</string>
     <!-- Aviso depois do "Sim, mais um" -->
-    <string name="add_added_again">%1$s entrou de novo na lista.</string>
+    <string name="add_added_again">Adicionado de novo: %1$s.</string>
 
     <!-- Falar os produtos (#60, plano §3.3) -->
     <string name="add_speak">Falar</string>
@@ -107,9 +109,9 @@
     <string name="add_voice_unavailable">Não deu certo ouvir agora. Você pode escrever.</string>
     <!-- Aviso depois de falar vários produtos de uma vez (com um só, vale o add_added) -->
     <plurals name="add_added_many">
-        <item quantity="one">%d produto entrou na lista.</item>
-        <item quantity="many">%d produtos entraram na lista.</item>
-        <item quantity="other">%d produtos entraram na lista.</item>
+        <item quantity="one">Adicionado: %d produto.</item>
+        <item quantity="many">Adicionados: %d produtos.</item>
+        <item quantity="other">Adicionados: %d produtos.</item>
     </plurals>
 
     <!-- Edição do produto (#55): tudo é salvo sozinho, não existe "Salvar" -->

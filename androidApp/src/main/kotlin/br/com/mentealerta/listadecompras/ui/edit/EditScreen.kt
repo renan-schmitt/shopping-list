@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.Quantity
+import br.com.mentealerta.listadecompras.ui.components.BackToListButton
 import br.com.mentealerta.listadecompras.ui.components.LabeledTextField
 import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
@@ -120,11 +121,7 @@ fun EditContent(
                 .statusBarsPadding()
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
         ) {
-            SecondaryButton(
-                text = stringResource(R.string.back_to_list),
-                onClick = onClose,
-                icon = painterResource(R.drawable.ic_arrow_back),
-            )
+            BackToListButton(onClick = onClose)
         }
         if (uiState is EditUiState.Editing) {
             Column(

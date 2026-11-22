@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Seta curva do "Voltar para a lista" (#122, opção A de docs/prototipos/icone-voltar.html): ao abrir a
+    tela, gira para trás e assenta, uma vez só. Com "remover animações" ligado, fica parada.
+-->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="36dp"
+            android:height="36dp"
+            android:autoMirrored="true"
+            android:viewportWidth="40"
+            android:viewportHeight="40">
+            <group
+                android:name="arrow"
+                android:pivotX="24"
+                android:pivotY="26">
+                <path
+                    android:fillColor="@color/back_arrow_fill"
+                    android:pathData="M3,17 L15,6 L15,12 Q32,12 37,25 Q39,31 37,37 Q33,27 15,23 L15,29 Z"
+                    android:strokeWidth="3"
+                    android:strokeColor="@color/back_arrow_outline"
+                    android:strokeLineJoin="round" />
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="arrow">
+        <aapt:attr name="android:animation">
+            <set android:ordering="sequentially">
+                <objectAnimator
+                    android:duration="400"
+                    android:interpolator="@android:interpolator/decelerate_cubic"
+                    android:propertyName="rotation"
+                    android:valueFrom="35"
+                    android:valueTo="-10"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="300"
+                    android:interpolator="@android:interpolator/accelerate_decelerate"
+                    android:propertyName="rotation"
+                    android:valueFrom="-10"
+                    android:valueTo="0"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>

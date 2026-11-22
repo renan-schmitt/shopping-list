@@ -33,8 +33,9 @@ import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 private val FieldMinHeight = 68.dp
 
 /**
- * Campo grande com o rótulo em cima, em caixa alta (protótipo navegável). O TalkBack ouve o rótulo
- * pelo próprio campo, em caixa normal. [placeholder] aparece com o campo vazio, só na tela (ex.:
+ * Campo grande com o rótulo em cima, em caixa alta (protótipo navegável); rótulo que é frase fica
+ * em caixa normal ([uppercaseLabel] falso). O TalkBack ouve o rótulo pelo próprio campo, em caixa
+ * normal. [placeholder] aparece com o campo vazio, só na tela (ex.:
  * "Ex.: desnatado"). A tecla do teclado ([imeAction]) chama [onImeAction]; [focusRequester] permite
  * abrir a tela com o teclado.
  */
@@ -45,6 +46,7 @@ fun LabeledTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
+    uppercaseLabel: Boolean = true,
     placeholder: String? = null,
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit = {},
@@ -55,7 +57,7 @@ fun LabeledTextField(
     val textStyle = MaterialTheme.typography.bodyLarge
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
-            text = label.toUpperCase(LocaleList.current),
+            text = if (uppercaseLabel) label.toUpperCase(LocaleList.current) else label,
             style = MaterialTheme.typography.labelLarge,
             color = labelColor,
             modifier = Modifier.clearAndSetSemantics {},

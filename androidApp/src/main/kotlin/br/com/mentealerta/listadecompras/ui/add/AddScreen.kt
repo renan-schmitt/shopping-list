@@ -40,7 +40,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -63,18 +66,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
+import br.com.mentealerta.listadecompras.ui.components.BackToListButton
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.LabeledTextField
 import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
+import br.com.mentealerta.listadecompras.ui.list.ItemName
+import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.list.format
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
+import br.com.mentealerta.listadecompras.ui.list.QuantityBadge as ListQuantityBadge
 
 private val PlusSize = 36.dp
 private val OptionIconSize = 44.dp
+private val AddedDividerWidth = 2.dp
 
 /**
  * Tela de adicionar digitando (#53, plano §1.2) ou falando (#60): ocupa a tela toda, por cima da
@@ -86,6 +94,7 @@ private val OptionIconSize = 44.dp
 @Composable
 fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: AddViewModel = koinViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val added by viewModel.added.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val close = {
         viewModel.onClose()
@@ -102,6 +111,7 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onStopListening() }
     AddContent(
         uiState = uiState,
+        added = added,
         canSpeak = viewModel.canSpeak,
         onQueryChange = viewModel::onQueryChange,
         onAdd = viewModel::onAdd,
@@ -121,9 +131,11 @@ private fun Context.hasMicrophone(): Boolean =
     checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
 /**
- * Topo verde com "Voltar para a lista", o campo "Procurar produto" (protótipo navegável) e, se o
- * celular tem voz ([canSpeak]), o botão **Falar**; embaixo, no papel, o aviso do que entrou e as
- * opções da busca. O campo abre com o teclado. Com o produto repetido (#54), a pergunta toma o lugar
+ * Topo verde com "Voltar para a lista", o campo "Digite ou fale o que quer comprar." e, se o celular
+ * tem voz ([canSpeak]), o botão **Falar**. Com busca, as opções aparecem embaixo, no mesmo verde do
+ * topo, cada uma numa caixa de papel. Sem busca, no papel: o aviso do que entrou ("Adicionado:
+ * Leite.") e a lista **Adicionados** ([added], #122), para a pessoa ver que o produto entrou. O campo
+ * abre com o teclado. Com o produto repetido (#54), a pergunta toma o lugar
  * do aviso e das opções até a pessoa responder; o mesmo vale para a explicação do microfone e a
  * escuta (#60), que escondem o teclado. Depois de um recado que sugere escrever, o teclado volta.
  */
@@ -131,6 +143,7 @@ private fun Context.hasMicrophone(): Boolean =
 fun AddContent(
     uiState: AddUiState,
     modifier: Modifier = Modifier,
+    added: List<ListRowUi> = emptyList(),
     canSpeak: Boolean = false,
     onQueryChange: (String) -> Unit = {},
     onAdd: (AddOptionUi) -> Unit = {},
@@ -155,40 +168,26 @@ fun AddContent(
         }
     }
     Column(modifier = modifier.fillMaxSize().background(colors.surface)) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(colors.primary)
-                .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SecondaryButton(
-                text = stringResource(R.string.back_to_list),
-                onClick = onClose,
-                icon = painterResource(R.drawable.ic_arrow_back),
-            )
-            SearchField(
-                query = uiState.query,
-                onQueryChange = onQueryChange,
-                onSubmit = onSubmit,
-                focusRequester = focusRequester,
-            )
-            if (canSpeak && voice !is VoiceUi.Listening && voice != VoiceUi.Notice) {
-                SecondaryButton(
-                    text = stringResource(R.string.add_speak),
-                    onClick = onSpeak,
-                    icon = painterResource(R.drawable.ic_mic),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
+        AddTopBar(
+            query = uiState.query,
+            showSpeak = canSpeak && voice !is VoiceUi.Listening && voice != VoiceUi.Notice,
+            focusRequester = focusRequester,
+            onQueryChange = onQueryChange,
+            onSubmit = onSubmit,
+            onSpeak = onSpeak,
+            onClose = onClose,
+        )
+        val repeated = uiState.repeated
+        val searching = uiState.showsOptions
         LazyColumn(
-            modifier = Modifier.weight(1f).fillMaxWidth().imePadding(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(if (searching) colors.primary else colors.surface)
+                .imePadding(),
             contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 8.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            val repeated = uiState.repeated
             when {
                 voice == VoiceUi.Notice -> item(key = "voice-notice", contentType = "voice-notice") {
                     VoiceNotice(onAccept = onAcceptNotice, onDecline = onDeclineNotice)
@@ -199,12 +198,13 @@ fun AddContent(
                 repeated != null -> item(key = "repeated", contentType = "repeated") {
                     RepeatedQuestion(name = repeated.name, onAddMore = onAddMore, onKeepAsIs = onKeepAsIs)
                 }
+                searching -> options(uiState, onAdd)
                 else -> {
                     if (voice is VoiceUi.Message) {
                         item(key = "voice-message", contentType = "voice-message") { VoiceMessage(voice) }
                     }
                     item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
-                    options(uiState, onAdd)
+                    addedList(added)
                 }
             }
             item(key = "bottom", contentType = "bottom") { Box(Modifier.navigationBarsPadding()) }
@@ -212,10 +212,56 @@ fun AddContent(
     }
 }
 
-/** Os produtos achados e, depois, a opção de pôr o texto como está. */
+/** Topo verde: "Voltar para a lista", o campo e, se o celular tem voz, o botão **Falar**. */
+@Composable
+private fun AddTopBar(
+    query: String,
+    showSpeak: Boolean,
+    focusRequester: FocusRequester,
+    onQueryChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+    onSpeak: () -> Unit,
+    onClose: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
+            .statusBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        BackToListButton(onClick = onClose)
+        SearchField(query = query, onQueryChange = onQueryChange, onSubmit = onSubmit, focusRequester = focusRequester)
+        if (showSpeak) {
+            SecondaryButton(
+                text = stringResource(R.string.add_speak),
+                onClick = onSpeak,
+                icon = painterResource(R.drawable.ic_mic),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+/**
+ * "Adicionados" (#122): o que entrou desde que a tela abriu, o mais recente no topo, sem seções. Só
+ * para ver: mudar fica na lista.
+ */
+private fun LazyListScope.addedList(added: List<ListRowUi>) {
+    if (added.isEmpty()) return
+    item(key = "added-title", contentType = "title") {
+        OptionsTitle(stringResource(R.string.add_added_title), color = MaterialTheme.colorScheme.onSurface)
+    }
+    items(added, key = { "added-${it.id.value}" }, contentType = { "added-row" }) { AddedRow(it) }
+}
+
+/** Os produtos achados e, depois, a opção de pôr o texto como está, no verde do topo. */
 private fun LazyListScope.options(uiState: AddUiState, onAdd: (AddOptionUi) -> Unit) {
     if (uiState.found.isNotEmpty()) {
-        item(key = "found-title", contentType = "title") { OptionsTitle(stringResource(R.string.add_found)) }
+        item(key = "found-title", contentType = "title") {
+            OptionsTitle(stringResource(R.string.add_found), color = MaterialTheme.colorScheme.onPrimary)
+        }
         items(uiState.found, contentType = { "option" }) {
             OptionButton(option = it, unknown = false, onClick = { onAdd(it) })
         }
@@ -230,7 +276,10 @@ private fun LazyListScope.options(uiState: AddUiState, onAdd: (AddOptionUi) -> U
     }
 }
 
-/** Campo "Procurar produto", que abre com o teclado. Tecla "pronto" põe a primeira opção na lista. */
+/**
+ * Campo "Digite ou fale o que quer comprar.", que abre com o teclado; o rótulo é frase, em caixa
+ * normal. Tecla "pronto" põe a primeira opção na lista.
+ */
 @Composable
 private fun SearchField(
     query: String,
@@ -244,14 +293,15 @@ private fun SearchField(
         value = query,
         onValueChange = onQueryChange,
         labelColor = MaterialTheme.colorScheme.onPrimary,
+        uppercaseLabel = false,
         onImeAction = onSubmit,
         focusRequester = focusRequester,
     )
 }
 
 /**
- * "Leite entrou na lista." (ou "entrou de novo", depois do "Sim, mais um"), lido pelo TalkBack assim
- * que aparece. Some quando a pessoa volta a digitar.
+ * "Adicionado: Leite." (ou "Adicionado de novo: Leite.", depois do "Sim, mais um"), lido pelo
+ * TalkBack assim que aparece. Some quando a pessoa volta a digitar.
  */
 @Composable
 private fun AddedNotice(added: AddedUi?) {
@@ -294,10 +344,11 @@ private fun RepeatedQuestion(name: String, onAddMore: () -> Unit, onKeepAsIs: ()
                     onClick = onAddMore,
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
+                // Mesma letra do "Sim, mais um" (#122), no papel para não parecer a ação principal.
                 SecondaryButton(
                     text = stringResource(R.string.add_keep_as_is),
                     onClick = onKeepAsIs,
-                    minHeight = tokens.primaryButtonHeight,
+                    prominent = true,
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
@@ -392,11 +443,11 @@ private fun VoiceMessage(message: VoiceUi.Message) {
 }
 
 @Composable
-private fun OptionsTitle(text: String) {
+private fun OptionsTitle(text: String, color: Color) {
     UppercaseText(
         text = text,
         style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurface,
+        color = color,
         modifier = Modifier.padding(top = 8.dp).semantics { heading() },
     )
 }
@@ -406,7 +457,7 @@ private fun NothingFound() {
     Text(
         text = stringResource(R.string.add_nothing_found),
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurface,
+        color = MaterialTheme.colorScheme.onPrimary,
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).semantics { heading() },
     )
 }
@@ -487,6 +538,42 @@ private fun QuantityBadge(text: String) {
             .border(2.dp, color, RoundedCornerShape(10.dp))
             .padding(horizontal = 8.dp, vertical = 2.dp),
     )
+}
+
+/**
+ * Linha de "Adicionados": nome (com detalhe e quantidade) → ícone, com uma linha discreta embaixo.
+ * Para o TalkBack é um texto só, em caixa normal.
+ */
+@Composable
+private fun AddedRow(row: ListRowUi) {
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant
+    val name = row.detail?.let { stringResource(R.string.list_item_name_with_detail, row.name, it) } ?: row.name
+    val quantity = row.quantity?.format(LocalContext.current.resources)
+    val label = quantity?.let { stringResource(R.string.list_item_with_quantity, name, it.spoken) } ?: name
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = ComicTheme.tokens.minRowHeight)
+            .drawBehind {
+                val y = size.height - AddedDividerWidth.toPx() / 2
+                drawLine(dividerColor, Offset(0f, y), Offset(size.width, y), AddedDividerWidth.toPx())
+            }
+            .clearAndSetSemantics { text = AnnotatedString(label) }
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FlowRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            itemVerticalAlignment = Alignment.CenterVertically,
+        ) {
+            ItemName(text = name, checked = row.checked)
+            if (quantity != null) ListQuantityBadge(text = quantity.visible, checked = row.checked)
+        }
+        Image(painter = painterResource(row.icon), contentDescription = null, modifier = Modifier.size(OptionIconSize))
+    }
 }
 
 /** "xyzzy" → "Xyzzy", para o aviso começar com maiúscula como frase. */

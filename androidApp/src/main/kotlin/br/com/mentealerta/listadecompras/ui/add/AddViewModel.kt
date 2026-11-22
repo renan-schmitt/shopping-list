@@ -8,11 +8,15 @@ import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
+import br.com.mentealerta.listadecompras.domain.ListItemId
+import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
 import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
+import br.com.mentealerta.listadecompras.ui.list.ListRowUi
+import br.com.mentealerta.listadecompras.ui.list.toRow
 import br.com.mentealerta.listadecompras.voice.VoiceEvent
 import br.com.mentealerta.listadecompras.voice.VoicePreferences
 import br.com.mentealerta.listadecompras.voice.VoiceRecognizer
@@ -20,8 +24,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -36,17 +43,25 @@ data class AddUiState(
     val found: List<AddOptionUi> = emptyList(),
     /** O texto como está, para o produto que o app não conhece (#49). */
     val unknown: AddOptionUi? = null,
-    /** Último produto que entrou na lista, para o aviso "Leite entrou na lista.". */
+    /** Último produto que entrou na lista, para o aviso "Adicionado: Leite.". */
     val lastAdded: AddedUi? = null,
     /** Produto que já estava na lista, para a pergunta "Leite já está na lista. Quer mais um?" (#54). */
     val repeated: RepeatedUi? = null,
     /** Falar os produtos (#60): explicação, escuta ou recado; `null` quando a voz não está em uso. */
     val voice: VoiceUi? = null,
-)
+) {
+    /**
+     * As opções da busca estão na tela (#122): há o que mostrar e nenhuma pergunta, explicação ou
+     * escuta na frente. Enquanto isso, "Adicionados" fica escondido.
+     */
+    val showsOptions: Boolean
+        get() = (found.isNotEmpty() || unknown != null) && repeated == null &&
+            voice != VoiceUi.Notice && voice !is VoiceUi.Listening
+}
 
 /**
  * O que entrou na lista: [again] quando a pessoa respondeu "Sim, mais um". Pela voz podem entrar
- * vários de uma vez: com [count] maior que 1, o aviso diz quantos ("3 produtos entraram na lista.").
+ * vários de uma vez: com [count] maior que 1, o aviso diz quantos ("Adicionados: 3 produtos.").
  */
 data class AddedUi(val name: String, val again: Boolean = false, val count: Int = 1)
 
@@ -91,6 +106,10 @@ data class AddOptionUi(
  * [ParseSpeechUseCase] separa os produtos, que entram direto na lista. (A conferência antes de pôr
  * na lista é a #61.)
  *
+ * O que entrou desde que a tela abriu aparece em [added] ("Adicionados", #122), o mais recente no
+ * topo, como está na lista agora ([ObserveListUseCase]): com a quantidade nova depois do "Sim, mais
+ * um" e sem o que saiu da lista.
+ *
  * A busca roda fora da thread principal ([searchDispatcher]) e só a da última letra vale. Pôr na
  * lista passa por um cadeado, para dois toques seguidos não criarem duas linhas.
  */
@@ -103,10 +122,20 @@ class AddViewModel(
     private val parseSpeech: ParseSpeechUseCase,
     private val voiceRecognizer: VoiceRecognizer,
     private val voicePreferences: VoicePreferences,
+    observeList: ObserveListUseCase,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddUiState())
     val uiState: StateFlow<AddUiState> = _uiState.asStateFlow()
+
+    /** Ids do que entrou desde que a tela abriu, o mais recente primeiro. */
+    private val addedIds = MutableStateFlow<List<ListItemId>>(emptyList())
+
+    /** "Adicionados" (#122): o que entrou desde que a tela abriu, como está na lista agora. */
+    val added: StateFlow<List<ListRowUi>> = combine(observeList(), addedIds) { sections, ids ->
+        val items = sections.flatMap { it.items }.associateBy { it.id }
+        ids.mapNotNull { items[it]?.toRow(catalogIndex) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), emptyList())
 
     /** Sem serviço de voz no celular, o botão "Falar" não aparece. */
     val canSpeak: Boolean = voiceRecognizer.isAvailable
@@ -143,7 +172,7 @@ class AddViewModel(
             addMutex.withLock {
                 val same = findSameItem(option.item)
                 if (same == null) {
-                    addItems(listOf(option.item))
+                    remember(addItems(listOf(option.item)).map { it.id })
                     _uiState.update { state ->
                         // Se a pessoa já voltou a digitar, o campo fica como está.
                         if (state.query == query) {
@@ -170,7 +199,12 @@ class AddViewModel(
             addMutex.withLock {
                 // Lê de novo: o item pode ter mudado enquanto a pergunta estava na tela.
                 val same = findSameItem(item)
-                if (same == null) addItems(listOf(item)) else editItem(same.addMore(item.quantity))
+                if (same == null) {
+                    remember(addItems(listOf(item)).map { it.id })
+                } else {
+                    editItem(same.addMore(item.quantity))
+                    remember(listOf(same.id))
+                }
             }
         }
     }
@@ -233,6 +267,12 @@ class AddViewModel(
         searchJob?.cancel()
         voiceJob?.cancel()
         _uiState.value = AddUiState()
+        addedIds.value = emptyList()
+    }
+
+    /** Põe os [ids] no topo de "Adicionados"; quem já estava sobe. */
+    private fun remember(ids: List<ListItemId>) {
+        addedIds.update { current -> ids.reversed() + current.filterNot { it in ids } }
     }
 
     private fun listenOrAsk(hasMicrophone: Boolean) {
@@ -260,7 +300,7 @@ class AddViewModel(
             if (items.isEmpty()) {
                 _uiState.update { it.copy(voice = problem ?: VoiceUi.Message.NOT_UNDERSTOOD) }
             } else {
-                addMutex.withLock { addItems(items) }
+                addMutex.withLock { remember(addItems(items).map { it.id }) }
                 val added = AddedUi(name = items.first().name, count = items.size)
                 _uiState.update { it.copy(voice = problem, lastAdded = added) }
             }
@@ -272,6 +312,11 @@ class AddViewModel(
             val listening = state.voice as? VoiceUi.Listening ?: return@update state
             state.copy(voice = change(listening))
         }
+    }
+
+    private companion object {
+        /** Mantém a coleta numa rotação de tela, sem reabrir a consulta. */
+        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 
     private fun ParsedItem.toOption(): AddOptionUi {

@@ -36,6 +36,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.ListItemId
+import br.com.mentealerta.listadecompras.ui.components.BackToListButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
@@ -74,11 +75,7 @@ fun ChangeListContent(
                     .statusBarsPadding()
                     .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
             ) {
-                SecondaryButton(
-                    text = stringResource(R.string.back_to_list),
-                    onClick = onClose,
-                    icon = painterResource(R.drawable.ic_arrow_back),
-                )
+                BackToListButton(onClick = onClose)
             }
         },
     ) { padding ->

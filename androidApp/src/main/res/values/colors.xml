@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background">#F4E7C2</color>
+    <!-- Seta do "Voltar para a lista" (#122): verde-folha com contorno de tinta -->
+    <color name="back_arrow_fill">#2E6B3A</color>
+    <color name="back_arrow_outline">#141414</color>
 </resources>

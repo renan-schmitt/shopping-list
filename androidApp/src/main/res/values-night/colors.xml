@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background">#1C1A16</color>
+    <!-- Seta do "Voltar para a lista" no escuro (paleta provisória, #9) -->
+    <color name="back_arrow_fill">#8CC79A</color>
+    <color name="back_arrow_outline">#FBF3DC</color>
 </resources>

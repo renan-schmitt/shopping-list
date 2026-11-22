@@ -3,9 +3,11 @@ package br.com.mentealerta.listadecompras.ui.add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.mentealerta.listadecompras.R
+import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
+import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 
 /**
@@ -25,6 +27,26 @@ val SampleAddState = AddUiState(
     ),
     unknown = option("lei", R.drawable.catalog_fluent_shopping_cart, Quantity(2.0, QuantityUnit.LITER)),
     lastAdded = AddedUi("Banana"),
+)
+
+/** Depois de pôr o leite: campo vazio, o aviso e "Adicionados" com o que entrou (#122). */
+val SampleAddAddedState = AddUiState(lastAdded = AddedUi("Leite"))
+
+/** "Adicionados" de exemplo, o mais recente no topo. */
+val SampleAdded = listOf(
+    ListRowUi(
+        ListItemId("milk"),
+        "Leite",
+        "desnatado",
+        Quantity(2.0, QuantityUnit.LITER),
+        icon = R.drawable.catalog_fluent_glass_of_milk,
+    ),
+    ListRowUi(ListItemId("banana"), "Banana", quantity = Quantity(6.0), icon = R.drawable.catalog_fluent_banana),
+    ListRowUi(
+        ListItemId("crackers"),
+        "Biscoito de polvilho salgado da padaria da esquina",
+        icon = R.drawable.catalog_fluent_rice_cracker,
+    ),
 )
 
 /** Nada achado: só a opção de pôr o texto como está. */
@@ -67,6 +89,12 @@ private fun option(name: String, icon: Int, quantity: Quantity? = null) = AddOpt
 @Composable
 private fun AddListeningPreview() {
     ShoppingListTheme { AddContent(SampleAddListeningState, canSpeak = true) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddAddedPreview() {
+    ShoppingListTheme { AddContent(SampleAddAddedState, added = SampleAdded, canSpeak = true) }
 }
 
 @Preview(showBackground = true)

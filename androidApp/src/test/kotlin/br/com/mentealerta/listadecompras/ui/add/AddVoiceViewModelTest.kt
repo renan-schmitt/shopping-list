@@ -4,8 +4,10 @@ import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.voice.VoiceEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -102,6 +104,17 @@ class AddVoiceViewModelTest {
         val state = viewModel.uiState.value
         assertNull(state.voice)
         assertEquals(3, state.lastAdded?.count)
+    }
+
+    @Test
+    fun everythingSaidAppearsInAddedLastSpokenFirst() = runTest {
+        val viewModel = listening()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.added.collect {} }
+        voice.say(VoiceEvent.Heard(listOf("bananas e maçã")))
+
+        viewModel.onStopListening()
+
+        assertEquals(listOf("maçã", "bananas"), viewModel.added.value.map { it.name })
     }
 
     @Test

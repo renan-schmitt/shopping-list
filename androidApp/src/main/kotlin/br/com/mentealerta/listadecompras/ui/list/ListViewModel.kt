@@ -144,7 +144,8 @@ class ListViewModel(
     }
 }
 
-private fun ListItem.toRow(index: CatalogIndex) = ListRowUi(
+/** Linha do item, também usada na lista "Adicionados" da tela de adicionar (#122). */
+internal fun ListItem.toRow(index: CatalogIndex) = ListRowUi(
     id = id,
     name = name,
     detail = detail,

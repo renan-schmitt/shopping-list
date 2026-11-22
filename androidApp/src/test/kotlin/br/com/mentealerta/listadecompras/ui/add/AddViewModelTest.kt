@@ -6,7 +6,9 @@ import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -109,6 +111,58 @@ class AddViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf("Banana"), viewModel.uiState.value.found.map { it.name })
+    }
+
+    /** Nomes e quantidades de "Adicionados" (#122), coletando como a tela faria. */
+    private fun TestScope.addedOf(viewModel: AddViewModel): () -> List<Pair<String, Quantity?>> {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.added.collect {} }
+        return { viewModel.added.value.map { it.name to it.quantity } }
+    }
+
+    @Test
+    fun addedShowsWhatEnteredNewestFirst() = runTest {
+        val viewModel = fixture.viewModel()
+        val added = addedOf(viewModel)
+        assertEquals(emptyList<Pair<String, Quantity?>>(), added())
+
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        viewModel.onQueryChange("maçã")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+
+        assertEquals(listOf("Maçã" to null, "Banana" to null), added())
+    }
+
+    @Test
+    fun addMoreMovesTheItemToTheTopWithTheNewQuantity() = runTest {
+        val viewModel = fixture.viewModel()
+        val added = addedOf(viewModel)
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        viewModel.onQueryChange("maçã")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        viewModel.onAddMore()
+
+        assertEquals(listOf("Banana" to Quantity(2.0), "Maçã" to null), added())
+    }
+
+    @Test
+    fun whatLeavesTheListLeavesAddedAndClosingEmptiesIt() = runTest {
+        val viewModel = fixture.viewModel()
+        val added = addedOf(viewModel)
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        viewModel.onQueryChange("maçã")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+
+        fixture.remove(fixture.items.first().id)
+        assertEquals(listOf("Maçã" to null), added())
+
+        viewModel.onClose()
+        assertEquals(emptyList<Pair<String, Quantity?>>(), added())
     }
 
     @Test

@@ -13,6 +13,7 @@ import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
+import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
@@ -26,13 +27,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 
 /**
  * Catálogo pequeno e repositório falso para os testes da tela de adicionar: guarda o que entrou na
- * lista em [added] e a lista como está em [items]. O "Ops, voltar" fica na [undoStack]. A voz é o
- * [voice], que entrega o que o teste mandar.
+ * lista em [added] e a lista como está em [items], observada como no banco. O "Ops, voltar" fica
+ * na [undoStack]. A voz é o [voice], que entrega o que o teste mandar.
  */
 class AddFixture {
     private val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -58,19 +60,32 @@ class AddFixture {
     val items = mutableListOf<ListItem>()
     val undoStack = UndoStack()
 
+    /** Muda a cada escrita, para a lista observada ("Adicionados") emitir de novo. */
+    private val version = MutableStateFlow(0)
+
+    /** Tira o item da lista, como o "Tirar da lista" faria em outra tela. */
+    fun remove(id: ListItemId) {
+        items.removeAll { it.id == id }
+        version.value++
+    }
+
     private val repository = object : ShoppingListRepository {
-        override fun observeSections(): Flow<List<ListSection>> = flow {
-            emit(listOf(ListSection(other, items.toList())))
+        override fun observeSections(): Flow<List<ListSection>> = version.map {
+            listOf(ListSection(other, items.toList()))
         }
 
         override suspend fun add(item: ListItem) {
             added += item
             items += item
+            version.value++
         }
 
         override suspend fun update(item: ListItem): ListItem? {
             val index = items.indexOfFirst { it.id == item.id }.takeIf { it >= 0 } ?: return null
-            return items[index].also { items[index] = item }
+            return items[index].also {
+                items[index] = item
+                version.value++
+            }
         }
 
         override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? =
@@ -96,6 +111,7 @@ class AddFixture {
         ParseSpeechUseCase(ItemTextParser(index)),
         voice,
         voicePreferences,
+        ObserveListUseCase(repository),
         searchDispatcher,
     )
 }

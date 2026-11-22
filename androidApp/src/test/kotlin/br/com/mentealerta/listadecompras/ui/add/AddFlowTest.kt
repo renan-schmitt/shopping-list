@@ -17,6 +17,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.unit.dp
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
@@ -63,17 +64,20 @@ class AddFlowTest {
         field.assertIsFocused()
 
         field.performTextInput("2 banan")
-        compose.onNodeWithText("Achei estes").assert(isHeading())
+        compose.onNodeWithText("Adicionar na lista de compras").assert(isHeading())
         compose.onNode(hasText("Banana, 2") and hasClickAction()).assertHeightIsAtLeast(72.dp).performClick()
 
         assertEquals("banana", fixture.added.single().productId)
         assertEquals(Quantity(2.0), fixture.added.single().quantity)
-        compose.onNodeWithText("Banana entrou na lista.")
+        compose.onNodeWithText("Adicionado: Banana.")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
         // O campo fica vazio para o próximo produto, e a tela continua aberta.
         field.assert(hasText(""))
-        compose.onAllNodesWithText("Achei estes").assertCountEquals(0)
+        compose.onAllNodesWithText("Adicionar na lista de compras").assertCountEquals(0)
         assertEquals(0, closes)
+        // O produto aparece em "Adicionados", na própria tela (#122).
+        compose.onNodeWithText("Adicionados").assert(isHeading())
+        compose.onNodeWithText("Banana, 2").assertExists()
     }
 
     @Test
@@ -103,7 +107,23 @@ class AddFlowTest {
         val item = fixture.added.single()
         assertEquals("bergamota", item.name)
         assertEquals(null, item.productId)
-        compose.onNodeWithText("Bergamota entrou na lista.").assertExists()
+        compose.onNodeWithText("Adicionado: Bergamota.").assertExists()
+    }
+
+    @Test
+    fun addedListHidesWhileSearchingAndComesBackAfter() {
+        show()
+        field.performTextInput("banana")
+        field.performImeAction()
+        compose.onNodeWithText("Adicionados").assertExists()
+
+        field.performTextInput("maç")
+        compose.onAllNodesWithText("Adicionados").assertCountEquals(0)
+        compose.onAllNodesWithText("Banana").assertCountEquals(0)
+
+        field.performTextReplacement("")
+        compose.onNodeWithText("Adicionados").assertExists()
+        compose.onNodeWithText("Banana").assertExists()
     }
 
     private fun addBananaTwice() {
@@ -120,13 +140,15 @@ class AddFlowTest {
 
         compose.onNodeWithText("Banana já está na lista. Quer mais um?")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
-        compose.onAllNodesWithText("Achei estes").assertCountEquals(0)
+        compose.onAllNodesWithText("Adicionar na lista de compras").assertCountEquals(0)
         compose.onNode(hasText("Sim, mais um") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
 
         assertEquals(Quantity(3.0), fixture.items.single().quantity)
-        compose.onNodeWithText("Banana entrou de novo na lista.")
+        compose.onNodeWithText("Adicionado de novo: Banana.")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
         field.assert(hasText(""))
+        // Em "Adicionados", uma linha só, com a quantidade somada.
+        compose.onNodeWithText("Banana, 3").assertExists()
     }
 
     @Test
@@ -152,7 +174,12 @@ class AddFlowTest {
     @Test
     fun fieldIsReadWithItsLabel() {
         show()
-        field.assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentDescription, listOf("Procurar produto")))
+        field.assert(
+            SemanticsMatcher.expectValue(
+                SemanticsProperties.ContentDescription,
+                listOf("Digite ou fale o que quer comprar."),
+            ),
+        )
     }
 
     @Test
@@ -199,7 +226,7 @@ class AddFlowTest {
         compose.onNode(hasText("Terminei") and hasClickAction()).assertHeightIsAtLeast(64.dp).performClick()
 
         assertEquals(listOf("banana", "apple"), fixture.added.map { it.productId })
-        compose.onNodeWithText("2 produtos entraram na lista.")
+        compose.onNodeWithText("Adicionados: 2 produtos.")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
     }
 

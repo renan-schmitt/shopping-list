@@ -2,6 +2,7 @@ package br.com.mentealerta.listadecompras.ui.add
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 import br.com.mentealerta.listadecompras.ui.theme.ThemeScreenshotTest
 import com.github.takahirom.roborazzi.captureRoboImage
@@ -92,8 +93,20 @@ class AddScreenshotTest {
     @Config(fontScale = 2.0f)
     fun voiceMessage_light_font200() = capture("voice_message_light_font200", SampleAddVoiceMessageState)
 
-    private fun capture(name: String, state: AddUiState = SampleAddState) {
-        compose.setContent { ShoppingListTheme { AddContent(state, canSpeak = true) } }
+    @Test
+    @Config(fontScale = 1.0f)
+    fun added_light_font100() = capture("added_light_font100", SampleAddAddedState, SampleAdded)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun added_light_font200() = capture("added_light_font200", SampleAddAddedState, SampleAdded)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun added_dark_font100() = capture("added_dark_font100", SampleAddAddedState, SampleAdded)
+
+    private fun capture(name: String, state: AddUiState = SampleAddState, added: List<ListRowUi> = emptyList()) {
+        compose.setContent { ShoppingListTheme { AddContent(state, added = added, canSpeak = true) } }
         compose.onRoot().captureRoboImage("src/test/screenshots/add_$name.png")
     }
 }
