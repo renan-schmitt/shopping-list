@@ -27,19 +27,19 @@ Descobrir, antes do lançamento, onde pessoas 60+ travam no app. Pontos que o pl
 
 ## Preparação
 
-- O teste roda no **app de verdade** (APK de teste), **no celular de quem conduz**.
+- O teste roda no **app de verdade** (APK de teste), **no aparelho de quem conduz** (tablet ou celular Android). Se der, fazer pelo menos uma sessão num celular: é nele que o app vai ser usado, e no tablet a letra fica maior e o gesto de passar o dedo é mais longo. Anotar o aparelho no modelo.
 - Antes de cada sessão, deixar a lista vazia: Configurações → Apps → Lista de Compras → Armazenamento → **Limpar dados** (ou `adb shell pm clear br.com.mentealerta.listadecompras`).
-- Perguntar à pessoa (ou olhar no celular dela) o tamanho de letra que ela usa e deixar o mesmo no celular do teste.
+- Perguntar à pessoa (ou olhar no celular dela) o tamanho de letra que ela usa e deixar o mesmo no aparelho do teste.
 - Conferir internet e microfone (a voz precisa deles).
 - Ter à mão: o [modelo de anotação](modelo-sessao.md), as duas imagens da tarefa 12 (impressas ou em outra tela) e um papel com as cinco carinhas para a nota final.
-- Se o celular for um Motorola: conferir se o nome "Lista de Compras" aparece inteiro embaixo do ícone (ponto 5 do plano).
+- Se o aparelho do teste for um celular Motorola: conferir se o nome "Lista de Compras" aparece inteiro embaixo do ícone (ponto 5 do plano).
 
 ## Formato
 
 - **30 a 40 minutos**: conversa inicial (5 min), tarefas (20 a 25 min), perguntas finais (5 a 10 min).
 - Na casa da pessoa ou num lugar tranquilo que ela conheça. Não no mercado (o barulho atrapalha a voz e a observação).
 - **Uma pessoa conduz** e anota.
-- **Gravação da tela com áudio** (gravador de tela do Android), só se a pessoa aceitar. Perguntar antes: "Posso gravar a tela do celular e a sua voz? Seu rosto não aparece." A gravação fica fora do git e é apagada depois das anotações.
+- **Gravação da tela com áudio** (gravador de tela do Android), só se a pessoa aceitar. Perguntar antes: "Posso gravar a tela e a sua voz? Seu rosto não aparece." A gravação fica fora do git e é apagada depois das anotações.
 
 ## Conversa inicial
 
@@ -47,7 +47,7 @@ Dizer, com as próprias palavras:
 
 > "Estou testando um app de lista de compras. Quem está sendo testado é o app, não você. Se alguma coisa ficar difícil, a culpa é do app, e é exatamente isso que eu quero descobrir. Se puder, vá falando o que está pensando enquanto usa."
 
-Depois, pedir que a pessoa digite umas palavras no WhatsApp do celular do teste, para se acostumar com o teclado.
+Depois, pedir que a pessoa digite umas palavras no WhatsApp ou num app de notas do aparelho do teste, para se acostumar com o teclado.
 
 Anotar no modelo: faixa de idade, onde cresceu, uso do celular, se faz lista hoje, óculos ou letra aumentada.
 
@@ -102,7 +102,7 @@ Não medir tempo durante a sessão; se precisar, tirar da gravação.
 
 Durante toda a sessão:
 
-- **Letra:** aproxima ou afasta o celular, aperta os olhos, pede os óculos
+- **Letra:** aproxima ou afasta o aparelho, aperta os olhos, pede os óculos
 - **Toques** errados ou fora do botão
 - **Passar o dedo:** tenta sozinha? Funciona de primeira?
 - **Voz:** fala natural ou pausada? O app entendeu? O que fez quando errou?

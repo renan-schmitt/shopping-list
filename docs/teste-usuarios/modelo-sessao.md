@@ -4,6 +4,7 @@ Copie este arquivo para `sessao-N.md`. Nunca escreva o nome da pessoa. Roteiro: 
 
 - Data:
 - Participante: PN
+- Aparelho do teste: celular / tablet (modelo)
 - Faixa de idade: 60–69 / 70–79 / 80+
 - Onde cresceu (cidade/estado):
 - Uso do celular: básico / se vira bem
