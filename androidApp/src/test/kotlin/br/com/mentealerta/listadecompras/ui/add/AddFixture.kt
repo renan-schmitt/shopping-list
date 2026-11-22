@@ -9,6 +9,7 @@ import br.com.mentealerta.listadecompras.catalog.IconFit
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
+import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
@@ -70,6 +71,10 @@ class AddFixture {
         override suspend fun clear() = RemovedItems.NONE
 
         override suspend fun restore(removed: RemovedItems) = Unit
+
+        override suspend fun finishShopping(): FinishedShopping? = null
+
+        override suspend fun undoFinishShopping(finished: FinishedShopping) = Unit
     }
 
     fun viewModel(searchDispatcher: CoroutineDispatcher = Dispatchers.Unconfined) = AddViewModel(

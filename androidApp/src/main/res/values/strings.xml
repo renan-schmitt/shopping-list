@@ -26,6 +26,20 @@
     </plurals>
     <!-- Abaixo do "Terminei", com todos os produtos riscados -->
     <string name="list_nothing_remaining">Não falta nada</string>
+    <!-- Aviso depois do "Terminei" (#57), com o botão "Ops, voltar": "Pronto! 8 produtos comprados." -->
+    <plurals name="list_finished_bought">
+        <item quantity="one">Pronto! %d produto comprado.</item>
+        <item quantity="many">Pronto! %d produtos comprados.</item>
+        <item quantity="other">Pronto! %d produtos comprados.</item>
+    </plurals>
+    <!-- Segunda frase do aviso do "Terminei", quando ficaram produtos não riscados -->
+    <plurals name="list_finished_remaining">
+        <item quantity="one">Ficou %d na lista para a próxima vez.</item>
+        <item quantity="many">Ficaram %d na lista para a próxima vez.</item>
+        <item quantity="other">Ficaram %d na lista para a próxima vez.</item>
+    </plurals>
+    <!-- Junta as duas frases do aviso do "Terminei": "Pronto! 8 produtos comprados." + "Ficaram 3…" -->
+    <string name="list_finished">%1$s %2$s</string>
     <!-- Ação do TalkBack para abrir a edição do produto (#55) -->
     <string name="list_item_edit">Editar</string>
     <!-- Aviso depois de tirar o produto da lista, com o botão "Ops, voltar" -->

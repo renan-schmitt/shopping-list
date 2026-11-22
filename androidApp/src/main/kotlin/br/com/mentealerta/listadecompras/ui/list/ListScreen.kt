@@ -1,5 +1,6 @@
 package br.com.mentealerta.listadecompras.ui.list
 
+import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -50,7 +51,8 @@ import org.koin.compose.viewmodel.koinViewModel
  * a tela de adicionar (#53) e tocar num produto abre a edição (#55), as duas por cima da lista, sem
  * biblioteca de navegação; elas continuam abertas numa rotação de tela.
  *
- * Produto tirado da lista na edição mostra o aviso "Feijão saiu da lista." com **Ops, voltar**.
+ * Produto tirado da lista na edição mostra o aviso "Feijão saiu da lista." com **Ops, voltar**; o
+ * "Terminei" (#57), "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez.".
  * [editScreen] é a tela de edição; os testes trocam por uma com o ViewModel deles.
  */
 @Composable
@@ -62,6 +64,7 @@ fun ListScreen(
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val notice by viewModel.notice.collectAsStateWithLifecycle()
     var adding by rememberSaveable { mutableStateOf(false) }
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var removedName by rememberSaveable { mutableStateOf<String?>(null) }
@@ -79,6 +82,16 @@ fun ListScreen(
         if (result == SnackbarResult.ActionPerformed) viewModel.onUndo()
         removedName = null
     }
+    LaunchedEffect(notice) {
+        val current = notice ?: return@LaunchedEffect
+        val result = snackbarHostState.showSnackbar(
+            message = noticeMessage(resources, current),
+            actionLabel = resources.getString(R.string.undo),
+            duration = SnackbarDuration.Long,
+        )
+        if (result == SnackbarResult.ActionPerformed) viewModel.onUndo()
+        viewModel.onNoticeShown()
+    }
 
     val editing = editingId
     when {
@@ -89,12 +102,12 @@ fun ListScreen(
                 if (removed != null) removedName = removed
             }
         }
-        // Terminei (#57) ganha ação na tarefa dele.
         else -> ListContent(
             uiState = uiState,
             onToggleCheck = viewModel::onToggleCheck,
             onEdit = { editingId = it.value },
             onAdd = { adding = true },
+            onFinish = viewModel::onFinish,
             snackbarHost = {
                 SnackbarHost(snackbarHostState) {
                     UndoNotice(it, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
@@ -102,6 +115,26 @@ fun ListScreen(
             },
             modifier = modifier,
         )
+    }
+}
+
+/**
+ * "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." (guia de linguagem); sem nada
+ * na lista, só a primeira frase.
+ */
+private fun noticeMessage(resources: Resources, notice: ListNotice): String = when (notice) {
+    is ListNotice.Finished -> {
+        val bought = resources.getQuantityString(R.plurals.list_finished_bought, notice.bought, notice.bought)
+        if (notice.remaining == 0) {
+            bought
+        } else {
+            val remaining = resources.getQuantityString(
+                R.plurals.list_finished_remaining,
+                notice.remaining,
+                notice.remaining,
+            )
+            resources.getString(R.string.list_finished, bought, remaining)
+        }
     }
 }
 

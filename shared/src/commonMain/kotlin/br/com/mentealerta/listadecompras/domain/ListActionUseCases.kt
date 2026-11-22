@@ -40,6 +40,15 @@ class ClearListUseCase(private val repository: ShoppingListRepository, private v
     } != null
 }
 
+/**
+ * "Terminei": grava a compra no histórico e tira os riscados da lista, guardando para o "Ops, voltar".
+ * Devolve o que foi feito, ou `null` se nada estava riscado.
+ */
+class FinishShoppingUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
+    suspend operator fun invoke(): FinishedShopping? =
+        undoStack.record { repository.finishShopping()?.let(UndoableAction::ShoppingFinished) }?.finished
+}
+
 /** "Ops, voltar": desfaz a última ação. Devolve a ação desfeita, ou `null` se não havia o que voltar. */
 class UndoLastActionUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
     suspend operator fun invoke(): UndoableAction? = undoStack.undo(repository)

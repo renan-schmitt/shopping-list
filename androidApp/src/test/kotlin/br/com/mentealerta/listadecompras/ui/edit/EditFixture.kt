@@ -7,10 +7,13 @@ import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
+import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
+import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
@@ -27,8 +30,9 @@ import kotlinx.coroutines.flow.update
 import kotlin.time.Instant
 
 /**
- * Catálogo pequeno e repositório falso, com estado, para os testes da edição (#55): a lista em
- * [items], na ordem em que os itens entraram; tirar e o "Ops, voltar" devolvem o item ao lugar.
+ * Catálogo pequeno e repositório falso, com estado, para os testes da edição (#55) e do "Terminei"
+ * (#57): a lista em [items], na ordem em que os itens entraram, e o histórico em [purchases]; tirar e
+ * o "Ops, voltar" devolvem o item ao lugar.
  */
 class EditFixture {
     val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -55,6 +59,9 @@ class EditFixture {
     private val state = MutableStateFlow<List<ListItem>>(emptyList())
 
     val items: List<ListItem> get() = state.value
+
+    /** Compras gravadas pelo "Terminei". */
+    val purchases = mutableListOf<Purchase>()
 
     /** Põe o item direto na lista, sem passar pela pilha do "Ops, voltar". */
     fun put(item: ListItem): ListItem = item.also {
@@ -88,7 +95,7 @@ class EditFixture {
         override suspend fun remove(id: ListItemId): RemovedItems {
             val item = state.value.find { it.id == id } ?: return RemovedItems.NONE
             state.update { list -> list - item }
-            return RemovedItems.of(listOf(item to Instant.fromEpochMilliseconds(order.getValue(id))))
+            return removedItemsOf(listOf(item))
         }
 
         override suspend fun clear(): RemovedItems = RemovedItems.NONE
@@ -96,7 +103,23 @@ class EditFixture {
         override suspend fun restore(removed: RemovedItems) {
             state.update { list -> (list + removed.items).sortedBy { order.getValue(it.id) } }
         }
+
+        override suspend fun finishShopping(): FinishedShopping? {
+            val checked = state.value.filter { it.checked }.takeIf { it.isNotEmpty() } ?: return null
+            val purchase = Purchase.create(Instant.fromEpochSeconds(0), checked)
+            purchases += purchase
+            state.update { list -> list - checked.toSet() }
+            return FinishedShopping(purchase, removedItemsOf(checked), remaining = state.value.size)
+        }
+
+        override suspend fun undoFinishShopping(finished: FinishedShopping) {
+            purchases.removeAll { it.id == finished.purchase.id }
+            restore(finished.removed)
+        }
     }
+
+    private fun removedItemsOf(items: List<ListItem>) =
+        RemovedItems.of(items.map { it to Instant.fromEpochMilliseconds(order.getValue(it.id)) })
 
     fun editViewModel() = EditViewModel(
         ObserveListUseCase(repository),
@@ -110,6 +133,7 @@ class EditFixture {
         ObserveListUseCase(repository),
         index,
         SetItemCheckedUseCase(repository, undoStack),
+        FinishShoppingUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
     )
 }

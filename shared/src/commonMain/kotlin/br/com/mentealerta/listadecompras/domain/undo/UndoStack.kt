@@ -26,7 +26,7 @@ class UndoStack(private val maxSize: Int = DEFAULT_MAX_SIZE) {
     val lastAction: StateFlow<UndoableAction?> = mutableLastAction.asStateFlow()
 
     /** Faz a ação com [block] e guarda o que ele devolver; `null` (nada mudou) não entra na pilha. */
-    internal suspend fun record(block: suspend () -> UndoableAction?): UndoableAction? = mutex.withLock {
+    internal suspend fun <T : UndoableAction> record(block: suspend () -> T?): T? = mutex.withLock {
         block()?.also { action ->
             if (actions.size == maxSize) actions.removeFirst()
             actions.addLast(action)

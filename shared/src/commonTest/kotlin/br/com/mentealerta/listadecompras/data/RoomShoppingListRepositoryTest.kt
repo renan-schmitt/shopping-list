@@ -3,9 +3,12 @@ package br.com.mentealerta.listadecompras.data
 import app.cash.turbine.test
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.data.database.createTestDatabase
+import br.com.mentealerta.listadecompras.data.database.toDomain
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
+import br.com.mentealerta.listadecompras.domain.Purchase
+import br.com.mentealerta.listadecompras.domain.PurchasedItem
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import kotlinx.coroutines.flow.first
@@ -13,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -206,6 +210,56 @@ class RoomShoppingListRepositoryTest {
             assertNull(section.items.single().productId)
         }
     }
+
+    @Test
+    fun finishShoppingSavesTheCheckedItemsAndKeepsTheOthersOnTheList() = runTest {
+        val twoLiters = milk.copy(quantity = Quantity(2.0, QuantityUnit.LITER))
+        listOf(soap, twoLiters, cassava, cheese).forEach { repository.add(it) }
+        listOf(cheese, soap, twoLiters).forEach { repository.setChecked(it.id, checked = true) }
+
+        val finished = assertNotNull(repository.finishShopping())
+
+        assertEquals(3, finished.bought)
+        assertEquals(1, finished.remaining)
+        assertEquals(listOf(soap.check(), twoLiters.check(), cheese.check()), finished.removed.items)
+        assertEquals(
+            listOf(
+                PurchasedItem(null, "Sabão em pó", null),
+                PurchasedItem("milk", "Leite", Quantity(2.0, QuantityUnit.LITER)),
+                PurchasedItem("cheese", "Queijo", null),
+            ),
+            finished.purchase.items,
+        )
+        assertEquals(listOf(finished.purchase), purchases())
+        repository.observeSections().test {
+            assertEquals(listOf("produce" to listOf(cassava)), awaitItem().simplified())
+        }
+    }
+
+    @Test
+    fun finishShoppingWithNothingCheckedDoesNothing() = runTest {
+        repository.add(milk)
+
+        assertNull(repository.finishShopping())
+
+        assertEquals(emptyList(), purchases())
+        repository.observeSections().test { assertEquals(listOf(milk), awaitItem().single().items) }
+    }
+
+    @Test
+    fun undoFinishShoppingDeletesThePurchaseAndBringsTheItemsBackInPlace() = runTest {
+        listOf(milk, cassava, cheese).forEach { repository.add(it) }
+        repository.setChecked(milk.id, checked = true)
+        val before = repository.observeSections().first()
+        val finished = assertNotNull(repository.finishShopping())
+
+        repository.undoFinishShopping(finished)
+
+        assertEquals(emptyList(), purchases())
+        assertEquals(before, repository.observeSections().first())
+    }
+
+    private suspend fun purchases(): List<Purchase> = database.purchaseDao().observeAll().first().map { it.toDomain() }
 
     private fun List<ListSection>.simplified() = map { it.section.id to it.items }
 }

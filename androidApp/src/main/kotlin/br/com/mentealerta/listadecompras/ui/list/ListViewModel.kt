@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
+import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
@@ -11,8 +12,10 @@ import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.ui.catalog.iconRes
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -48,16 +51,28 @@ data class ListRowUi(
     @DrawableRes val icon: Int,
 )
 
+/** Aviso com "Ops, voltar" que a tela mostra depois de uma ação. */
+sealed interface ListNotice {
+    /** "Terminei" (#57): [bought] produtos comprados, [remaining] ficaram na lista. */
+    data class Finished(val bought: Int, val remaining: Int) : ListNotice
+}
+
 /**
  * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. Riscar e tirar
- * o risco (#51) entram na pilha do "Ops, voltar"; [onUndo] desfaz a última ação.
+ * o risco (#51) e o "Terminei" (#57) entram na pilha do "Ops, voltar"; [onUndo] desfaz a última ação.
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
     catalogIndex: CatalogIndex,
     private val setItemChecked: SetItemCheckedUseCase,
+    private val finishShopping: FinishShoppingUseCase,
     private val undoLastAction: UndoLastActionUseCase,
 ) : ViewModel() {
+    private val mutableNotice = MutableStateFlow<ListNotice?>(null)
+
+    /** Aviso a mostrar; a tela chama [onNoticeShown] quando ele sai. Fica guardado numa rotação de tela. */
+    val notice: StateFlow<ListNotice?> = mutableNotice.asStateFlow()
+
     val uiState: StateFlow<ListUiState> = observeList()
         .map { sections ->
             if (sections.isEmpty()) {
@@ -75,6 +90,18 @@ class ListViewModel(
     /** Risca o produto que não estava riscado, ou tira o risco de quem estava ([checked] é o estado atual). */
     fun onToggleCheck(id: ListItemId, checked: Boolean) {
         viewModelScope.launch { setItemChecked(id, !checked) }
+    }
+
+    /** "Terminei": grava a compra, tira os riscados e mostra quantos foram comprados e quantos ficaram. */
+    fun onFinish() {
+        viewModelScope.launch {
+            finishShopping()?.let { mutableNotice.value = ListNotice.Finished(it.bought, it.remaining) }
+        }
+    }
+
+    /** O aviso saiu da tela (sumiu sozinho ou a pessoa tocou em "Ops, voltar"). */
+    fun onNoticeShown() {
+        mutableNotice.value = null
     }
 
     /** "Ops, voltar" do aviso (ex.: "Feijão saiu da lista."): desfaz a última ação. */

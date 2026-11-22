@@ -39,6 +39,24 @@ interface ShoppingListRepository {
 
     /** Devolve à lista os itens tirados, com o mesmo `id` e no mesmo lugar de antes. */
     suspend fun restore(removed: RemovedItems)
+
+    /**
+     * "Terminei": grava no histórico a compra com os itens riscados e tira esses itens da lista, tudo
+     * de uma vez. Os não riscados ficam para a próxima vez. Devolve `null` se nada estava riscado.
+     */
+    suspend fun finishShopping(): FinishedShopping?
+
+    /** "Ops, voltar" do "Terminei": apaga a compra do histórico e devolve os itens à lista. */
+    suspend fun undoFinishShopping(finished: FinishedShopping)
+}
+
+/**
+ * O que o "Terminei" fez: a compra gravada, os itens tirados da lista (para o "Ops, voltar") e quantos
+ * ficaram na lista.
+ */
+class FinishedShopping(val purchase: Purchase, val removed: RemovedItems, val remaining: Int) {
+    /** Quantos produtos foram comprados. */
+    val bought: Int get() = purchase.items.size
 }
 
 /**

@@ -1,5 +1,6 @@
 package br.com.mentealerta.listadecompras.domain.undo
 
+import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
@@ -37,6 +38,13 @@ sealed class UndoableAction {
     class ListCleared(val removed: RemovedItems) : UndoableAction() {
         override suspend fun undo(repository: ShoppingListRepository) {
             repository.restore(removed)
+        }
+    }
+
+    /** "Terminei": gravou a compra no histórico e tirou os riscados da lista. */
+    class ShoppingFinished(val finished: FinishedShopping) : UndoableAction() {
+        override suspend fun undo(repository: ShoppingListRepository) {
+            repository.undoFinishShopping(finished)
         }
     }
 }

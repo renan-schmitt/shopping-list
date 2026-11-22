@@ -6,10 +6,13 @@ import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.data.database.AppDatabase
 import br.com.mentealerta.listadecompras.data.database.ListItemEntity
 import br.com.mentealerta.listadecompras.data.database.toDomain
+import br.com.mentealerta.listadecompras.data.database.toEntities
 import br.com.mentealerta.listadecompras.data.database.toEntity
+import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
+import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +29,7 @@ internal class RoomShoppingListRepository(
     private val clock: Clock,
 ) : ShoppingListRepository {
     private val dao = database.listItemDao()
+    private val purchaseDao = database.purchaseDao()
 
     override fun observeSections(): Flow<List<ListSection>> =
         dao.observeAll().map { entities -> groupBySection(entities.map { it.toDomain() }) }
@@ -71,6 +75,21 @@ internal class RoomShoppingListRepository(
     override suspend fun restore(removed: RemovedItems) {
         if (removed.isEmpty()) return
         dao.upsertAll(removed.entries.map { it.item.toEntity(addedAt = it.addedAt) })
+    }
+
+    override suspend fun finishShopping(): FinishedShopping? = database.withWriteTransaction {
+        val (checked, unchecked) = dao.getAll().partition { it.checked }
+        if (checked.isEmpty()) return@withWriteTransaction null
+        val purchase = Purchase.create(date = clock.now(), items = checked.map { it.toDomain() })
+        val (purchaseEntity, purchasedItems) = purchase.toEntities()
+        purchaseDao.insert(purchaseEntity, purchasedItems)
+        dao.deleteChecked()
+        FinishedShopping(purchase, removedItemsOf(checked), remaining = unchecked.size)
+    }
+
+    override suspend fun undoFinishShopping(finished: FinishedShopping) = database.withWriteTransaction {
+        purchaseDao.deleteById(finished.purchase.id.value)
+        restore(finished.removed)
     }
 
     /** Agrupa na ordem das seções do catálogo; seção que o catálogo não tem vai para "Outros". */

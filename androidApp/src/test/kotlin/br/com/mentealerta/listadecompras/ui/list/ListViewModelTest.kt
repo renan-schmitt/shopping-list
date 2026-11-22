@@ -8,10 +8,13 @@ import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
+import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
+import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import br.com.mentealerta.listadecompras.domain.RemovedItems
@@ -32,6 +35,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListViewModelTest {
@@ -74,7 +78,21 @@ class ListViewModelTest {
 
         override suspend fun clear() = RemovedItems.NONE
 
-        override suspend fun restore(removed: RemovedItems) = Unit
+        override suspend fun restore(removed: RemovedItems) {
+            removed.items.forEach { stored[it.id] = it }
+        }
+
+        override suspend fun finishShopping(): FinishedShopping? {
+            val checked = stored.values.filter { it.checked }.takeIf { it.isNotEmpty() } ?: return null
+            checked.forEach { stored.remove(it.id) }
+            return FinishedShopping(
+                Purchase.create(Instant.fromEpochSeconds(0), checked),
+                RemovedItems.of(checked.map { it to Instant.fromEpochSeconds(0) }),
+                remaining = stored.size,
+            )
+        }
+
+        override suspend fun undoFinishShopping(finished: FinishedShopping) = restore(finished.removed)
     }
 
     @Before
@@ -87,6 +105,7 @@ class ListViewModelTest {
         ObserveListUseCase(repository),
         index,
         SetItemCheckedUseCase(repository, undoStack),
+        FinishShoppingUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
     )
 
@@ -214,6 +233,34 @@ class ListViewModelTest {
 
         viewModel().onUndo()
         assertEquals(false, stored.getValue(tomato.id).checked)
+        assertNull(undoStack.lastAction.value)
+    }
+
+    @Test
+    fun finishingShowsHowManyWereBoughtAndHowManyAreLeft() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce", checked = true)
+        val kale = ListItem(ListItemId("2"), "Couve", null, "produce", checked = true)
+        val beans = ListItem(ListItemId("3"), "Feijão", null, "produce")
+        listOf(tomato, kale, beans).forEach { stored[it.id] = it }
+        val viewModel = viewModel()
+
+        viewModel.onFinish()
+
+        assertEquals(ListNotice.Finished(bought = 2, remaining = 1), viewModel.notice.value)
+        assertEquals(listOf(beans), stored.values.toList())
+        viewModel.onNoticeShown()
+        assertNull(viewModel.notice.value)
+    }
+
+    @Test
+    fun finishingWithNothingCheckedShowsNothing() = runTest {
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
+        stored[tomato.id] = tomato
+        val viewModel = viewModel()
+
+        viewModel.onFinish()
+
+        assertNull(viewModel.notice.value)
         assertNull(undoStack.lastAction.value)
     }
 }

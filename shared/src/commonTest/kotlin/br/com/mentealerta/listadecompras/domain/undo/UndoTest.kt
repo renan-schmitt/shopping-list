@@ -7,6 +7,8 @@ import br.com.mentealerta.listadecompras.data.StepClock
 import br.com.mentealerta.listadecompras.data.database.createTestDatabase
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
+import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
+import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
@@ -26,6 +28,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -38,6 +41,7 @@ class UndoTest {
     private val edit = EditItemUseCase(repository, undoStack)
     private val remove = RemoveItemUseCase(repository, undoStack)
     private val clear = ClearListUseCase(repository, undoStack)
+    private val finish = FinishShoppingUseCase(repository, undoStack)
     private val undo = UndoLastActionUseCase(repository, undoStack)
 
     private val milk = ListItem.create(name = "Leite", productId = "milk", sectionId = "deli_dairy")
@@ -150,6 +154,30 @@ class UndoTest {
     }
 
     @Test
+    fun undoingFinishShoppingBringsTheCheckedItemsBack() = runTest {
+        addAll(milk, cassava, cheese)
+        repository.setChecked(cassava.id, checked = true)
+        val before = sections()
+
+        val finished = assertNotNull(finish())
+        assertEquals(1, finished.bought)
+        assertEquals(2, finished.remaining)
+        assertEquals(listOf(milk, cheese), sections().flatMap { it.items })
+        assertIs<UndoableAction.ShoppingFinished>(undo())
+
+        assertEquals(before, sections())
+    }
+
+    @Test
+    fun finishingWithNothingCheckedDoesNotEnterTheStack() = runTest {
+        addAll(milk)
+
+        assertNull(finish())
+
+        assertNull(undoStack.lastAction.value)
+    }
+
+    @Test
     fun undoesFromTheLastToTheFirst() = runTest {
         addAll(milk, cheese)
         val initial = sections()
@@ -240,5 +268,9 @@ class UndoTest {
         override suspend fun clear(): RemovedItems = error("falhou")
 
         override suspend fun restore(removed: RemovedItems) = error("falhou")
+
+        override suspend fun finishShopping(): FinishedShopping? = error("falhou")
+
+        override suspend fun undoFinishShopping(finished: FinishedShopping) = error("falhou")
     }
 }
