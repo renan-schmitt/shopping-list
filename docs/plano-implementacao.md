@@ -335,6 +335,17 @@ shopping-list/
 
 **Ícones próprios de Limpeza e higiene (2026-11-22, #27):** 10 ícones em `catalog/own-icons/`, no mesmo estilo e sem marca: caixa de sabão em pó, frasco de detergente, galão de água sanitária, frasco de desinfetante, frasco de amaciante, rolo de papel-toalha, tubo de creme dental, desodorante em spray, absorvente e fralda. Cobrem 18 produtos, alguns como aproximado (ex.: multiuso e desengordurante usam o detergente; sabão líquido usa o amaciante; pomada usa o tubo de creme dental). A fralda aparece aberta, não no pacote, para se reconhecer em 32 px; a geriátrica é fiel e a infantil, aproximada. O papel-toalha troca o rolo do papel higiênico pelo rolo alto. O resto das duas seções espera a lista por prioridade (#23).
 
+**Cobertura real do catálogo v1 (2026-11-22, #23)**, página [prototipos/icones.html](prototipos/icones.html), agora gerada por `./gradlew :shared:generateIconsPage` a partir de `catalog/`:
+- **662 produtos ativos:** **184 com ícone fiel** (28%; 141 Fluent e 43 próprios), **239 aproximados** (36%; 213 Fluent e 26 próprios) e **239 sem ícone** (36%), que usam o ícone da seção.
+- As lacunas se concentram na Mercearia (57: temperos, molhos, misturas e salgadinhos), no Hortifrúti (53, quase só frutas e legumes regionais), em Higiene e farmácia (29) e na Limpeza (26: panos, rodo e utensílios). Padaria, Açougue e Bebidas têm poucas.
+- **Fila do complemento próprio:** [`catalog/own-icons-queue.csv`](../catalog/own-icons-queue.csv). Cada linha é um desenho, que pode cobrir vários produtos (ex.: um pote de tempero serve para pimenta-do-reino, colorau, cominho e outros cinco). Os 239 produtos sem ícone viram **141 desenhos**:
+  - **Prioridade 1** (compra de toda semana ou todo mês, conferida com a cesta básica do DIEESE e a POF): **32 desenhos, 64 produtos**. Exemplos: mandioca, mamão, abóbora, chuchu, carne moída, creme de leite, leite em pó, pote de tempero, bisnaga de molho, adoçante, filtro de café, álcool, palha de aço, pano, papel-alumínio, dentadura, fita de glicemia, frasco de remédio, botijão de gás.
+  - **Prioridade 2** (compra comum): 57 desenhos, 103 produtos.
+  - **Prioridade 3** (ocasional ou regional): 52 desenhos, 72 produtos, a maioria frutas regionais.
+- A prioridade é uma estimativa, sem dado de compra real; quando houver analytics, revisar.
+- A fila passa da estimativa de 50–100 ícones. Fazer a prioridade 1 e depois decidir até onde ir na 2; o resto continua com o ícone da seção.
+- Os 239 aproximados ficam fora da fila: a revisão deles é a #24.
+
 **Descartados:** Noto Emoji (mesmas lacunas, estilo mais simples), OpenMoji (CC BY-SA obriga adaptações na mesma licença; estilo menos atraente), conjunto 100% próprio (custo e prazo).
 
 ### 4.5 Privacidade, métricas e coleta de dados

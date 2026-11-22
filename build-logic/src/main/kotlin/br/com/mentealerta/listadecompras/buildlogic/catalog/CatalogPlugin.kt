@@ -36,5 +36,17 @@ class CatalogPlugin : Plugin<Project> {
             fluentIconsFile.set(catalogDir.file("fluent-icons.txt"))
             svgDir.set(catalogDir.dir(FLUENT_SVG_DIR))
         }
+        project.tasks.register("generateIconsPage", GenerateIconsPageTask::class.java) {
+            group = "catalog"
+            description = "Confere a fila do complemento próprio e gera docs/prototipos/icones.html"
+            sectionsFile.set(catalogDir.file("sections.csv"))
+            productsFile.set(catalogDir.file("products.csv"))
+            termsFile.set(catalogDir.file("terms.csv"))
+            fluentIconsFile.set(catalogDir.file("fluent-icons.txt"))
+            queueFile.set(catalogDir.file("own-icons-queue.csv"))
+            ownIcons.from(project.fileTree(catalogDir.dir(OWN_ICONS_DIR)))
+            fluentSvgs.from(project.fileTree(catalogDir.dir(FLUENT_SVG_DIR)))
+            pageFile.set(project.rootProject.layout.projectDirectory.file("docs/prototipos/icones.html"))
+        }
     }
 }

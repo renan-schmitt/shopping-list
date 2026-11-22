@@ -100,3 +100,21 @@ O build transforma estes CSV em código Kotlin (`EmbeddedCatalog`, no pacote `ca
 - No build do app, cada SVG vira um VectorDrawable (`catalog_fluent_red_apple`, `catalog_own_<id>`), gerado em `androidApp/build/generated/`, fora do git. Os filtros do Fluent (desfoque e sombra) não existem no VectorDrawable e são descartados; a diferença no ícone é mínima.
 - No app, `CatalogProduct.iconRes(section)` devolve o ícone do produto ou, sem ícone próprio, o da seção.
 - Para conferir todos os ícones convertidos: screenshot `androidApp/src/test/screenshots/catalog_icons.png`.
+
+### `own-icons-queue.csv` — fila do complemento próprio
+
+Os ícones próprios que ainda faltam, por prioridade ([plano §4.4](../docs/plano-implementacao.md#44-ícones)). Uma linha por desenho; um desenho pode cobrir vários produtos.
+
+| Coluna | O que é |
+|---|---|
+| `icon_id` | `id` do futuro `own-icons/<id>.svg`, em minúsculas, números e `_` |
+| `name` | O que desenhar, em poucas palavras |
+| `priority` | `1` compra de toda semana ou todo mês; `2` compra comum; `3` ocasional ou regional |
+| `products` | `id` dos produtos que o desenho vai cobrir, separados por `;` |
+| `notes` | Observações para quem desenha |
+
+Regras:
+
+- Um produto aparece em no máximo um desenho e não pode ter ícone fiel.
+- Desenho pronto sai da fila: ao criar `own-icons/<id>.svg` e ligar os produtos na planilha, apague a linha.
+- `./gradlew :shared:generateIconsPage` confere a fila e regrava a página [`docs/prototipos/icones.html`](../docs/prototipos/icones.html) com a cobertura de ícones. Roda à mão, depois de mexer em ícones ou na fila; a página não se edita à mão.

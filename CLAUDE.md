@@ -63,6 +63,7 @@ Requer JDK 21 e o Android SDK (`local.properties` com `sdk.dir`, fora do git).
 - Screenshots Roborazzi: gravar `./gradlew :androidApp:recordRoborazziDebug`, conferir `./gradlew :androidApp:verifyRoborazziDebug` (referências em `androidApp/src/test/screenshots/`, no git)
 - Catálogo (valida `catalog/` e gera o catálogo embarcado): `./gradlew :shared:generateCatalog` — também roda no build
 - Ícones do catálogo (baixa os SVG do Fluent usados na planilha para `catalog/fluent-svg/`): `./gradlew :shared:downloadFluentIcons` — rodar à mão ao usar um ícone Fluent novo; a conversão para VectorDrawable roda no build
+- Cobertura de ícones (confere `catalog/own-icons-queue.csv` e regrava `docs/prototipos/icones.html`): `./gradlew :shared:generateIconsPage` — rodar à mão depois de mexer em ícones ou na fila
 - Lint (ktlint + detekt + Android Lint, em todos os módulos e no `build-logic`): `./gradlew lint` — também roda no `check`/`build`
 - Corrigir formatação automaticamente: `./gradlew ktlintFormat :build-logic:ktlintFormat`
 - CI (`.github/workflows/ci.yml`, a cada push e PR, runner macOS): `./gradlew build :androidApp:verifyRoborazziDebug` — rode o mesmo comando antes de commitar; em falha, os relatórios e as diferenças de screenshot ficam no artefato `relatorios` do run
