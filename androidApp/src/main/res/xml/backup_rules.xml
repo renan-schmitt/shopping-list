@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Auto Backup no Android 8 a 11 (plano §1.8). Mesmas regras de data_extraction_rules.xml:
+    só o banco e as preferências.
+-->
+<full-backup-content>
+    <include domain="database" path="shopping-list.db" />
+    <include domain="database" path="shopping-list.db-wal" />
+    <include domain="file" path="settings.preferences_pb" />
+</full-backup-content>

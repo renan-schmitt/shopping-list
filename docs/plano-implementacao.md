@@ -81,7 +81,7 @@ O que precisa existir na primeira versão publicada.
 - [ ] Tela não apaga enquanto a pessoa está comprando (após riscar o primeiro produto)
 
 ### 1.8 Segurança dos dados
-- [ ] Android Auto Backup ativado (salva no Google Drive do celular, sem login no app)
+- [x] Android Auto Backup ativado (salva no Google Drive do celular, sem login no app) — 2026-11-22, #73: só o banco e as preferências entram no backup e na troca de celular; sem exigir bloqueio de tela (quem não tem ficaria sem backup)
 
 ---
 

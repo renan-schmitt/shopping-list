@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Auto Backup no Android 12+ (plano §1.8): salva no Google Drive da pessoa, sem login no app.
+    Só entra o que está listado aqui; qualquer outro arquivo fica de fora.
+    Os nomes vêm de DATABASE_FILE_NAME e PREFERENCES_FILE_NAME no shared.
+    Sem exigir criptografia: quem não tem bloqueio de tela ficaria sem backup (#73).
+    Mudou algo aqui? Mude também backup_rules.xml (Android 8 a 11).
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="database" path="shopping-list.db" />
+        <include domain="database" path="shopping-list.db-wal" />
+        <include domain="file" path="settings.preferences_pb" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="shopping-list.db" />
+        <include domain="database" path="shopping-list.db-wal" />
+        <include domain="file" path="settings.preferences_pb" />
+    </device-transfer>
+</data-extraction-rules>

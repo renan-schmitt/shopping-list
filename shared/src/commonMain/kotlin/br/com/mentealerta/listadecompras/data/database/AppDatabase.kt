@@ -43,7 +43,7 @@ internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatab
     override fun initialize(): AppDatabase
 }
 
-/** Nome do arquivo do banco. */
+/** Nome do arquivo do banco. Mudou? Atualize as regras de backup em `androidApp/src/main/res/xml`. */
 internal const val DATABASE_FILE_NAME = "shopping-list.db"
 
 /** Migrations de uma versão para a seguinte, em ordem. Vazia enquanto o banco está na versão 1. */

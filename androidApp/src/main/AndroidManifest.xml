@@ -11,9 +11,12 @@
         </intent>
     </queries>
 
+    <!-- Auto Backup (plano §1.8): só o banco e as preferências, ver res/xml -->
     <application
         android:name=".ShoppingListApplication"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.ShoppingList">

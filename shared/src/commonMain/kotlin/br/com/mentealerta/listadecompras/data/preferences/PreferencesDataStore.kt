@@ -9,7 +9,10 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import okio.Path.Companion.toPath
 
-/** Nome do arquivo das preferências simples (ajustes do app). */
+/**
+ * Nome do arquivo das preferências simples (ajustes do app). Mudou? Atualize as regras de backup
+ * em `androidApp/src/main/res/xml`.
+ */
 internal const val PREFERENCES_FILE_NAME = "settings.preferences_pb"
 
 /**
