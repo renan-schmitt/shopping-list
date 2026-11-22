@@ -37,7 +37,8 @@ private const val DISABLED_ALPHA = 0.4f
  * (plano §4.8). Ex.: "Terminei" com o texto de apoio "Faltam 5".
  *
  * O ícone, se houver, fica acima do texto, como no protótipo; é decorativo
- * para o TalkBack, que lê só o texto.
+ * para o TalkBack, que lê só o texto. Desativado ([enabled] falso), fica
+ * apagado e o TalkBack anuncia "desativado" (ex.: "Menos" na quantidade mínima).
  */
 @Composable
 fun PrimaryButton(
@@ -46,11 +47,13 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     icon: Painter? = null,
     supportingText: String? = null,
+    enabled: Boolean = true,
 ) {
     val colors = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
     ComicButton(
         onClick = onClick,
+        enabled = enabled,
         background = colors.primary,
         shadow = ComicTheme.tokens.mediumShadow,
         minHeight = ComicTheme.tokens.primaryButtonHeight,
@@ -78,6 +81,10 @@ fun PrimaryButton(
  * ([enabled] falso), fica apagado e o TalkBack anuncia "desativado". Com
  * [tintIcon] falso, o ícone mantém as cores dele (ex.: o cesto de lixo do
  * "Jogar a lista fora", que é colorido).
+ *
+ * Com [prominent], usa a letra Bangers e a altura do botão principal, mas
+ * continua no papel: chama atenção sem parecer a ação principal da tela (ex.:
+ * "Tirar da lista" na edição, #124).
  */
 @Composable
 fun SecondaryButton(
@@ -86,10 +93,12 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     icon: Painter? = null,
     tintIcon: Boolean = true,
-    minHeight: Dp = ComicTheme.tokens.minTouchTarget,
+    prominent: Boolean = false,
+    minHeight: Dp = if (prominent) ComicTheme.tokens.primaryButtonHeight else ComicTheme.tokens.minTouchTarget,
     enabled: Boolean = true,
 ) {
     val colors = MaterialTheme.colorScheme
+    val typography = MaterialTheme.typography
     ComicButton(
         onClick = onClick,
         enabled = enabled,
@@ -99,7 +108,11 @@ fun SecondaryButton(
         modifier = modifier,
     ) {
         if (icon != null) ButtonIcon(icon, if (tintIcon) colors.primary else Color.Unspecified)
-        UppercaseText(text = text, style = MaterialTheme.typography.labelLarge, color = colors.primary)
+        UppercaseText(
+            text = text,
+            style = if (prominent) typography.headlineMedium else typography.labelLarge,
+            color = colors.primary,
+        )
     }
 }
 

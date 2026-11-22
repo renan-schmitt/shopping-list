@@ -47,6 +47,7 @@ import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.ui.components.LabeledTextField
+import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
@@ -95,7 +96,8 @@ fun EditScreen(
 
 /**
  * Topo verde com "Voltar para a lista"; embaixo, no papel: nome com o ícone do produto, quantidade
- * com **Menos** / **Mais**, detalhe e, por último, **Tirar da lista**. Não existe "Salvar". O
+ * com **Menos** / **Mais** em verde, detalhe e, por último, **Tirar da lista** em destaque, com o
+ * cesto de lixo do "Jogar a lista fora" (#124). Não existe "Salvar". O
  * teclado só abre quando a pessoa toca num campo, para não cobrir os botões.
  */
 @Composable
@@ -163,6 +165,9 @@ fun EditContent(
                 SecondaryButton(
                     text = stringResource(R.string.edit_remove),
                     onClick = onRemove,
+                    icon = painterResource(R.drawable.catalog_fluent_wastebasket),
+                    tintIcon = false,
+                    prominent = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -172,8 +177,9 @@ fun EditContent(
 
 /**
  * "Quantidade": a quantidade numa linha ("2 litros"; sem quantidade, 1) e, embaixo, **Menos** e
- * **Mais** lado a lado, da mesma altura — com três colunas, a fonte em 200% cortaria as palavras. A
- * quantidade nova é lida pelo TalkBack a cada toque, como se fala ("meio quilo").
+ * **Mais** lado a lado, verdes como o botão principal (#124) e da mesma altura — com três colunas,
+ * a fonte em 200% cortaria as palavras. A quantidade nova é lida pelo TalkBack a cada toque, como
+ * se fala ("meio quilo").
  */
 @Composable
 private fun QuantityStepper(quantity: Quantity?, canDecrease: Boolean, onIncrease: () -> Unit, onDecrease: () -> Unit) {
@@ -217,19 +223,17 @@ private fun QuantityStepper(quantity: Quantity?, canDecrease: Boolean, onIncreas
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
         ) {
-            SecondaryButton(
+            PrimaryButton(
                 text = stringResource(R.string.edit_less),
                 onClick = onDecrease,
                 icon = painterResource(R.drawable.ic_remove),
                 enabled = canDecrease,
-                minHeight = tokens.primaryButtonHeight,
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             )
-            SecondaryButton(
+            PrimaryButton(
                 text = stringResource(R.string.edit_more),
                 onClick = onIncrease,
                 icon = painterResource(R.drawable.ic_add),
-                minHeight = tokens.primaryButtonHeight,
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
