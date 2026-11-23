@@ -2,16 +2,23 @@ package br.com.mentealerta.listadecompras.ui.list
 
 import android.content.res.Resources
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -48,6 +55,7 @@ import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.UndoNotice
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
+import br.com.mentealerta.listadecompras.ui.components.comicStyle
 import br.com.mentealerta.listadecompras.ui.components.halftone
 import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
 import br.com.mentealerta.listadecompras.ui.edit.EditScreen
@@ -305,9 +313,10 @@ private fun Sheet(sections: List<SectionUi>, actions: SheetActions) {
 internal fun SectionUi.title(): String = if (bought) stringResource(R.string.list_bought_section) else name
 
 /**
- * Título **Lista de Compras** e "Toque em **Adicionar** para começar sua lista." (guia de
- * linguagem). O texto todo já é Lexend negrito, então o trecho em `<b>` ganha a cor de destaque para
- * se distinguir.
+ * Arte do ícone do app e "Mente Alerta" acima do título **Lista de Compras** (logo do plano §4.8),
+ * e "Toque em **Adicionar** para começar sua lista." (guia de linguagem). O texto todo já é Lexend
+ * negrito, então o trecho em `<b>` ganha a cor de destaque para se distinguir. Com letra grande, a
+ * folha rola em vez de cortar o texto.
  */
 @Composable
 private fun EmptyList() {
@@ -317,23 +326,56 @@ private fun EmptyList() {
         append(html.text)
         html.spanStyles.forEach { addStyle(accent, it.start, it.end) }
     }
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        UppercaseText(
-            text = stringResource(R.string.list_title),
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.fillMaxWidth().semantics { heading() },
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
-        )
+    val tokens = ComicTheme.tokens
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .heightIn(min = maxHeight)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            // Decorativa: o nome logo abaixo já diz o que é.
+            Image(
+                painter = painterResource(R.drawable.logo_app),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(LOGO_SIZE)
+                    .comicStyle(
+                        shape = LogoShape,
+                        background = MaterialTheme.colorScheme.surface,
+                        outline = MaterialTheme.colorScheme.outline,
+                        outlineWidth = tokens.thickOutline,
+                        shadow = tokens.mediumShadow,
+                    ),
+            )
+            // Nome da família pequeno, colado acima do título, como no logo.
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                UppercaseText(
+                    text = stringResource(R.string.app_family_name),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                UppercaseText(
+                    text = stringResource(R.string.list_title),
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.fillMaxWidth().semantics { heading() },
+                )
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
+
+private val LOGO_SIZE = 136.dp
+private val LogoShape = RoundedCornerShape(28.dp)

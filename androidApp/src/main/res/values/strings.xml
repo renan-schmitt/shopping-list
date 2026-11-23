@@ -10,6 +10,8 @@
     <!-- Em HTML escapado, para o negrito chegar ao Compose (AnnotatedString.fromHtml) -->
     <!-- Título da lista vazia (#121); caixa alta vem do estilo -->
     <string name="list_title">Lista de Compras</string>
+    <!-- Nome da família de apps, pequeno acima do título da lista vazia (logo, plano §4.8); caixa alta vem do estilo -->
+    <string name="app_family_name">Mente Alerta</string>
     <string name="list_empty">Toque em &lt;b>Adicionar&lt;/b> para começar sua lista.</string>
     <!-- Seção no fim da lista com os produtos riscados (#121) -->
     <string name="list_bought_section">Já peguei</string>
