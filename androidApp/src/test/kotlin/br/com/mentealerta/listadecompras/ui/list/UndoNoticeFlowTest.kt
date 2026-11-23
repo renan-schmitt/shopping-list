@@ -24,8 +24,9 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * Aviso com "Ops, voltar" (#59): anunciado pelo TalkBack, fica 15 s na tela (mais que o padrão, para
- * o público 60+), some ao tocar em "Ops, voltar" e um aviso novo tira o anterior na hora.
+ * Aviso no meio da tela com "Desfazer" e "Certo" (#59, 2026-11-23): anunciado pelo TalkBack, fica
+ * 15 s na tela (mais que o padrão, para o público 60+), some ao tocar num dos dois botões e um aviso
+ * novo tira o anterior na hora.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -73,14 +74,25 @@ class UndoNoticeFlowTest {
     }
 
     @Test
-    fun opsVoltarClosesTheNotice() {
+    fun undoClosesTheNotice() {
         show()
         button("Terminei").performClick()
 
-        button("Ops, voltar").performClick()
+        button("Desfazer").performClick()
 
         compose.onNodeWithText(finished).assertDoesNotExist()
         compose.onNodeWithText("Banana").assertExists()
+    }
+
+    @Test
+    fun certoClosesTheNoticeWithoutUndoing() {
+        show()
+        button("Terminei").performClick()
+
+        button("Certo").performClick()
+
+        compose.onNodeWithText(finished).assertDoesNotExist()
+        compose.onNodeWithText("Banana").assertDoesNotExist()
     }
 
     @Test

@@ -98,7 +98,7 @@ data class ListItem(
     }
 }
 
-/** Identificador do item, em UUID: o "Ops, voltar" devolve o item com o mesmo `id`. */
+/** Identificador do item, em UUID: o "Desfazer" devolve o item com o mesmo `id`. */
 @JvmInline
 value class ListItemId(val value: String) {
     companion object {

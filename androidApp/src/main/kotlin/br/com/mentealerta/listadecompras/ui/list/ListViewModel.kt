@@ -66,7 +66,7 @@ data class ListRowUi(
     @DrawableRes val icon: Int,
 )
 
-/** Aviso com "Ops, voltar" que a tela mostra depois de uma ação. */
+/** Aviso com "Desfazer" que a tela mostra depois de uma ação. */
 sealed interface ListNotice {
     /** "Terminei" (#57): [bought] produtos comprados, [remaining] ficaram na lista. */
     data class Finished(val bought: Int, val remaining: Int) : ListNotice
@@ -82,7 +82,7 @@ sealed interface ListNotice {
  * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. As seções
  * mostram só o que falta; os riscados descem para "Já peguei", no fim (#121, plano §1.1). Riscar e tirar
  * o risco (#51), o "Terminei" (#57), o "Jogar a lista fora" (#58) e o "Tirar da lista" do TalkBack
- * (#71) entram na pilha do "Ops, voltar"; [onUndo] desfaz a última ação.
+ * (#71) entram na pilha do "Desfazer"; [onUndo] desfaz a última ação.
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
@@ -140,12 +140,12 @@ class ListViewModel(
         }
     }
 
-    /** O aviso saiu da tela (sumiu sozinho ou a pessoa tocou em "Ops, voltar"). */
+    /** O aviso saiu da tela (sumiu sozinho ou a pessoa tocou em "Desfazer"). */
     fun onNoticeShown() {
         mutableNotice.value = null
     }
 
-    /** "Ops, voltar" do aviso (ex.: "Feijão saiu da lista."): desfaz a última ação. */
+    /** "Desfazer" do aviso (ex.: "Feijão saiu da lista."): desfaz a última ação. */
     fun onUndo() {
         viewModelScope.launch { undoLastAction() }
     }

@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,7 +53,7 @@ import br.com.mentealerta.listadecompras.ui.add.AddScreen
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
-import br.com.mentealerta.listadecompras.ui.components.UndoNotice
+import br.com.mentealerta.listadecompras.ui.components.UndoNoticeHost
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
 import br.com.mentealerta.listadecompras.ui.components.halftone
@@ -69,11 +69,11 @@ import org.koin.compose.viewmodel.koinViewModel
  * Tudo por cima da lista, sem biblioteca de navegação; continua aberto numa rotação de tela. Ao sair
  * da edição, a pessoa volta para o modo de mudar.
  *
- * Produto tirado da lista na edição mostra o aviso "Feijão saiu da lista." com **Ops, voltar**; o
+ * Produto tirado da lista na edição mostra o aviso "Feijão saiu da lista." com **Desfazer** e **Certo**; o
  * "Terminei" (#57), "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez.". "Jogar a
- * lista fora" (#58) pergunta antes, volta para a lista e mostra "A lista foi jogada fora." com
- * **Ops, voltar**.
- * Cada aviso fica 15 s na tela (#59) e um novo tira o anterior; riscar não mostra aviso (guia).
+ * lista fora" (#58) pergunta antes, volta para a lista e mostra "A lista foi jogada fora.".
+ * Os avisos aparecem no meio da tela (2026-11-23), ficam 15 s (#59) e um novo tira o anterior; abrir
+ * outra tela fecha o aviso. Riscar não mostra aviso (guia).
  * [editScreen] é a tela de edição; os testes trocam por uma com o ViewModel deles.
  */
 @Composable
@@ -85,77 +85,68 @@ fun ListScreen(
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val notice by viewModel.notice.collectAsStateWithLifecycle()
     var adding by rememberSaveable { mutableStateOf(false) }
     var changing by rememberSaveable { mutableStateOf(false) }
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var removedName by rememberSaveable { mutableStateOf<String?>(null) }
     var askingToClear by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val resources = LocalContext.current.resources
-
-    val accessibilityManager = LocalAccessibilityManager.current
-
-    LaunchedEffect(removedName) {
-        val name = removedName ?: return@LaunchedEffect
-        val undo = snackbarHostState.showUndoNotice(
-            message = resources.getString(R.string.list_item_removed, name.replaceFirstChar { it.titlecase() }),
-            actionLabel = resources.getString(R.string.undo),
-            accessibilityManager = accessibilityManager,
-        )
-        if (undo) viewModel.onUndo()
-        removedName = null
-    }
-    LaunchedEffect(notice) {
-        val current = notice ?: return@LaunchedEffect
-        val undo = snackbarHostState.showUndoNotice(
-            message = noticeMessage(resources, current),
-            actionLabel = resources.getString(R.string.undo),
-            accessibilityManager = accessibilityManager,
-        )
-        if (undo) viewModel.onUndo()
-        viewModel.onNoticeShown()
-    }
+    val notice by viewModel.notice.collectAsStateWithLifecycle()
+    ListNotices(
+        state = snackbarHostState,
+        removedName = removedName,
+        notice = notice,
+        onUndo = viewModel::onUndo,
+        onRemovedNoticeEnd = { removedName = null },
+        onNoticeEnd = viewModel::onNoticeShown,
+    )
 
     // Sem produtos, não há o que mudar: volta para a lista vazia.
     LaunchedEffect(uiState) { if (uiState == ListUiState.Empty) changing = false }
 
-    val snackbarHost = @Composable {
-        SnackbarHost(snackbarHostState) {
-            UndoNotice(it, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-        }
+    // Abrir outra tela fecha o aviso: ele não volta a aparecer quando a pessoa retorna.
+    val dismissNotice = { snackbarHostState.currentSnackbarData?.dismiss() }
+    val openEdit = { id: ListItemId ->
+        dismissNotice()
+        editingId = id.value
     }
     val editing = editingId
-    when {
-        adding -> AddScreen(onClose = { adding = false }, modifier = modifier)
-        editing != null -> Box(modifier) {
-            editScreen(ListItemId(editing)) { removed ->
+    Box(modifier) {
+        when {
+            adding -> AddScreen(onClose = { adding = false })
+            editing != null -> editScreen(ListItemId(editing)) { removed ->
                 editingId = null
                 if (removed != null) removedName = removed
             }
-        }
-        changing -> {
-            BackHandler { changing = false }
-            ChangeListContent(
+            changing -> {
+                BackHandler { changing = false }
+                ChangeListContent(
+                    uiState = uiState,
+                    onEdit = openEdit,
+                    onClear = {
+                        dismissNotice()
+                        askingToClear = true
+                    },
+                    onClose = { changing = false },
+                )
+            }
+            else -> ListContent(
                 uiState = uiState,
-                onEdit = { editingId = it.value },
-                onClear = { askingToClear = true },
-                onClose = { changing = false },
-                snackbarHost = snackbarHost,
-                modifier = modifier,
+                onToggleCheck = viewModel::onToggleCheck,
+                onEdit = openEdit,
+                onRemove = viewModel::onRemove,
+                onAdd = {
+                    dismissNotice()
+                    adding = true
+                },
+                onFinish = viewModel::onFinish,
+                onChange = {
+                    dismissNotice()
+                    changing = true
+                },
             )
         }
-        else -> ListContent(
-            uiState = uiState,
-            onToggleCheck = viewModel::onToggleCheck,
-            onEdit = { editingId = it.value },
-            onRemove = viewModel::onRemove,
-            onAdd = { adding = true },
-            onFinish = viewModel::onFinish,
-            onChange = { changing = true },
-            snackbarHost = snackbarHost,
-            modifier = modifier,
-        )
+        if (!adding && editing == null) UndoNoticeHost(snackbarHostState)
     }
 
     // Se a lista esvaziar com a pergunta aberta, ela some sozinha.
@@ -170,6 +161,45 @@ fun ListScreen(
             },
             onDismiss = { askingToClear = false },
         )
+    }
+}
+
+/**
+ * Mostra os avisos no [state]: o produto tirado na edição ([removedName]) e o [notice] do ViewModel
+ * (tirar pelo TalkBack, "Terminei", jogar a lista fora). **Desfazer** chama [onUndo]; quando cada
+ * aviso sai da tela, [onRemovedNoticeEnd] ou [onNoticeEnd].
+ */
+@Composable
+private fun ListNotices(
+    state: SnackbarHostState,
+    removedName: String?,
+    notice: ListNotice?,
+    onUndo: () -> Unit,
+    onRemovedNoticeEnd: () -> Unit,
+    onNoticeEnd: () -> Unit,
+) {
+    val resources = LocalContext.current.resources
+    val accessibilityManager = LocalAccessibilityManager.current
+    val currentOnUndo by rememberUpdatedState(onUndo)
+    val currentOnRemovedNoticeEnd by rememberUpdatedState(onRemovedNoticeEnd)
+    val currentOnNoticeEnd by rememberUpdatedState(onNoticeEnd)
+    LaunchedEffect(removedName) {
+        val name = removedName ?: return@LaunchedEffect
+        val undo = state.showUndoNotice(
+            message = resources.getString(R.string.list_item_removed, name.replaceFirstChar { it.titlecase() }),
+            accessibilityManager = accessibilityManager,
+        )
+        if (undo) currentOnUndo()
+        currentOnRemovedNoticeEnd()
+    }
+    LaunchedEffect(notice) {
+        val current = notice ?: return@LaunchedEffect
+        val undo = state.showUndoNotice(
+            message = noticeMessage(resources, current),
+            accessibilityManager = accessibilityManager,
+        )
+        if (undo) currentOnUndo()
+        currentOnNoticeEnd()
     }
 }
 
@@ -204,8 +234,7 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
  * Fundo com retícula, a folha da lista (plano §4.8) e o rodapé que se adapta (#52). [onToggleCheck]
  * recebe o produto e o estado atual dele, para riscar ou tirar o risco. [onChange] é o "Mudar a
  * lista", no fim da folha. [onEdit] e [onRemove] são as ações "Mudar" e "Tirar da lista" do TalkBack
- * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. [snackbarHost] mostra os
- * avisos com "Ops, voltar" acima do rodapé. Comprando, a tela não apaga.
+ * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. Comprando, a tela não apaga.
  */
 @Composable
 fun ListContent(
@@ -217,7 +246,6 @@ fun ListContent(
     onAdd: () -> Unit = {},
     onFinish: () -> Unit = {},
     onChange: () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
     val content = uiState as? ListUiState.Content
@@ -229,7 +257,6 @@ fun ListContent(
             .background(colors.background)
             .halftone(colors.outline, ComicTheme.tokens.halftoneSpacing),
         containerColor = Color.Transparent,
-        snackbarHost = snackbarHost,
         bottomBar = {
             if (uiState != ListUiState.Loading) {
                 ListFooter(

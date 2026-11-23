@@ -8,7 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 /**
- * Pilha do "Ops, voltar": as últimas ações, da mais recente para a mais antiga. Fica só na memória
+ * Pilha do "Desfazer": as últimas ações, da mais recente para a mais antiga. Fica só na memória
  * (some ao fechar o app) e guarda no máximo [maxSize] ações; a mais antiga sai primeiro.
  *
  * Fazer a ação e desfazer passam pelo mesmo cadeado, para a pilha nunca ficar fora de ordem.
@@ -22,7 +22,7 @@ class UndoStack(private val maxSize: Int = DEFAULT_MAX_SIZE) {
         require(maxSize > 0) { "Pilha sem espaço" }
     }
 
-    /** A ação que o "Ops, voltar" desfaz agora; `null` quando não há o que voltar. */
+    /** A ação que o "Desfazer" desfaz agora; `null` quando não há o que voltar. */
     val lastAction: StateFlow<UndoableAction?> = mutableLastAction.asStateFlow()
 
     /** Faz a ação com [block] e guarda o que ele devolver; `null` (nada mudou) não entra na pilha. */

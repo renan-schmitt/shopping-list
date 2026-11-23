@@ -20,21 +20,21 @@ interface ShoppingListRepository {
 
     /**
      * Grava a edição do item (nome, produto, seção, quantidade, detalhe e risco) sem mudar o lugar
-     * dele. Devolve o item como estava antes, para o "Ops, voltar", ou `null` se o item não está mais
+     * dele. Devolve o item como estava antes, para o "Desfazer", ou `null` se o item não está mais
      * na lista.
      */
     suspend fun update(item: ListItem): ListItem?
 
     /**
-     * Risca ou tira o risco do item. Devolve o item como estava antes, para o "Ops, voltar", ou `null`
+     * Risca ou tira o risco do item. Devolve o item como estava antes, para o "Desfazer", ou `null`
      * se nada mudou: o item não está mais na lista ou já estava assim.
      */
     suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem?
 
-    /** Tira o item da lista. O que volta serve para o "Ops, voltar" ([restore]). */
+    /** Tira o item da lista. O que volta serve para o "Desfazer" ([restore]). */
     suspend fun remove(id: ListItemId): RemovedItems
 
-    /** Joga a lista fora: tira todos os itens. O que volta serve para o "Ops, voltar" ([restore]). */
+    /** Joga a lista fora: tira todos os itens. O que volta serve para o "Desfazer" ([restore]). */
     suspend fun clear(): RemovedItems
 
     /** Devolve à lista os itens tirados, com o mesmo `id` e no mesmo lugar de antes. */
@@ -46,12 +46,12 @@ interface ShoppingListRepository {
      */
     suspend fun finishShopping(): FinishedShopping?
 
-    /** "Ops, voltar" do "Terminei": apaga a compra do histórico e devolve os itens à lista. */
+    /** "Desfazer" do "Terminei": apaga a compra do histórico e devolve os itens à lista. */
     suspend fun undoFinishShopping(finished: FinishedShopping)
 }
 
 /**
- * O que o "Terminei" fez: a compra gravada, os itens tirados da lista (para o "Ops, voltar") e quantos
+ * O que o "Terminei" fez: a compra gravada, os itens tirados da lista (para o "Desfazer") e quantos
  * ficaram na lista.
  */
 class FinishedShopping(val purchase: Purchase, val removed: RemovedItems, val remaining: Int) {

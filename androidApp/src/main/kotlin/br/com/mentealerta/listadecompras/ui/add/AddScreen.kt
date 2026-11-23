@@ -31,19 +31,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -69,11 +75,14 @@ import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.components.BackToListButton
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.HoldButton
+import br.com.mentealerta.listadecompras.ui.components.IconOnlyButton
 import br.com.mentealerta.listadecompras.ui.components.LabeledTextField
 import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
+import br.com.mentealerta.listadecompras.ui.components.UndoNoticeHost
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
+import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
 import br.com.mentealerta.listadecompras.ui.list.ItemName
 import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.list.format
@@ -111,23 +120,37 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
     }
     LaunchedEffect(Unit) { viewModel.onOpen() }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onSpeakRelease() }
-    AddContent(
-        uiState = uiState,
-        added = added,
-        canSpeak = viewModel.canSpeak,
-        onQueryChange = viewModel::onQueryChange,
-        onAdd = viewModel::onAdd,
-        onSubmit = viewModel::onSubmit,
-        onAddMore = viewModel::onAddMore,
-        onKeepAsIs = viewModel::onKeepAsIs,
-        onSpeakPress = { viewModel.onSpeakPress(context.hasMicrophone()) },
-        onSpeakRelease = viewModel::onSpeakRelease,
-        onSpeakToggle = { viewModel.onSpeakPress(context.hasMicrophone(), byToggle = true) },
-        onAcceptNotice = { viewModel.onNoticeAnswer(accepted = true, context.hasMicrophone()) },
-        onDeclineNotice = { viewModel.onNoticeAnswer(accepted = false, context.hasMicrophone()) },
-        onClose = close,
-        modifier = modifier,
-    )
+    val removed by viewModel.removal.removed.collectAsStateWithLifecycle()
+    val noticeState = remember { SnackbarHostState() }
+    val accessibilityManager = LocalAccessibilityManager.current
+    LaunchedEffect(removed) {
+        val name = removed ?: return@LaunchedEffect
+        val undo = noticeState.showUndoNotice(
+            message = context.resources.getString(R.string.list_item_removed, name.capitalized()),
+            accessibilityManager = accessibilityManager,
+        )
+        viewModel.removal.onNoticeClosed(undo)
+    }
+    Box(modifier) {
+        AddContent(
+            uiState = uiState,
+            added = added,
+            canSpeak = viewModel.canSpeak,
+            onQueryChange = viewModel::onQueryChange,
+            onAdd = viewModel::onAdd,
+            onSubmit = viewModel::onSubmit,
+            onAddMore = viewModel::onAddMore,
+            onKeepAsIs = viewModel::onKeepAsIs,
+            onSpeakPress = { viewModel.onSpeakPress(context.hasMicrophone()) },
+            onSpeakRelease = viewModel::onSpeakRelease,
+            onSpeakToggle = { viewModel.onSpeakPress(context.hasMicrophone(), byToggle = true) },
+            onAcceptNotice = { viewModel.onNoticeAnswer(accepted = true, context.hasMicrophone()) },
+            onDeclineNotice = { viewModel.onNoticeAnswer(accepted = false, context.hasMicrophone()) },
+            onRemoveItem = viewModel.removal::remove,
+            onClose = close,
+        )
+        UndoNoticeHost(noticeState, Modifier.imePadding())
+    }
 }
 
 private fun Context.hasMicrophone(): Boolean =
@@ -158,6 +181,7 @@ fun AddContent(
     onSpeakToggle: () -> Unit = {},
     onAcceptNotice: () -> Unit = {},
     onDeclineNotice: () -> Unit = {},
+    onRemoveItem: (ListRowUi) -> Unit = {},
     onClose: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
@@ -210,7 +234,7 @@ fun AddContent(
                         item(key = "voice-message", contentType = "voice-message") { VoiceMessage(voice) }
                     }
                     item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
-                    addedList(added)
+                    addedList(added, onRemoveItem)
                 }
             }
             item(key = "bottom", contentType = "bottom") { Box(Modifier.navigationBarsPadding()) }
@@ -283,40 +307,52 @@ private fun AddTopBar(
 }
 
 /**
- * "Adicionados" (#122): o que entrou desde que a tela abriu, o mais recente no topo, sem seções. Só
- * para ver: mudar fica na lista.
+ * "Adicionados" (#122): o que entrou desde que a tela abriu, o mais recente no topo, sem seções. A
+ * lixeira de cada linha tira o produto da lista, com o aviso e **Desfazer** (2026-11-23); mudar o
+ * produto fica na lista.
  */
-private fun LazyListScope.addedList(added: List<ListRowUi>) {
+private fun LazyListScope.addedList(added: List<ListRowUi>, onRemove: (ListRowUi) -> Unit) {
     if (added.isEmpty()) return
     item(key = "added-title", contentType = "title") {
         OptionsTitle(stringResource(R.string.add_added_title), color = MaterialTheme.colorScheme.onSurface)
     }
-    items(added, key = { "added-${it.id.value}" }, contentType = { "added-row" }) { AddedRow(it) }
+    items(added, key = { "added-${it.id.value}" }, contentType = { "added-row" }) {
+        AddedRow(it, onRemove = { onRemove(it) })
+    }
 }
 
 /** Os produtos achados e, depois, a opção de pôr o texto como está, no verde do topo. */
 private fun LazyListScope.options(uiState: AddUiState, onAdd: (AddOptionUi) -> Unit) {
+    val unknown = uiState.unknown
     if (uiState.found.isNotEmpty()) {
         item(key = "found-title", contentType = "title") {
             OptionsTitle(stringResource(R.string.add_found), color = MaterialTheme.colorScheme.onPrimary)
         }
+        // Só batidas aproximadas ("nescau" → Nescafé): o texto como está vem primeiro (2026-11-23).
+        if (unknown != null && uiState.unknownFirst) unknownOption(unknown, onAdd)
         items(uiState.found, contentType = { "option" }) {
             OptionButton(option = it, unknown = false, onClick = { onAdd(it) })
         }
     }
-    uiState.unknown?.let { unknown ->
+    if (unknown != null && (uiState.found.isEmpty() || !uiState.unknownFirst)) {
         if (uiState.found.isEmpty()) {
             item(key = "nothing-found", contentType = "nothing-found") { NothingFound() }
         }
-        item(key = "unknown", contentType = "option") {
-            OptionButton(option = unknown, unknown = true, onClick = { onAdd(unknown) })
-        }
+        unknownOption(unknown, onAdd)
+    }
+}
+
+private fun LazyListScope.unknownOption(unknown: AddOptionUi, onAdd: (AddOptionUi) -> Unit) {
+    item(key = "unknown", contentType = "option") {
+        OptionButton(option = unknown, unknown = true, onClick = { onAdd(unknown) })
     }
 }
 
 /**
  * Campo "Digite ou fale o que quer comprar.", que abre com o teclado; o rótulo é frase, em caixa
- * normal. Tecla "pronto" põe a primeira opção na lista.
+ * normal. Tecla "pronto" põe a primeira opção na lista. O texto fica num [TextFieldState]: o que a
+ * pessoa digita vai para o [onQueryChange], e quando o [query] muda pelo app (limpo depois de pôr na
+ * lista), o campo acompanha sem perder o teclado.
  */
 @Composable
 private fun SearchField(
@@ -325,11 +361,19 @@ private fun SearchField(
     onSubmit: () -> Unit,
     focusRequester: FocusRequester,
 ) {
+    val state = rememberTextFieldState(query)
+    val currentQuery by rememberUpdatedState(query)
+    val currentOnQueryChange by rememberUpdatedState(onQueryChange)
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    LaunchedEffect(query) {
+        if (state.text.toString() != query) state.setTextAndPlaceCursorAtEnd(query)
+    }
+    LaunchedEffect(state) {
+        snapshotFlow { state.text.toString() }.collect { if (it != currentQuery) currentOnQueryChange(it) }
+    }
     LabeledTextField(
         label = stringResource(R.string.add_search_label),
-        value = query,
-        onValueChange = onQueryChange,
+        state = state,
         labelColor = MaterialTheme.colorScheme.onPrimary,
         uppercaseLabel = false,
         onImeAction = onSubmit,
@@ -585,11 +629,12 @@ private fun QuantityBadge(text: String) {
 }
 
 /**
- * Linha de "Adicionados": nome (com detalhe e quantidade) → ícone, com uma linha discreta embaixo.
- * Para o TalkBack é um texto só, em caixa normal.
+ * Linha de "Adicionados": nome (com detalhe e quantidade) → ícone → lixeira, com uma linha discreta
+ * embaixo. Para o TalkBack, o nome é um texto só, em caixa normal, e a lixeira é o botão "Tirar leite
+ * da lista".
  */
 @Composable
-private fun AddedRow(row: ListRowUi) {
+private fun AddedRow(row: ListRowUi, onRemove: () -> Unit) {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
     val name = row.detail?.let { stringResource(R.string.list_item_name_with_detail, row.name, it) } ?: row.name
     val quantity = row.quantity?.format(LocalContext.current.resources)
@@ -602,13 +647,12 @@ private fun AddedRow(row: ListRowUi) {
                 val y = size.height - AddedDividerWidth.toPx() / 2
                 drawLine(dividerColor, Offset(0f, y), Offset(size.width, y), AddedDividerWidth.toPx())
             }
-            .clearAndSetSemantics { text = AnnotatedString(label) }
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         FlowRow(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).clearAndSetSemantics { text = AnnotatedString(label) },
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
             itemVerticalAlignment = Alignment.CenterVertically,
@@ -616,7 +660,17 @@ private fun AddedRow(row: ListRowUi) {
             ItemName(text = name, checked = row.checked)
             if (quantity != null) ListQuantityBadge(text = quantity.visible, checked = row.checked)
         }
-        Image(painter = painterResource(row.icon), contentDescription = null, modifier = Modifier.size(OptionIconSize))
+        Image(
+            painter = painterResource(row.icon),
+            contentDescription = null,
+            modifier = Modifier.size(OptionIconSize).clearAndSetSemantics {},
+        )
+        IconOnlyButton(
+            icon = painterResource(R.drawable.ic_trash),
+            label = stringResource(R.string.add_added_remove, row.name),
+            onClick = onRemove,
+            modifier = Modifier.padding(bottom = ComicTheme.tokens.smallShadow),
+        )
     }
 }
 

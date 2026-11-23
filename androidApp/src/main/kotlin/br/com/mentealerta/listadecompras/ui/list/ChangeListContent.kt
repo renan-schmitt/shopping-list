@@ -50,8 +50,7 @@ private val ProductIconSize = 48.dp
  * Topo verde com "Voltar para a lista"; embaixo, "Toque no produto que quer mudar.", os produtos por
  * seção (com "Já peguei" no fim), cada um numa caixa com lápis, e por último **Jogar a lista fora**
  * (#58). Tocar num produto abre a edição ([onEdit]); aqui tocar nunca risca, para não haver dois
- * comportamentos no mesmo toque. [snackbarHost] mostra o aviso "Feijão saiu da lista." ao voltar da
- * edição.
+ * comportamentos no mesmo toque.
  */
 @Composable
 fun ChangeListContent(
@@ -60,13 +59,11 @@ fun ChangeListContent(
     onEdit: (ListItemId) -> Unit = {},
     onClear: () -> Unit = {},
     onClose: () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
     Scaffold(
         modifier = modifier,
         containerColor = colors.surface,
-        snackbarHost = snackbarHost,
         topBar = {
             Box(
                 modifier = Modifier

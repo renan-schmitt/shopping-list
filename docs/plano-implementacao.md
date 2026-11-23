@@ -5,7 +5,7 @@
 ## Princípios
 
 - **Zero fricção:** sem login, sem cadastro, sem configuração. O app abre direto numa folha de lista vazia.
-- **Linguagem do dia a dia:** "Jogar a lista fora", "Terminei", "Ops, voltar" — nunca "apagar", "finalizar", "desfazer".
+- **Linguagem do dia a dia:** "Jogar a lista fora", "Terminei", "Desfazer" — nunca "apagar", "finalizar". ("Ops, voltar" virou "Desfazer" em 2026-11-23.)
 - **Acessibilidade não é premium:** tudo que torna o app usável fica grátis.
 - **Dados no celular:** sem backend na primeira fase. Privacidade como argumento de venda.
 - **Android primeiro**, com tecnologia que permita levar para o iPhone sem reescrever.
@@ -113,7 +113,7 @@ Decisões que ainda precisam ser tomadas, mas não exigem pesquisa aprofundada.
 | 10 | ~~Banco de ícones~~ | **Decidido:** Fluent Emoji Color + complemento próprio (ver seção 4.4) |
 | 11 | ~~Coleta de métricas de uso~~ | **Decidido:** Crashlytics + eventos anônimos; conteúdo da lista nunca sai do celular (ver seção 4.5) |
 | 12 | ~~Rodapé "Adicionar" + "Terminei"~~ | **Decidido (2026-11-21, #52):** sempre empilhados, em largura total, de 100% a 200% de fonte. Comprando: "Adicionar" menor (64dp) em cima e "Terminei" grande (88dp) embaixo, perto do polegar, com "Falta 1" / "Faltam N" / "Não falta nada". Antes de riscar: só o "Adicionar" grande |
-| 13 | ~~Aviso com "Ops, voltar"~~ | **Decidido (2026-11-22, #59):** aviso no pé da tela depois de tirar um produto, do "Terminei" e de jogar a lista fora; fica **15 s** (50% a mais que o padrão longo do Android), ou mais se o TalkBack pedir; um aviso novo tira o anterior na hora. Riscar não mostra aviso (guia de linguagem): tocar de novo tira o risco, e o "Ops, voltar" também desfaz |
+| 13 | ~~Aviso com "Ops, voltar"~~ | **Decidido (2026-11-22, #59):** aviso no pé da tela depois de tirar um produto, do "Terminei" e de jogar a lista fora; fica **15 s** (50% a mais que o padrão longo do Android), ou mais se o TalkBack pedir; um aviso novo tira o anterior na hora. Riscar não mostra aviso (guia de linguagem): tocar de novo tira o risco, e o "Ops, voltar" também desfaz | **Revisto (2026-11-23, teste do app):** o aviso fica **no meio da tela**, sem escurecer a lista, com **Desfazer** (no lugar de "Ops, voltar") e **Certo** (só fecha), um embaixo do outro. Abrir outra tela fecha o aviso. A lista **Adicionados** ganhou uma lixeira em cada produto (única exceção ao "ícone sempre com o nome"), com o mesmo aviso. Na busca, quando só há batidas aproximadas ("nescau" → Nescafé), **Pôr “nescau” na lista** vem primeiro e é o que entra pelo "pronto" do teclado
 
 ---
 

@@ -30,7 +30,7 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * "Jogar a lista fora" (#58): a única ação que pergunta antes. "Não" deixa a lista como está; "Sim,
- * jogar fora" tira todos os produtos, riscados ou não, e o "Ops, voltar" devolve tudo no mesmo lugar.
+ * jogar fora" tira todos os produtos, riscados ou não, e o "Desfazer" devolve tudo no mesmo lugar.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -126,7 +126,7 @@ class ListClearFlowTest {
         tapClear()
         button("Sim, jogar fora").performClick()
 
-        button("Ops, voltar").performClick()
+        button("Desfazer").performClick()
 
         assertEquals(listOf(banana, kale, beans), fixture.items)
         compose.onNodeWithText("Couve").assertExists()

@@ -75,7 +75,11 @@ fun EditScreen(
     val currentOnClose by rememberUpdatedState(onClose)
     LaunchedEffect(id) { viewModel.open(id) }
     LaunchedEffect(uiState) {
-        (uiState as? EditUiState.Closed)?.let { currentOnClose(it.removedName) }
+        (uiState as? EditUiState.Closed)?.let {
+            // Consome o fechamento: o próximo produto aberto não pode herdar o aviso deste.
+            viewModel.onClosedHandled()
+            currentOnClose(it.removedName)
+        }
     }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onSave() }
     val close = {

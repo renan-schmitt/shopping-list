@@ -1,15 +1,15 @@
 # Guia de Linguagem
 
-> Referência obrigatória para todo texto do app. Versão inicial — validar nos testes com pessoas 60+ da fase 0 (principalmente "Seção" e "Ops, voltar").
+> Referência obrigatória para todo texto do app. Versão inicial — validar nos testes com pessoas 60+ da fase 0 (principalmente "Seção" e "Desfazer").
 
 ## Princípios
 
 1. **Tratar por "você"**, com frases curtas (até ~10 palavras) e na ordem direta.
 2. **Respeitar sem infantilizar.** Nada de "vovó", excesso de diminutivos, exclamações demais ou emoji em mensagens importantes.
-3. **Botões dizem a ação concreta.** Nunca "OK" ou "Confirmar": usar "Sim, jogar fora" e "Não, deixar como está".
+3. **Botões dizem a ação concreta.** Nunca "OK" ou "Confirmar": usar "Sim, jogar fora" e "Não, deixar como está". Para só fechar um aviso, **Certo** (2026-11-23).
 4. **Nunca culpar a pessoa.** "Não entendi, pode falar de novo?", nunca "Erro no reconhecimento de voz".
-5. **Ícone sempre acompanhado de texto.** Nenhum botão só com ícone.
-6. **Voltar atrás em vez de pedir confirmação.** Confirmação só para "Jogar a lista fora"; nas outras ações, "Ops, voltar".
+5. **Ícone sempre acompanhado de texto.** Nenhum botão só com ícone. Única exceção: a lixeira de cada produto em **Adicionados**, que se repete em cada linha; o TalkBack lê "Tirar leite da lista" (2026-11-23).
+6. **Voltar atrás em vez de pedir confirmação.** Confirmação só para "Jogar a lista fora"; nas outras ações, aviso no meio da tela com **Desfazer** e **Certo** (2026-11-23, no lugar de "Ops, voltar", pedido no teste do app).
 7. **Datas relativas e por extenso:** "ontem", "há 12 dias", "semana passada".
 8. **Sem siglas e sem palavras em inglês.**
 9. **Caixa alta liberada em textos curtos** (logo, títulos, botões, rótulos, avisos de poucas palavras e nomes da lista) — faz parte do estilo quadrinhos. Frase com mais de uma linha, sempre em caixa normal. O texto é escrito em caixa normal e as maiúsculas vêm do estilo, para o TalkBack não soletrar palavras como se fossem siglas.
@@ -22,7 +22,8 @@
 | Apagar / excluir item | **Tirar da lista** |
 | Apagar / limpar lista | **Jogar a lista fora** |
 | Finalizar compra | **Terminei** |
-| Desfazer | **Ops, voltar** |
+| Ops, voltar *(até 2026-11-23)* | **Desfazer** |
+| OK (fechar aviso) | **Certo** |
 | Salvar | *(não existe; tudo é salvo sozinho)* |
 | Item | **Produto** |
 | Categoria | **Seção** (como no mercado: "seção de limpeza") |
@@ -53,10 +54,10 @@
 | Produtos riscados | Seção **Já peguei**, no fim da lista (2026-11-22) |
 | Mudar produtos da lista | Botão **Mudar a lista** (não "Corrigir": a pessoa não errou); **Jogar a lista fora** fica lá dentro (2026-11-22) |
 | Produto riscado | *(só o risco e a vibração, sem mensagem)* |
-| Produto tirado da lista | "Feijão saiu da lista." · **Ops, voltar** |
+| Produto tirado da lista (edição ou lixeira de **Adicionados**) | "Feijão saiu da lista." · **Desfazer** · **Certo** (no meio da tela; 2026-11-23) |
 | Jogar a lista fora | "Jogar a lista fora? Os 12 produtos serão tirados." · **Sim, jogar fora** · **Não** |
-| Lista jogada fora | "A lista foi jogada fora." · **Ops, voltar** |
-| Terminei | "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." |
+| Lista jogada fora | "A lista foi jogada fora." · **Desfazer** · **Certo** |
+| Terminei | "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." · **Desfazer** · **Certo** |
 | Botão de voz (segurar para falar) | "Segure para falar." acima de **Falar**; com o microfone aberto, o botão vira **Terminei** (2026-11-22, #123) |
 | Toque rápido no **Falar**, sem segurar | "Segure o botão enquanto fala." |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |

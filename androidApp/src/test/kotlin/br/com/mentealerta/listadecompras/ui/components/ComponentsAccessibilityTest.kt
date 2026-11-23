@@ -47,6 +47,7 @@ class ComponentsAccessibilityTest {
     private var primaryClicks = 0
     private var secondaryClicks = 0
     private var undoClicks = 0
+    private var dismissClicks = 0
 
     @Before
     fun setUp() {
@@ -62,8 +63,8 @@ class ComponentsAccessibilityTest {
                     )
                     UndoNotice(
                         message = "Feijão saiu da lista.",
-                        actionLabel = "Ops, voltar",
-                        onAction = { undoClicks++ },
+                        onUndo = { undoClicks++ },
+                        onDismiss = { dismissClicks++ },
                     )
                 }
             }
@@ -82,16 +83,18 @@ class ComponentsAccessibilityTest {
 
     @Test
     fun secondaryButtonsHave64dpTouchTarget() {
-        listOf("Adicionar", "Ops, voltar").forEach { text ->
+        listOf("Adicionar", "Desfazer", "Certo").forEach { text ->
             compose.onNodeWithText(text)
                 .assertHeightIsAtLeast(64.dp)
                 .assertWidthIsAtLeast(64.dp)
                 .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
         }
         compose.onNodeWithText("Adicionar").performClick()
-        compose.onNodeWithText("Ops, voltar").performClick()
+        compose.onNodeWithText("Desfazer").performClick()
+        compose.onNodeWithText("Certo").performClick()
         assertEquals(1, secondaryClicks)
         assertEquals(1, undoClicks)
+        assertEquals(1, dismissClicks)
     }
 
     @Test

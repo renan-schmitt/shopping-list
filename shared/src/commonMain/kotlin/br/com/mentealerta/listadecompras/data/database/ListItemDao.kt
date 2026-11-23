@@ -27,7 +27,7 @@ internal interface ListItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(item: ListItemEntity)
 
-    /** Adiciona ou atualiza vários itens de uma vez (ex.: "Ops, voltar" de "Jogar a lista fora"). */
+    /** Adiciona ou atualiza vários itens de uma vez (ex.: "Desfazer" de "Jogar a lista fora"). */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(items: List<ListItemEntity>)
 

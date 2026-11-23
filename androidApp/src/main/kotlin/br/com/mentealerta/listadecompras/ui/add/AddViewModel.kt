@@ -12,7 +12,9 @@ import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
+import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
+import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
 import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
 import br.com.mentealerta.listadecompras.ui.list.ListRowUi
@@ -21,6 +23,7 @@ import br.com.mentealerta.listadecompras.voice.VoiceEvent
 import br.com.mentealerta.listadecompras.voice.VoicePreferences
 import br.com.mentealerta.listadecompras.voice.VoiceRecognizer
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +46,8 @@ data class AddUiState(
     val found: List<AddOptionUi> = emptyList(),
     /** O texto como está, para o produto que o app não conhece (#49). */
     val unknown: AddOptionUi? = null,
+    /** O [unknown] aparece antes do [found]: só houve batidas aproximadas (2026-11-23). */
+    val unknownFirst: Boolean = false,
     /** Último produto que entrou na lista, para o aviso "Adicionado: Leite.". */
     val lastAdded: AddedUi? = null,
     /** Produto que já estava na lista, para a pergunta "Leite já está na lista. Quer mais um?" (#54). */
@@ -117,7 +122,7 @@ data class AddOptionUi(
  * continua aberta para o próximo produto.
  *
  * Se o produto já está na lista ([FindSameItemUseCase]), pergunta antes (#54): "Sim, mais um" soma
- * na quantidade do item que já está, pelo [EditItemUseCase] (o "Ops, voltar" desfaz); "Não" deixa
+ * na quantidade do item que já está, pelo [EditItemUseCase] (o "Desfazer" desfaz); "Não" deixa
  * como está. Voltar a digitar também conta como "Não".
  *
  * Falar (#60, #123): segurar o botão abre o microfone e soltar fecha. Quem usa o TalkBack toca para
@@ -139,6 +144,8 @@ class AddViewModel(
     private val addItems: AddItemsUseCase,
     private val findSameItem: FindSameItemUseCase,
     private val editItem: EditItemUseCase,
+    removeItem: RemoveItemUseCase,
+    undoLastAction: UndoLastActionUseCase,
     private val parseSpeech: ParseSpeechUseCase,
     private val voiceRecognizer: VoiceRecognizer,
     private val voicePreferences: VoicePreferences,
@@ -157,6 +164,9 @@ class AddViewModel(
         ids.mapNotNull { items[it]?.toRow(catalogIndex) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), emptyList())
 
+    /** Lixeira de "Adicionados" e o aviso dela (2026-11-23). */
+    val removal = AddedRemoval(viewModelScope, removeItem, undoLastAction)
+
     /** Sem serviço de voz no celular, o botão "Falar" não aparece. */
     val canSpeak: Boolean = voiceRecognizer.isAvailable
 
@@ -172,6 +182,8 @@ class AddViewModel(
 
     /** O campo mudou: o texto entra na hora (o campo não pode esperar a busca) e a busca vem depois. */
     fun onQueryChange(text: String) {
+        // Voltar a digitar fecha o aviso do produto tirado.
+        removal.dismiss()
         _uiState.update {
             // Escrever tira o recado da voz; a escuta continua
             val voice = it.voice.takeIf { voice -> voice is VoiceUi.Listening }
@@ -184,7 +196,11 @@ class AddViewModel(
                 if (state.query != text) {
                     state
                 } else {
-                    state.copy(found = options.found.map { it.toOption() }, unknown = options.unknown?.toOption())
+                    state.copy(
+                        found = options.found.map { it.toOption() },
+                        unknown = options.unknown?.toOption(),
+                        unknownFirst = options.unknownFirst,
+                    )
                 }
             }
         }
@@ -247,7 +263,8 @@ class AddViewModel(
     fun onSubmit() {
         val state = _uiState.value
         if (state.query.isBlank() || state.repeated != null) return
-        (state.found.firstOrNull() ?: state.unknown)?.let(::onAdd)
+        val first = if (state.unknownFirst) state.unknown else state.found.firstOrNull() ?: state.unknown
+        first?.let(::onAdd)
     }
 
     /**
@@ -309,6 +326,7 @@ class AddViewModel(
 
     /** Saindo da tela: na próxima vez ela abre com o campo vazio. */
     fun onClose() {
+        removal.dismiss()
         searchJob?.cancel()
         voiceJob?.cancel()
         _uiState.value = AddUiState()
@@ -437,5 +455,36 @@ class AddViewModel(
             quantity = quantity,
             icon = checkNotNull(icon.drawableRes()) { "Ícone $icon sem recurso convertido" },
         )
+    }
+}
+
+/**
+ * Lixeira de "Adicionados" (2026-11-23): [remove] tira o produto da lista e guarda o nome em
+ * [removed], para o aviso "Leite saiu da lista." com **Desfazer** e **Certo**. O produto continua
+ * lembrado em "Adicionados", para voltar ao mesmo lugar com o **Desfazer**.
+ */
+class AddedRemoval(
+    private val scope: CoroutineScope,
+    private val removeItem: RemoveItemUseCase,
+    private val undoLastAction: UndoLastActionUseCase,
+) {
+    private val mutableRemoved = MutableStateFlow<String?>(null)
+    val removed: StateFlow<String?> = mutableRemoved.asStateFlow()
+
+    fun remove(row: ListRowUi) {
+        scope.launch {
+            if (removeItem(row.id)) mutableRemoved.value = row.name
+        }
+    }
+
+    /** O aviso saiu da tela; com [undo] (**Desfazer**), o produto volta. */
+    fun onNoticeClosed(undo: Boolean) {
+        mutableRemoved.value = null
+        if (undo) scope.launch { undoLastAction() }
+    }
+
+    /** Fecha o aviso sem desfazer (a pessoa voltou a digitar ou saiu da tela). */
+    fun dismiss() {
+        mutableRemoved.value = null
     }
 }

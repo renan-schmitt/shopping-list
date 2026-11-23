@@ -10,7 +10,7 @@ import kotlin.time.Instant
  * Item da lista de compras ([br.com.mentealerta.listadecompras.domain.ListItem]).
  *
  * A quantidade fica em duas colunas, as duas nulas quando a pessoa não informou. [addedAt] dá a
- * ordem dentro da seção: o item que volta com o "Ops, voltar" mantém a data e volta para o lugar.
+ * ordem dentro da seção: o item que volta com o "Desfazer" mantém a data e volta para o lugar.
  */
 @Entity(tableName = "list_item")
 internal data class ListItemEntity(

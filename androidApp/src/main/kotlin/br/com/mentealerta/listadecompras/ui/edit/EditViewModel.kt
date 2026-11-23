@@ -46,11 +46,11 @@ sealed interface EditUiState {
 /**
  * Edição do produto (#55, plano §1.1): nome, quantidade com − / + e detalhe. Não existe "Salvar":
  * o rascunho é gravado ao sair da tela ([onClose]) e quando o app vai para segundo plano ([onSave]),
- * pelo [EditItemUseCase] — cada gravação que muda algo vira uma entrada do "Ops, voltar". Nome em
+ * pelo [EditItemUseCase] — cada gravação que muda algo vira uma entrada do "Desfazer". Nome em
  * branco mantém o nome anterior.
  *
  * "Tirar da lista" ([onRemove]) tira o produto pelo [RemoveItemUseCase] e fecha a edição; a lista
- * mostra o aviso com o "Ops, voltar".
+ * mostra o aviso com o "Desfazer".
  *
  * Um só ViewModel para a tela, como o de adicionar: [open] carrega o produto e, numa rotação de tela,
  * mantém o rascunho. Gravar e tirar passam por um cadeado, para não se cruzarem.
@@ -124,6 +124,14 @@ class EditViewModel(
                 _uiState.value = EditUiState.Closed(removedName = name.takeIf { removed })
             }
         }
+    }
+
+    /**
+     * A tela já tratou o [EditUiState.Closed]. Sem isso, o ViewModel (um só para a tela) continuava
+     * fechado e a edição do próximo produto fechava na hora, repetindo o aviso "Feijão saiu da lista.".
+     */
+    fun onClosedHandled() {
+        if (_uiState.value is EditUiState.Closed) _uiState.value = EditUiState.Loading
     }
 
     private fun close() {

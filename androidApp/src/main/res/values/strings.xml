@@ -3,8 +3,10 @@
     <string name="app_name">Lista de Compras</string>
     <!-- Botão no topo das telas que abrem por cima da lista (adicionar, editar) -->
     <string name="back_to_list">Voltar para a lista</string>
-    <!-- Botão do aviso que desfaz a última ação (guia de linguagem) -->
-    <string name="undo">Ops, voltar</string>
+    <!-- Botão do aviso no meio da tela que desfaz a última ação (guia de linguagem, 2026-11-23) -->
+    <string name="undo">Desfazer</string>
+    <!-- Botão do aviso no meio da tela que só fecha o aviso (guia de linguagem, 2026-11-23; nunca "OK") -->
+    <string name="notice_dismiss">Certo</string>
 
     <!-- Tela da lista (#50) -->
     <!-- Em HTML escapado, para o negrito chegar ao Compose (AnnotatedString.fromHtml) -->
@@ -32,7 +34,7 @@
     </plurals>
     <!-- Abaixo do "Terminei", com todos os produtos riscados -->
     <string name="list_nothing_remaining">Não falta nada</string>
-    <!-- Aviso depois do "Terminei" (#57), com o botão "Ops, voltar": "Pronto! 8 produtos comprados." -->
+    <!-- Aviso depois do "Terminei" (#57), com o botão "Desfazer": "Pronto! 8 produtos comprados." -->
     <plurals name="list_finished_bought">
         <item quantity="one">Pronto! %d produto comprado.</item>
         <item quantity="many">Pronto! %d produtos comprados.</item>
@@ -52,7 +54,7 @@
     <string name="list_change_hint">Toque no produto que quer mudar.</string>
     <!-- Ação do TalkBack num produto: abre a edição (modo "Mudar a lista" e linha da lista, #71) -->
     <string name="list_item_change">Mudar</string>
-    <!-- Ação do TalkBack na linha da lista: tira o produto, com o aviso e "Ops, voltar" (#71) -->
+    <!-- Ação do TalkBack na linha da lista: tira o produto, com o aviso e "Desfazer" (#71) -->
     <string name="list_item_remove">Tirar da lista</string>
     <!-- No fim do modo "Mudar a lista" (#58, #121): a única ação que pede confirmação (guia de linguagem) -->
     <string name="list_clear">Jogar a lista fora</string>
@@ -66,9 +68,9 @@
     </plurals>
     <string name="list_clear_yes">Sim, jogar fora</string>
     <string name="list_clear_no">Não</string>
-    <!-- Aviso depois de jogar a lista fora, com o botão "Ops, voltar" -->
+    <!-- Aviso depois de jogar a lista fora, com o botão "Desfazer" -->
     <string name="list_cleared">A lista foi jogada fora.</string>
-    <!-- Aviso depois de tirar o produto da lista, com o botão "Ops, voltar" -->
+    <!-- Aviso depois de tirar o produto da lista, com o botão "Desfazer" -->
     <string name="list_item_removed">%1$s saiu da lista.</string>
     <!-- Produto com detalhe: "Leite" + "desnatado" -->
     <string name="list_item_name_with_detail">%1$s %2$s</string>
@@ -82,6 +84,8 @@
     <string name="add_found">Adicionar na lista de compras</string>
     <!-- Título da lista do que entrou desde que a tela abriu (#122) -->
     <string name="add_added_title">Adicionados</string>
+    <!-- TalkBack na lixeira de cada produto de "Adicionados" (2026-11-23): "Tirar leite da lista" -->
+    <string name="add_added_remove">Tirar %1$s da lista</string>
     <!-- Sem nenhum produto achado, acima da opção de pôr o texto como está -->
     <string name="add_nothing_found">Não achei esse produto. Pode pôr assim mesmo:</string>
     <!-- Opção do produto que o app não conhece, com o texto digitado -->

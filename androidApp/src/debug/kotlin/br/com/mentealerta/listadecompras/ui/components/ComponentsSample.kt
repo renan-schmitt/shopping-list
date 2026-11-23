@@ -90,7 +90,7 @@ private fun StandaloneButtonsSample() {
 
 @Composable
 private fun NoticeSample() {
-    UndoNotice(message = "Feijão saiu da lista.", actionLabel = "Ops, voltar", onAction = {})
+    UndoNotice(message = "Feijão saiu da lista.", onUndo = {}, onDismiss = {})
 }
 
 @Composable

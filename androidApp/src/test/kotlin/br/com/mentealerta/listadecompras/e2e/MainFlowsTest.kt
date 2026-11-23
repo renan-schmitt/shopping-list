@@ -126,7 +126,7 @@ class MainFlowsTest {
         waitForGone("Banana")
         compose.onNodeWithText("Feijão").assertExists()
 
-        button("Ops, voltar").performClick()
+        button("Desfazer").performClick()
         waitFor("Banana")
         button("Terminei").assertExists()
     }
@@ -147,7 +147,7 @@ class MainFlowsTest {
         waitForGone("Banana")
         compose.onNodeWithText("Toque em Adicionar para começar sua lista.").assertExists()
 
-        button("Ops, voltar").performClick()
+        button("Desfazer").performClick()
         waitFor("Banana")
         compose.onNodeWithText("Feijão").assertExists()
     }

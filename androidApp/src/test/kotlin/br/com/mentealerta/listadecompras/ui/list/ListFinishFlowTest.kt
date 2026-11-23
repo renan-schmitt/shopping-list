@@ -28,7 +28,7 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * "Terminei" (#57): grava a compra com os riscados, tira esses da lista, mostra quantos foram comprados
- * e quantos ficaram; o "Ops, voltar" apaga a compra e devolve os riscados.
+ * e quantos ficaram; o "Desfazer" apaga a compra e devolve os riscados.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -92,7 +92,7 @@ class ListFinishFlowTest {
         show(banana, kale, beans)
         button("Terminei").performClick()
 
-        button("Ops, voltar").performClick()
+        button("Desfazer").performClick()
 
         assertEquals(listOf(banana, kale, beans), fixture.items)
         assertTrue(fixture.purchases.isEmpty())

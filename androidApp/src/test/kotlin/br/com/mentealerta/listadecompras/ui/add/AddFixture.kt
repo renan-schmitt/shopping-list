@@ -15,9 +15,11 @@ import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
+import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
+import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import br.com.mentealerta.listadecompras.voice.VoiceEvent
@@ -30,10 +32,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlin.time.Instant
 
 /**
  * Catálogo pequeno e repositório falso para os testes da tela de adicionar: guarda o que entrou na
- * lista em [added] e a lista como está em [items], observada como no banco. O "Ops, voltar" fica
+ * lista em [added] e a lista como está em [items], observada como no banco. O "Desfazer" fica
  * na [undoStack]. A voz é o [voice], que entrega o que o teste mandar.
  */
 class AddFixture {
@@ -98,11 +101,19 @@ class AddFixture {
         override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? =
             items.find { it.id == id }?.let { update(it.copy(checked = checked)) }
 
-        override suspend fun remove(id: ListItemId) = RemovedItems.NONE
+        override suspend fun remove(id: ListItemId): RemovedItems {
+            val index = items.indexOfFirst { it.id == id }.takeIf { it >= 0 } ?: return RemovedItems.NONE
+            val item = items.removeAt(index)
+            version.value++
+            return RemovedItems.of(listOf(item to Instant.fromEpochMilliseconds(index.toLong())))
+        }
 
         override suspend fun clear() = RemovedItems.NONE
 
-        override suspend fun restore(removed: RemovedItems) = Unit
+        override suspend fun restore(removed: RemovedItems) {
+            removed.items.forEach { items += it }
+            version.value++
+        }
 
         override suspend fun finishShopping(): FinishedShopping? = null
 
@@ -115,6 +126,8 @@ class AddFixture {
         AddItemsUseCase(repository),
         FindSameItemUseCase(repository),
         EditItemUseCase(repository, undoStack),
+        RemoveItemUseCase(repository, undoStack),
+        UndoLastActionUseCase(repository, undoStack),
         ParseSpeechUseCase(ItemTextParser(index)),
         voice,
         voicePreferences,

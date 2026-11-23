@@ -27,7 +27,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -86,7 +88,7 @@ fun PrimaryButton(
 
 /**
  * Botão secundário: papel com contorno e letra verde em Lexend Deca. Ex.:
- * "Adicionar" ao lado do "Terminei", ou "Ops, voltar" no aviso.
+ * "Adicionar" ao lado do "Terminei", ou "Desfazer" no aviso.
  *
  * Altura mínima de 64dp (área de toque, plano §1.7); [minHeight] permite
  * igualar ao botão principal quando os dois ficam lado a lado. Desativado
@@ -125,6 +127,34 @@ fun SecondaryButton(
             style = if (prominent) typography.headlineMedium else typography.labelLarge,
             color = colors.primary,
         )
+    }
+}
+
+/** Marca do [IconOnlyButton], para os checks de acessibilidade aceitarem a exceção decidida. */
+internal const val ICON_ONLY_BUTTON_TAG = "icon-only-button"
+
+/**
+ * Botão só com o ícone, no papel, com 64dp nos dois sentidos. Exceção à regra do ícone com nome,
+ * decidida em 2026-11-23 só para a lixeira de "Adicionados", que se repete em cada linha. O TalkBack
+ * lê o [label] ("Tirar leite da lista"). Com [tintIcon] falso, o ícone mantém as cores dele.
+ */
+@Composable
+fun IconOnlyButton(
+    icon: Painter,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    tintIcon: Boolean = true,
+) {
+    val colors = MaterialTheme.colorScheme
+    ComicButton(
+        onClick = onClick,
+        background = colors.surface,
+        shadow = ComicTheme.tokens.smallShadow,
+        minHeight = ComicTheme.tokens.minTouchTarget,
+        modifier = modifier.testTag(ICON_ONLY_BUTTON_TAG).semantics { contentDescription = label },
+    ) {
+        ButtonIcon(icon, if (tintIcon) colors.primary else Color.Unspecified)
     }
 }
 

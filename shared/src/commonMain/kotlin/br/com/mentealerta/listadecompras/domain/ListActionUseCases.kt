@@ -3,14 +3,14 @@ package br.com.mentealerta.listadecompras.domain
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
 
-/** Risca ou tira o risco, guardando para o "Ops, voltar". Devolve `false` se nada mudou. */
+/** Risca ou tira o risco, guardando para o "Desfazer". Devolve `false` se nada mudou. */
 class SetItemCheckedUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
     suspend operator fun invoke(id: ListItemId, checked: Boolean): Boolean =
         undoStack.record { repository.setChecked(id, checked)?.let(UndoableAction::ItemChecked) } != null
 }
 
 /**
- * Grava a edição do item, guardando para o "Ops, voltar". Devolve `false` se o item não está mais
+ * Grava a edição do item, guardando para o "Desfazer". Devolve `false` se o item não está mais
  * na lista; edição que não muda nada não entra na pilha.
  */
 class EditItemUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
@@ -26,14 +26,14 @@ class EditItemUseCase(private val repository: ShoppingListRepository, private va
     }
 }
 
-/** Tira o item da lista, guardando para o "Ops, voltar". Devolve `false` se o item já não estava. */
+/** Tira o item da lista, guardando para o "Desfazer". Devolve `false` se o item já não estava. */
 class RemoveItemUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
     suspend operator fun invoke(id: ListItemId): Boolean = undoStack.record {
         repository.remove(id).takeUnless { it.isEmpty() }?.let(UndoableAction::ItemRemoved)
     } != null
 }
 
-/** Joga a lista fora, guardando para o "Ops, voltar". Devolve `false` se a lista já estava vazia. */
+/** Joga a lista fora, guardando para o "Desfazer". Devolve `false` se a lista já estava vazia. */
 class ClearListUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
     suspend operator fun invoke(): Boolean = undoStack.record {
         repository.clear().takeUnless { it.isEmpty() }?.let(UndoableAction::ListCleared)
@@ -41,7 +41,7 @@ class ClearListUseCase(private val repository: ShoppingListRepository, private v
 }
 
 /**
- * "Terminei": grava a compra no histórico e tira os riscados da lista, guardando para o "Ops, voltar".
+ * "Terminei": grava a compra no histórico e tira os riscados da lista, guardando para o "Desfazer".
  * Devolve o que foi feito, ou `null` se nada estava riscado.
  */
 class FinishShoppingUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
@@ -49,7 +49,7 @@ class FinishShoppingUseCase(private val repository: ShoppingListRepository, priv
         undoStack.record { repository.finishShopping()?.let(UndoableAction::ShoppingFinished) }?.finished
 }
 
-/** "Ops, voltar": desfaz a última ação. Devolve a ação desfeita, ou `null` se não havia o que voltar. */
+/** "Desfazer": desfaz a última ação. Devolve a ação desfeita, ou `null` se não havia o que voltar. */
 class UndoLastActionUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
     suspend operator fun invoke(): UndoableAction? = undoStack.undo(repository)
 }

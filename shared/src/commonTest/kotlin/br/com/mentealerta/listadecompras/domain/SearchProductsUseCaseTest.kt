@@ -5,6 +5,7 @@ import br.com.mentealerta.listadecompras.catalog.EmbeddedCatalog
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -84,6 +85,22 @@ class SearchProductsUseCaseTest {
     fun firstOptionIsTheTopFoundOrTheUnknown() {
         assertEquals("apple", search("maca").first()?.match?.product?.id)
         assertEquals("xyzzy", search("xyzzy").first()?.name)
+    }
+
+    @Test
+    fun unknownComesFirstWhenOnlyApproximateProductsWereFound() {
+        val options = search("nescau")
+
+        assertTrue(options.unknownFirst)
+        assertEquals("nescau", options.first()?.name)
+    }
+
+    @Test
+    fun productStartingWithTheTextStaysBeforeTheUnknown() {
+        listOf("lei", "arr", "moid", "café da marca X").forEach { text ->
+            assertFalse(search(text).unknownFirst, text)
+        }
+        assertEquals("milk", search("lei").first()?.match?.product?.id)
     }
 
     @Test

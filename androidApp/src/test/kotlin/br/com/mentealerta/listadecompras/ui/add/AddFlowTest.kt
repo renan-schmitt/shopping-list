@@ -8,12 +8,16 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertWidthIsAtLeast
+import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
@@ -112,6 +116,42 @@ class AddFlowTest {
         assertEquals("bergamota", item.name)
         assertEquals(null, item.productId)
         compose.onNodeWithText("Adicionado: Bergamota.").assertExists()
+    }
+
+    @Test
+    fun unknownComesFirstWhenOnlyApproximateProductsWereFound() {
+        show()
+        field.performTextInput("bamana")
+
+        val options = compose.onAllNodes(hasClickAction() and (hasText("Pôr “bamana” na lista") or hasText("Banana")))
+        options[0].assert(hasText("Pôr “bamana” na lista"))
+        options[1].assert(hasText("Banana"))
+        field.performImeAction()
+        assertEquals("bamana", fixture.added.single().name)
+    }
+
+    @Test
+    fun trashRemovesFromAddedAndUndoBringsItBack() {
+        show()
+        field.performTextInput("banana")
+        field.performImeAction()
+
+        compose.onNode(hasContentDescription("Tirar Banana da lista") and hasClickAction())
+            .assertHeightIsAtLeast(64.dp)
+            .assertWidthIsAtLeast(64.dp)
+            .performClick()
+        assertTrue(fixture.items.isEmpty())
+        compose.onAllNodesWithText("Banana").assertCountEquals(0)
+        compose.onAllNodes(
+            SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion) and
+                hasAnyDescendant(hasText("Banana saiu da lista.")),
+        ).onFirst().assertExists()
+
+        compose.onNode(hasText("Desfazer") and hasClickAction()).performClick()
+
+        assertEquals("banana", fixture.items.single().productId)
+        compose.onNodeWithText("Banana").assertExists()
+        compose.onAllNodesWithText("Banana saiu da lista.").assertCountEquals(0)
     }
 
     @Test

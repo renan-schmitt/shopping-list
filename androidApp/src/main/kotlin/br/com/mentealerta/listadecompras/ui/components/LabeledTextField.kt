@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -101,6 +102,54 @@ fun LabeledTextField(
                     inner()
                 }
             },
+        )
+    }
+}
+
+/**
+ * O mesmo campo, com o texto num [TextFieldState] (campo de procurar, 2026-11-23). Quando o app limpa
+ * o campo sozinho (depois de pôr o produto na lista), o teclado acompanha a mudança: com o texto em
+ * `String`, o teclado podia ficar com a palavra antiga e não deixar digitar.
+ */
+@Composable
+fun LabeledTextField(
+    label: String,
+    state: TextFieldState,
+    modifier: Modifier = Modifier,
+    labelColor: Color = MaterialTheme.colorScheme.onSurface,
+    uppercaseLabel: Boolean = true,
+    imeAction: ImeAction = ImeAction.Done,
+    onImeAction: () -> Unit = {},
+    focusRequester: FocusRequester? = null,
+) {
+    val colors = MaterialTheme.colorScheme
+    val tokens = ComicTheme.tokens
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = if (uppercaseLabel) label.toUpperCase(LocaleList.current) else label,
+            style = MaterialTheme.typography.labelLarge,
+            color = labelColor,
+            modifier = Modifier.clearAndSetSemantics {},
+        )
+        BasicTextField(
+            state = state,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = colors.onSurface),
+            cursorBrush = SolidColor(colors.onSurface),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                autoCorrectEnabled = false,
+                imeAction = imeAction,
+            ),
+            onKeyboardAction = { onImeAction() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
+                .semantics { contentDescription = label }
+                .border(tokens.thickOutline, colors.outline, MaterialTheme.shapes.medium)
+                .background(colors.surface, MaterialTheme.shapes.medium)
+                .heightIn(min = FieldMinHeight)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            decorator = { inner -> Box(contentAlignment = Alignment.CenterStart) { inner() } },
         )
     }
 }

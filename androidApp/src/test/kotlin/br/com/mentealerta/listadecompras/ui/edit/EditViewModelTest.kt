@@ -173,7 +173,7 @@ class EditViewModelTest {
 
         assertEquals(EditUiState.Closed("feijão preto"), viewModel.uiState.value)
         assertTrue(fixture.items.isEmpty())
-        // O rascunho não foi gravado: o "Ops, voltar" devolve o produto como estava.
+        // O rascunho não foi gravado: o "Desfazer" devolve o produto como estava.
         UndoLastActionUseCase(fixture.repository, fixture.undoStack)()
         assertEquals(listOf(beans), fixture.items)
     }

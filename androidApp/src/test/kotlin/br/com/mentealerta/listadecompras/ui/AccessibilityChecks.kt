@@ -11,6 +11,8 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import br.com.mentealerta.listadecompras.ui.components.ICON_ONLY_BUTTON_TAG
+import br.com.mentealerta.listadecompras.ui.components.IconOnlyButton
 
 /** Área de toque mínima do app (plano §1.7). */
 val MinTouchTarget = 64.dp
@@ -23,7 +25,7 @@ val MinTouchTarget = 64.dp
  * - nenhum texto cortado ou com reticências, nem palavra partida sem hífen (nomes longos quebram
  *   a linha);
  * - só campo de texto tem descrição própria: o ícone acompanha o nome, não o substitui (guia,
- *   princípio 5).
+ *   princípio 5). A exceção é o [IconOnlyButton] (lixeira de "Adicionados", 2026-11-23).
  *
  * Devolve a lista de problemas, vazia se a tela passa.
  */
@@ -50,7 +52,10 @@ private fun SemanticsNode.contentProblems(): List<String> {
     val text = layout?.layoutInput?.text?.text
     return listOfNotNull(
         "Descrição própria fora de campo de texto: $description"
-            .takeIf { description != null && SemanticsProperties.EditableText !in config },
+            .takeIf {
+                description != null && SemanticsProperties.EditableText !in config &&
+                    config.getOrNull(SemanticsProperties.TestTag) != ICON_ONLY_BUTTON_TAG
+            },
         "Texto cortado: \"$text\"".takeIf { layout?.isCut() == true },
         "Palavra partida sem hífen: \"$text\"".takeIf { layout?.hasBrokenWord() == true },
     )

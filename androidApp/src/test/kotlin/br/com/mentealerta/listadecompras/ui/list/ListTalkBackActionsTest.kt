@@ -29,7 +29,7 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Ações do TalkBack na linha da lista (#71): além de riscar (tocar duas vezes), "Mudar" abre a
- * edição direto e "Tirar da lista" tira o produto com o aviso e "Ops, voltar", sem passar pelo modo
+ * edição direto e "Tirar da lista" tira o produto com o aviso e "Desfazer", sem passar pelo modo
  * "Mudar a lista".
  */
 @RunWith(RobolectricTestRunner::class)
@@ -98,7 +98,7 @@ class ListTalkBackActionsTest {
                 hasAnyDescendant(hasText("Feijão saiu da lista.")),
         ).onFirst().assertExists()
 
-        compose.onNode(hasText("Ops, voltar") and hasClickAction()).performClick()
+        compose.onNode(hasText("Desfazer") and hasClickAction()).performClick()
 
         row().assertExists()
         assertEquals(listOf(beans), fixture.items)

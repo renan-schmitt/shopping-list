@@ -6,7 +6,7 @@ import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 
 /**
- * Ação que o "Ops, voltar" desfaz (guia de linguagem, princípio 6). Guarda o que é preciso para a
+ * Ação que o "Desfazer" desfaz (guia de linguagem, princípio 6). Guarda o que é preciso para a
  * lista voltar exatamente ao que era antes; a UI usa o tipo e os itens para montar a frase.
  */
 sealed class UndoableAction {

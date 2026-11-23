@@ -1,6 +1,7 @@
 package br.com.mentealerta.listadecompras.domain
 
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
+import br.com.mentealerta.listadecompras.catalog.MatchKind
 import br.com.mentealerta.listadecompras.catalog.ProductMatch
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
@@ -11,11 +12,17 @@ data class ProductOptions(
     val found: List<ParsedItem>,
     /** O texto como a pessoa escreveu, sem produto do catálogo (#49); `null` quando o texto já é um produto. */
     val unknown: ParsedItem?,
+    /**
+     * O [unknown] vem antes do [found] (2026-11-23): nenhum nome do catálogo começa com o que foi
+     * digitado, só há batidas aproximadas ("nescau" → Nescafé); o mais provável é a pessoa querer o
+     * texto como está.
+     */
+    val unknownFirst: Boolean = false,
 ) {
     fun isEmpty(): Boolean = found.isEmpty() && unknown == null
 
-    /** A opção que entra na lista pela tecla "pronto" do teclado. */
-    fun first(): ParsedItem? = found.firstOrNull() ?: unknown
+    /** A opção que entra na lista pela tecla "pronto" do teclado: a que aparece primeiro. */
+    fun first(): ParsedItem? = if (unknownFirst) unknown else found.firstOrNull() ?: unknown
 
     companion object {
         val NONE = ProductOptions(found = emptyList(), unknown = null)
@@ -30,7 +37,8 @@ data class ProductOptions(
  * 1. o produto que o texto já nomeia, com o detalhe ("café da marca X");
  * 2. a busca aproximada no catálogo ("maca" → Maçã), sem repetir produto;
  * 3. o produto desconhecido, com o texto todo como nome, quando o texto não é exatamente um nome
- *    ou sinônimo do catálogo.
+ *    ou sinônimo do catálogo. Ele sobe para o topo quando só há batidas aproximadas
+ *    ("nescau" → **Pôr “nescau” na lista** antes de Nescafé; "lei" → Leite continua primeiro).
  *
  * Produto do catálogo leva o nome ou o sinônimo do catálogo que bateu, com acento e no singular:
  * "maca" → Maçã, "macaxeiras" → macaxeira (regionalismo de Mandioca).
@@ -41,9 +49,10 @@ class SearchProductsUseCase(private val index: CatalogIndex, private val parser:
         // O texto depois da quantidade: o nome e o detalhe, ou o nome todo do desconhecido.
         val typed = listOfNotNull(parsed.name, parsed.detail).joinToString(" ")
 
+        val results = index.search(typed, limit = MAX_RESULTS)
         val found = buildList {
             parsed.match?.let { add(parsed.copy(name = it.catalogName())) }
-            index.search(typed, limit = MAX_RESULTS).forEach { result ->
+            results.forEach { result ->
                 val match = ProductMatch(result.product, result.term)
                 if (none { it.match?.product?.id == result.product.id }) {
                     add(ParsedItem(match.catalogName(), match, parsed.quantity, detail = null))
@@ -53,7 +62,9 @@ class SearchProductsUseCase(private val index: CatalogIndex, private val parser:
 
         val isExactProduct = parsed.match != null && parsed.detail == null
         val unknown = if (isExactProduct) null else ParsedItem(typed, match = null, parsed.quantity, detail = null)
-        return ProductOptions(found, unknown)
+        // Com produto no texto ("café da marca X"), ele continua primeiro.
+        val unknownFirst = unknown != null && parsed.match == null && results.all { it.kind == MatchKind.APPROX }
+        return ProductOptions(found, unknown, unknownFirst)
     }
 
     private fun ProductMatch.catalogName(): String = term?.term ?: product.name

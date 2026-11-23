@@ -33,7 +33,7 @@ import kotlin.time.Instant
 /**
  * Catálogo pequeno e repositório falso, com estado, para os testes da edição (#55), do "Terminei"
  * (#57) e do "Jogar a lista fora" (#58): a lista em [items], na ordem em que os itens entraram, e o
- * histórico em [purchases]; tirar e o "Ops, voltar" devolvem o item ao lugar.
+ * histórico em [purchases]; tirar e o "Desfazer" devolvem o item ao lugar.
  */
 class EditFixture {
     val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -64,7 +64,7 @@ class EditFixture {
     /** Compras gravadas pelo "Terminei". */
     val purchases = mutableListOf<Purchase>()
 
-    /** Põe o item direto na lista, sem passar pela pilha do "Ops, voltar". */
+    /** Põe o item direto na lista, sem passar pela pilha do "Desfazer". */
     fun put(item: ListItem): ListItem = item.also {
         order[it.id] = order.size.toLong()
         state.update { list -> list + it }

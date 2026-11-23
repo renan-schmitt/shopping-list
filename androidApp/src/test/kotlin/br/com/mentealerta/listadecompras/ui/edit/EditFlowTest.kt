@@ -41,8 +41,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Fluxo da edição pela tela da lista (#55): "Mudar a lista" (#121), tocar no produto, mudar nome,
- * quantidade e detalhe, voltar (tudo salvo sozinho); tirar da lista, ver o aviso e voltar com "Ops,
- * voltar". E a acessibilidade da tela: campos com rótulo, botões de 64dp, "Menos" desativado em 1 e
+ * quantidade e detalhe, voltar (tudo salvo sozinho); tirar da lista, ver o aviso e voltar com
+ * "Desfazer". E a acessibilidade da tela: campos com rótulo, botões de 64dp, "Menos" desativado em 1 e
  * a quantidade lida pelo TalkBack.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -112,7 +112,7 @@ class EditFlowTest {
     }
 
     @Test
-    fun removingShowsTheNoticeAndOpsVoltarBringsItBack() {
+    fun removingShowsTheNoticeAndUndoBringsItBack() {
         showAndOpenBeans()
         button("Tirar da lista").performScrollTo().performClick()
 
@@ -122,10 +122,25 @@ class EditFlowTest {
             SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion) and
                 hasAnyDescendant(hasText("Feijão saiu da lista.")),
         ).onFirst().assertExists()
-        button("Ops, voltar").performClick()
+        button("Desfazer").performClick()
 
         compose.onNodeWithText("Feijão").assertExists()
         assertEquals(listOf(beans), fixture.items)
+        compose.onAllNodesWithText("Feijão saiu da lista.").assertCountEquals(0)
+    }
+
+    @Test
+    fun openingAnotherProductClosesTheNoticeForGood() {
+        fixture.put(ListItem(ListItemId("2"), "Arroz", "rice", "pantry"))
+        showAndOpenBeans()
+        button("Tirar da lista").performScrollTo().performClick()
+        compose.onNodeWithText("Feijão saiu da lista.").assertExists()
+
+        // O aviso não aparece de novo ao voltar da edição de outro produto.
+        compose.onNodeWithText("Arroz").performClick()
+        button("Voltar para a lista").performClick()
+
+        compose.onNodeWithText("Toque no produto que quer mudar.").assertExists()
         compose.onAllNodesWithText("Feijão saiu da lista.").assertCountEquals(0)
     }
 
