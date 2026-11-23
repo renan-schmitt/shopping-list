@@ -37,6 +37,7 @@ kotlin {
             api(project.dependencies.platform(libs.koin.bom))
             api(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
+            api(libs.kotlinx.datetime)
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
             api(libs.datastore.preferences.core)

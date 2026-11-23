@@ -65,5 +65,6 @@
 | Voz sem internet (só em erro de rede de verdade) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
 | Antes de pedir o microfone (uma vez) | "Para você falar os produtos, o app precisa usar o microfone. Para entender o que você fala, o celular pode enviar o som ao Google." · **Usar o microfone** · **Escrever** — só quando o app cai no serviço de voz padrão (2026-11-22) |
 | Voz para usar sem internet (configurações, Android 13+) | **Baixar a voz para usar sem internet** |
+| Histórico | Botão e título **O que já comprei**; cada compra "Hoje, 2 produtos" · "Ontem, 1 produto" · "Há 12 dias, 8 produtos"; sem compras, "Aqui aparecem as compras de quando você toca em **Terminei**." (2026-11-23, #66) |
 | Sugestão | "Faz 12 dias que você comprou café. Está faltando?" · **Sim, pôr na lista** · **Não** |
 | Lembrete | "Sua lista já tem 20 produtos. Que tal ir ao mercado?" |

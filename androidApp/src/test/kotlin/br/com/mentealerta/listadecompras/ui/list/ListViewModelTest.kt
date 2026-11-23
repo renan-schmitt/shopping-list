@@ -15,7 +15,9 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
+import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
@@ -28,16 +30,19 @@ import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -105,6 +110,12 @@ class ListViewModelTest {
         override suspend fun undoFinishShopping(finished: FinishedShopping) = restore(finished.removed)
     }
 
+    /** Histórico de compras: o repositório falso devolve tudo, sem filtrar pela data. */
+    private val history = MutableStateFlow(emptyList<Purchase>())
+    private val historyRepository = object : PurchaseHistoryRepository {
+        override fun observePurchases(since: Instant?) = history
+    }
+
     @Before
     fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
 
@@ -119,7 +130,19 @@ class ListViewModelTest {
         ClearListUseCase(repository, undoStack),
         RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
+        ObservePurchaseHistoryUseCase(historyRepository, Clock.System),
     )
+
+    @Test
+    fun showsTheHistoryButtonOnlyWithPurchases() = runTest {
+        viewModel().hasHistory.test {
+            assertFalse(awaitItem())
+            history.value = listOf(
+                Purchase.create(Clock.System.now(), listOf(ListItem.create("café", "coffee", "grocery"))),
+            )
+            assertTrue(awaitItem())
+        }
+    }
 
     @Test
     fun startsLoadingUntilTheListArrives() = runTest {

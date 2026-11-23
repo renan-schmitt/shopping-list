@@ -16,6 +16,9 @@ import br.com.mentealerta.listadecompras.ui.add.SampleAdded
 import br.com.mentealerta.listadecompras.ui.edit.EditContent
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditEmptyState
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditState
+import br.com.mentealerta.listadecompras.ui.history.HistoryContent
+import br.com.mentealerta.listadecompras.ui.history.HistoryUiState
+import br.com.mentealerta.listadecompras.ui.history.SampleHistoryState
 import br.com.mentealerta.listadecompras.ui.list.ChangeListContent
 import br.com.mentealerta.listadecompras.ui.list.ClearListQuestion
 import br.com.mentealerta.listadecompras.ui.list.ListContent
@@ -66,6 +69,10 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "lista comprando" to { ListContent(SampleListState) },
             "lista antes de comprar" to { ListContent(SampleListStateNotShopping) },
             "lista vazia" to { ListContent(ListUiState.Empty) },
+            "lista com histórico" to { ListContent(SampleListStateNotShopping, hasHistory = true) },
+            "lista vazia com histórico" to { ListContent(ListUiState.Empty, hasHistory = true) },
+            "o que já comprei" to { HistoryContent(SampleHistoryState) },
+            "o que já comprei vazio" to { HistoryContent(HistoryUiState.Empty) },
             "mudar a lista" to { ChangeListContent(SampleListState) },
             "jogar a lista fora" to { ClearListQuestion(total = 12, onConfirm = {}, onDismiss = {}) },
             "edição" to { EditContent(SampleEditState) },

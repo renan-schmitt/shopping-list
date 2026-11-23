@@ -5,6 +5,7 @@ import androidx.room3.Insert
 import androidx.room3.Query
 import androidx.room3.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Instant
 
 /** Histórico de compras. */
 @Dao
@@ -26,6 +27,11 @@ internal interface PurchaseDao {
     @Transaction
     @Query("SELECT * FROM purchase ORDER BY date DESC, id")
     fun observeAll(): Flow<List<PurchaseWithItems>>
+
+    /** Compras feitas a partir de [since], da mais recente para a mais antiga. */
+    @Transaction
+    @Query("SELECT * FROM purchase WHERE date >= :since ORDER BY date DESC, id")
+    fun observeSince(since: Instant): Flow<List<PurchaseWithItems>>
 
     @Query("DELETE FROM purchase WHERE id = :id")
     suspend fun deleteById(id: String)

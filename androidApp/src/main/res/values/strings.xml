@@ -50,6 +50,8 @@
     <string name="list_finished">%1$s %2$s</string>
     <!-- Botão no fim da folha (#121): abre a lista para mudar os produtos -->
     <string name="list_change">Mudar a lista</string>
+    <!-- Botão no fim da folha e na lista vazia (#66), só quando há compras: abre o histórico -->
+    <string name="list_history">O que já comprei</string>
     <!-- No topo do modo "Mudar a lista" -->
     <string name="list_change_hint">Toque no produto que quer mudar.</string>
     <!-- Ação do TalkBack num produto: abre a edição (modo "Mudar a lista" e linha da lista, #71) -->
@@ -233,4 +235,24 @@
     <string name="quantity_half_bunch">meio maço</string>
     <string name="quantity_half_tray">meia bandeja</string>
     <string name="quantity_half_jar">meio pote</string>
+
+    <!-- Tela "O que já comprei" (#66): o histórico gravado pelo "Terminei"; caixa alta vem do estilo -->
+    <string name="history_title">O que já comprei</string>
+    <!-- Data da compra por extenso (guia de linguagem, princípio 7) -->
+    <string name="history_today">Hoje</string>
+    <string name="history_yesterday">Ontem</string>
+    <plurals name="history_days_ago">
+        <item quantity="one">Há %d dia</item>
+        <item quantity="many">Há %d dias</item>
+        <item quantity="other">Há %d dias</item>
+    </plurals>
+    <plurals name="history_product_count">
+        <item quantity="one">%d produto</item>
+        <item quantity="many">%d produtos</item>
+        <item quantity="other">%d produtos</item>
+    </plurals>
+    <!-- Faixa de cada compra: "Ontem, 8 produtos" -->
+    <string name="history_purchase_title">%1$s, %2$s</string>
+    <!-- Sem compras nos últimos 30 dias. Em HTML escapado, para o negrito chegar ao Compose -->
+    <string name="history_empty">Aqui aparecem as compras de quando você toca em &lt;b>Terminei&lt;/b>.</string>
 </resources>

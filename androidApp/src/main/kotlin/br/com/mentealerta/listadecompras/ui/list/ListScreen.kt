@@ -59,6 +59,7 @@ import br.com.mentealerta.listadecompras.ui.components.comicStyle
 import br.com.mentealerta.listadecompras.ui.components.halftone
 import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
 import br.com.mentealerta.listadecompras.ui.edit.EditScreen
+import br.com.mentealerta.listadecompras.ui.history.HistoryScreen
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,7 +75,9 @@ import org.koin.compose.viewmodel.koinViewModel
  * lista fora" (#58) pergunta antes, volta para a lista e mostra "A lista foi jogada fora.".
  * Os avisos aparecem no meio da tela (2026-11-23), ficam 15 s (#59) e um novo tira o anterior; abrir
  * outra tela fecha o aviso. Riscar não mostra aviso (guia).
- * [editScreen] é a tela de edição; os testes trocam por uma com o ViewModel deles.
+ * "O que já comprei" (#66) fica no fim da folha e na lista vazia, só quando há compras no histórico.
+ * [editScreen] e [historyScreen] são as telas de edição e do histórico; os testes trocam por outras
+ * com o ViewModel deles.
  */
 @Composable
 fun ListScreen(
@@ -83,10 +86,13 @@ fun ListScreen(
     editScreen: @Composable (id: ListItemId, onClose: (removedName: String?) -> Unit) -> Unit = { id, onClose ->
         EditScreen(id = id, onClose = onClose)
     },
+    historyScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> HistoryScreen(onClose = onClose) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var adding by rememberSaveable { mutableStateOf(false) }
     var changing by rememberSaveable { mutableStateOf(false) }
+    var viewingHistory by rememberSaveable { mutableStateOf(false) }
+    val hasHistory by viewModel.hasHistory.collectAsStateWithLifecycle()
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var removedName by rememberSaveable { mutableStateOf<String?>(null) }
     var askingToClear by rememberSaveable { mutableStateOf(false) }
@@ -114,6 +120,7 @@ fun ListScreen(
     Box(modifier) {
         when {
             adding -> AddScreen(onClose = { adding = false })
+            viewingHistory -> historyScreen { viewingHistory = false }
             editing != null -> editScreen(ListItemId(editing)) { removed ->
                 editingId = null
                 if (removed != null) removedName = removed
@@ -144,9 +151,14 @@ fun ListScreen(
                     dismissNotice()
                     changing = true
                 },
+                hasHistory = hasHistory,
+                onHistory = {
+                    dismissNotice()
+                    viewingHistory = true
+                },
             )
         }
-        if (!adding && editing == null) UndoNoticeHost(snackbarHostState)
+        if (!adding && !viewingHistory && editing == null) UndoNoticeHost(snackbarHostState)
     }
 
     // Se a lista esvaziar com a pergunta aberta, ela some sozinha.
@@ -234,7 +246,9 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
  * Fundo com retícula, a folha da lista (plano §4.8) e o rodapé que se adapta (#52). [onToggleCheck]
  * recebe o produto e o estado atual dele, para riscar ou tirar o risco. [onChange] é o "Mudar a
  * lista", no fim da folha. [onEdit] e [onRemove] são as ações "Mudar" e "Tirar da lista" do TalkBack
- * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. Comprando, a tela não apaga.
+ * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. Com [hasHistory], o botão
+ * "O que já comprei" ([onHistory], #66) aparece no fim da folha ou na lista vazia. Comprando, a tela
+ * não apaga.
  */
 @Composable
 fun ListContent(
@@ -246,7 +260,10 @@ fun ListContent(
     onAdd: () -> Unit = {},
     onFinish: () -> Unit = {},
     onChange: () -> Unit = {},
+    hasHistory: Boolean = false,
+    onHistory: () -> Unit = {},
 ) {
+    val history = onHistory.takeIf { hasHistory }
     val colors = MaterialTheme.colorScheme
     val content = uiState as? ListUiState.Content
     val isShopping = content?.isShopping == true
@@ -277,10 +294,10 @@ fun ListContent(
             ComicCard(modifier = Modifier.fillMaxSize()) {
                 when (uiState) {
                     ListUiState.Loading -> Unit
-                    ListUiState.Empty -> EmptyList()
+                    ListUiState.Empty -> EmptyList(onHistory = history)
                     is ListUiState.Content -> Sheet(
                         uiState.sections,
-                        SheetActions(onToggleCheck, onEdit, onRemove, onChange),
+                        SheetActions(onToggleCheck, onEdit, onRemove, onChange, history),
                     )
                 }
             }
@@ -288,12 +305,13 @@ fun ListContent(
     }
 }
 
-/** O que a folha faz com os produtos e o "Mudar a lista". */
+/** O que a folha faz com os produtos, o "Mudar a lista" e o "O que já comprei" (`null`: sem histórico). */
 private class SheetActions(
     val onToggleCheck: (ListItemId, Boolean) -> Unit,
     val onEdit: (ListItemId) -> Unit,
     val onRemove: (ListItemId, String) -> Unit,
     val onChange: () -> Unit,
+    val onHistory: (() -> Unit)?,
 )
 
 /**
@@ -332,7 +350,26 @@ private fun Sheet(sections: List<SectionUi>, actions: SheetActions) {
                 modifier = Modifier.animateItem().fillMaxWidth().padding(top = 36.dp, end = 4.dp, bottom = 4.dp),
             )
         }
+        actions.onHistory?.let { onHistory ->
+            item(key = "history", contentType = "history") {
+                HistoryButton(
+                    onClick = onHistory,
+                    modifier = Modifier.animateItem().fillMaxWidth().padding(top = 16.dp, end = 4.dp, bottom = 4.dp),
+                )
+            }
+        }
     }
+}
+
+/** "O que já comprei" (#66): abre o histórico. */
+@Composable
+private fun HistoryButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SecondaryButton(
+        text = stringResource(R.string.list_history),
+        onClick = onClick,
+        icon = painterResource(R.drawable.ic_history),
+        modifier = modifier,
+    )
 }
 
 /** Nome da seção; a dos riscados é "Já peguei". */
@@ -342,11 +379,12 @@ internal fun SectionUi.title(): String = if (bought) stringResource(R.string.lis
 /**
  * Arte do ícone do app e "Mente Alerta" acima do título **Lista de Compras** (logo do plano §4.8),
  * e "Toque em **Adicionar** para começar sua lista." (guia de linguagem). O texto todo já é Lexend
- * negrito, então o trecho em `<b>` ganha a cor de destaque para se distinguir. Com letra grande, a
- * folha rola em vez de cortar o texto.
+ * negrito, então o trecho em `<b>` ganha a cor de destaque para se distinguir. Com histórico, embaixo,
+ * "O que já comprei" ([onHistory], #66): depois do "Terminei", a lista costuma ficar vazia. Com letra
+ * grande, a folha rola em vez de cortar o texto.
  */
 @Composable
-private fun EmptyList() {
+private fun EmptyList(onHistory: (() -> Unit)?) {
     val html = AnnotatedString.fromHtml(stringResource(R.string.list_empty))
     val accent = SpanStyle(color = MaterialTheme.colorScheme.primary)
     val text = buildAnnotatedString {
@@ -400,6 +438,9 @@ private fun EmptyList() {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
+            if (onHistory != null) {
+                HistoryButton(onClick = onHistory, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+            }
         }
     }
 }

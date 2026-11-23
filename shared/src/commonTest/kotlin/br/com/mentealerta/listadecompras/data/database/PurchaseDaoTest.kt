@@ -57,6 +57,16 @@ class PurchaseDaoTest {
     }
 
     @Test
+    fun listsOnlyThePurchasesFromTheGivenMomentOn() = runTest {
+        insert(firstPurchase)
+        insert(secondPurchase)
+
+        dao.observeSince(secondPurchase.date).test {
+            assertEquals(listOf(secondPurchase), awaitItem().map { it.toDomain() })
+        }
+    }
+
+    @Test
     fun deletingThePurchaseDeletesItsItems() = runTest {
         insert(firstPurchase)
         insert(secondPurchase)

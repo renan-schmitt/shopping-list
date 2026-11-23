@@ -9,6 +9,7 @@ import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
@@ -82,7 +83,8 @@ sealed interface ListNotice {
  * Tela da lista (#50): a lista agrupada por seção, atualizada a cada mudança no banco. As seções
  * mostram só o que falta; os riscados descem para "Já peguei", no fim (#121, plano §1.1). Riscar e tirar
  * o risco (#51), o "Terminei" (#57), o "Jogar a lista fora" (#58) e o "Tirar da lista" do TalkBack
- * (#71) entram na pilha do "Desfazer"; [onUndo] desfaz a última ação.
+ * (#71) entram na pilha do "Desfazer"; [onUndo] desfaz a última ação. [hasHistory] diz se há compras
+ * para mostrar em "O que já comprei" (#66).
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
@@ -92,6 +94,7 @@ class ListViewModel(
     private val clearList: ClearListUseCase,
     private val removeItem: RemoveItemUseCase,
     private val undoLastAction: UndoLastActionUseCase,
+    observeHistory: ObservePurchaseHistoryUseCase,
 ) : ViewModel() {
     private val mutableNotice = MutableStateFlow<ListNotice?>(null)
 
@@ -113,6 +116,11 @@ class ListViewModel(
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), ListUiState.Loading)
+
+    /** Se há compras no histórico (com o limite da versão grátis): só então aparece "O que já comprei". */
+    val hasHistory: StateFlow<Boolean> = observeHistory()
+        .map { it.isNotEmpty() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), false)
 
     /** Risca o produto que não estava riscado, ou tira o risco de quem estava ([checked] é o estado atual). */
     fun onToggleCheck(id: ListItemId, checked: Boolean) {

@@ -132,6 +132,27 @@ class MainFlowsTest {
     }
 
     @Test
+    fun finishedPurchaseShowsInTheHistory() {
+        waitFor("Lista de Compras")
+        addTyping("banana" to "Banana")
+        waitFor("Banana")
+
+        compose.onNodeWithText("Banana").performClick()
+        waitFor("Já peguei")
+        button("Terminei").performClick()
+        // O aviso fica no meio da tela, por cima do botão.
+        waitFor(hasText("Certo") and hasClickAction())
+        button("Certo").performClick()
+        waitFor(hasText("O que já comprei") and hasClickAction())
+        button("O que já comprei").performClick()
+
+        waitFor("Hoje, 1 produto")
+        compose.onNodeWithText("Banana").assertExists()
+        pressBack()
+        waitFor("Lista de Compras")
+    }
+
+    @Test
     fun throwingTheListAwayAsksFirstAndOpsVoltarBringsItBack() {
         waitFor("Lista de Compras")
         addTyping("banana" to "Banana", "feijao" to "Feijão")

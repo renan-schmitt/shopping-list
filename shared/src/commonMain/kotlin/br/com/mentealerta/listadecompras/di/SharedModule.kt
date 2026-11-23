@@ -2,6 +2,7 @@ package br.com.mentealerta.listadecompras.di
 
 import br.com.mentealerta.listadecompras.catalog.CatalogRepository
 import br.com.mentealerta.listadecompras.data.EmbeddedCatalogRepository
+import br.com.mentealerta.listadecompras.data.RoomPurchaseHistoryRepository
 import br.com.mentealerta.listadecompras.data.RoomShoppingListRepository
 import br.com.mentealerta.listadecompras.data.database.AppDatabase
 import br.com.mentealerta.listadecompras.data.preferences.DataStoreVoicePreferences
@@ -12,7 +13,9 @@ import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
+import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
@@ -40,6 +43,7 @@ val sharedModule = module {
     singleOf(::EmbeddedCatalogRepository) bind CatalogRepository::class
     single { get<CatalogRepository>().index() }
     singleOf(::RoomShoppingListRepository) bind ShoppingListRepository::class
+    singleOf(::RoomPurchaseHistoryRepository) bind PurchaseHistoryRepository::class
     single { get<AppDatabase>().listItemDao() }
     single { get<AppDatabase>().purchaseDao() }
     single { get<AppDatabase>().learnedPreferenceDao() }
@@ -48,6 +52,8 @@ val sharedModule = module {
     singleOf(::ItemTextParser)
     factoryOf(::GetSectionsUseCase)
     factoryOf(::ObserveListUseCase)
+    // Fuso do celular lido a cada tela aberta: o padrão do construtor.
+    factory { ObservePurchaseHistoryUseCase(get(), get()) }
     factoryOf(::AddItemsUseCase)
     factoryOf(::FindSameItemUseCase)
     factoryOf(::SearchProductsUseCase)

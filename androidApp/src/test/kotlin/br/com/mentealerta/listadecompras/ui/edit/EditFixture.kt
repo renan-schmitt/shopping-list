@@ -14,7 +14,9 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
+import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
@@ -23,17 +25,21 @@ import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
+import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
 import br.com.mentealerta.listadecompras.ui.list.ListViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 /**
  * Catálogo pequeno e repositório falso, com estado, para os testes da edição (#55), do "Terminei"
- * (#57) e do "Jogar a lista fora" (#58): a lista em [items], na ordem em que os itens entraram, e o
- * histórico em [purchases]; tirar e o "Desfazer" devolvem o item ao lugar.
+ * (#57), do "Jogar a lista fora" (#58) e do "O que já comprei" (#66): a lista em [items], na ordem em
+ * que os itens entraram, e o histórico em [purchases], da compra mais recente para a mais antiga; tirar
+ * e o "Desfazer" devolvem o item ao lugar. O relógio fica parado em [now], em UTC.
  */
 class EditFixture {
     val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -61,8 +67,27 @@ class EditFixture {
 
     val items: List<ListItem> get() = state.value
 
-    /** Compras gravadas pelo "Terminei". */
-    val purchases = mutableListOf<Purchase>()
+    /** Agora, para o "Terminei" e o histórico. */
+    val now: Instant = Instant.parse("2026-11-23T15:00:00Z")
+    private val clock = object : Clock {
+        override fun now(): Instant = now
+    }
+
+    private val purchaseState = MutableStateFlow<List<Purchase>>(emptyList())
+
+    /** Compras gravadas pelo "Terminei" ou por [putPurchase], da mais recente para a mais antiga. */
+    val purchases: List<Purchase> get() = purchaseState.value
+
+    /** Põe a compra direto no histórico. */
+    fun putPurchase(purchase: Purchase) {
+        purchaseState.update { (it + purchase).sortedByDescending(Purchase::date) }
+    }
+
+    /** Filtra pela data como o banco. */
+    val historyRepository = object : PurchaseHistoryRepository {
+        override fun observePurchases(since: Instant?): Flow<List<Purchase>> =
+            purchaseState.map { all -> all.filter { since == null || it.date >= since } }
+    }
 
     /** Põe o item direto na lista, sem passar pela pilha do "Desfazer". */
     fun put(item: ListItem): ListItem = item.also {
@@ -111,14 +136,14 @@ class EditFixture {
 
         override suspend fun finishShopping(): FinishedShopping? {
             val checked = state.value.filter { it.checked }.takeIf { it.isNotEmpty() } ?: return null
-            val purchase = Purchase.create(Instant.fromEpochSeconds(0), checked)
-            purchases += purchase
+            val purchase = Purchase.create(now, checked)
+            putPurchase(purchase)
             state.update { list -> list - checked.toSet() }
             return FinishedShopping(purchase, removedItemsOf(checked), remaining = state.value.size)
         }
 
         override suspend fun undoFinishShopping(finished: FinishedShopping) {
-            purchases.removeAll { it.id == finished.purchase.id }
+            purchaseState.update { list -> list.filterNot { it.id == finished.purchase.id } }
             restore(finished.removed)
         }
     }
@@ -142,5 +167,10 @@ class EditFixture {
         ClearListUseCase(repository, undoStack),
         RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
+        observeHistory(),
     )
+
+    fun historyViewModel() = HistoryViewModel(observeHistory(), index)
+
+    private fun observeHistory() = ObservePurchaseHistoryUseCase(historyRepository, clock, TimeZone.UTC)
 }

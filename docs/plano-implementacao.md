@@ -73,6 +73,7 @@ O que precisa existir na primeira versão publicada.
 
 ### 1.5 Histórico e sugestões
 - [ ] Histórico de compras (data + produtos comprados + quantidade) gravado a cada "Terminei"
+- [x] Tela **O que já comprei** — 2026-11-23, #66: compras da mais recente para a mais antiga, cada uma com a data por extenso na faixa ("Hoje, 2 produtos", "Ontem", "Há 12 dias", em dias do calendário no fuso do celular; sem "semana passada", ambíguo) e os produtos com ícone e quantidade, só para ver. Grátis mostra os últimos 30 dias (de hoje até há 30 dias); as compras antigas ficam no banco para a previsão e o premium. Entrada pelo botão **O que já comprei** no fim da folha, abaixo de "Mudar a lista", e na lista vazia, só quando há compra nesses 30 dias
 - [ ] Previsões no MVP usam só a frequência; quantidade fica gravada para uso futuro
 - [ ] Modelo simples: intervalo médio entre compras de cada produto
 - [ ] Sugestão no topo da lista: "Faz tempo que você não compra café" — um toque adiciona

@@ -8,6 +8,7 @@ activity-compose = "1.13.0"
 lifecycle = "2.11.0"
 koin-bom = "4.2.2"
 coroutines = "1.11.0"
+datetime = "0.8.0"
 ksp = "2.3.13"
 room = "3.0.3"
 sqlite = "2.7.1"
@@ -42,6 +43,7 @@ koin-test = { module = "io.insert-koin:koin-test" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 room-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
