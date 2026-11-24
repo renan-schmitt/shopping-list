@@ -76,6 +76,7 @@ import org.koin.compose.viewmodel.koinViewModel
  * Os avisos aparecem no meio da tela (2026-11-23), ficam 15 s (#59) e um novo tira o anterior; abrir
  * outra tela fecha o aviso. Riscar não mostra aviso (guia).
  * "O que já comprei" (#66) fica no fim da folha e na lista vazia, só quando há compras no histórico.
+ * "Mandar a lista" (#67), no fim da folha, abre a tela de compartilhar do Android com o que falta comprar.
  * [editScreen] e [historyScreen] são as telas de edição e do histórico; os testes trocam por outras
  * com o ViewModel deles.
  */
@@ -117,6 +118,7 @@ fun ListScreen(
         editingId = id.value
     }
     val editing = editingId
+    val context = LocalContext.current
     Box(modifier) {
         when {
             adding -> AddScreen(onClose = { adding = false })
@@ -150,6 +152,10 @@ fun ListScreen(
                 onChange = {
                     dismissNotice()
                     changing = true
+                },
+                onShare = {
+                    dismissNotice()
+                    context.shareList(uiState)
                 },
                 hasHistory = hasHistory,
                 onHistory = {
@@ -246,7 +252,8 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
  * Fundo com retícula, a folha da lista (plano §4.8) e o rodapé que se adapta (#52). [onToggleCheck]
  * recebe o produto e o estado atual dele, para riscar ou tirar o risco. [onChange] é o "Mudar a
  * lista", no fim da folha. [onEdit] e [onRemove] são as ações "Mudar" e "Tirar da lista" do TalkBack
- * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. Com [hasHistory], o botão
+ * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. [onShare] é o "Mandar a
+ * lista" (#67), no fim da folha quando há o que comprar. Com [hasHistory], o botão
  * "O que já comprei" ([onHistory], #66) aparece no fim da folha ou na lista vazia. Comprando, a tela
  * não apaga.
  */
@@ -260,6 +267,7 @@ fun ListContent(
     onAdd: () -> Unit = {},
     onFinish: () -> Unit = {},
     onChange: () -> Unit = {},
+    onShare: () -> Unit = {},
     hasHistory: Boolean = false,
     onHistory: () -> Unit = {},
 ) {
@@ -297,7 +305,14 @@ fun ListContent(
                     ListUiState.Empty -> EmptyList(onHistory = history)
                     is ListUiState.Content -> Sheet(
                         uiState.sections,
-                        SheetActions(onToggleCheck, onEdit, onRemove, onChange, history),
+                        SheetActions(
+                            onToggleCheck = onToggleCheck,
+                            onEdit = onEdit,
+                            onRemove = onRemove,
+                            onChange = onChange,
+                            onShare = onShare.takeIf { uiState.canShare },
+                            onHistory = history,
+                        ),
                     )
                 }
             }
@@ -305,12 +320,16 @@ fun ListContent(
     }
 }
 
-/** O que a folha faz com os produtos, o "Mudar a lista" e o "O que já comprei" (`null`: sem histórico). */
+/**
+ * O que a folha faz com os produtos, o "Mudar a lista", o "Mandar a lista" (`null`: nada a comprar) e o
+ * "O que já comprei" (`null`: sem histórico).
+ */
 private class SheetActions(
     val onToggleCheck: (ListItemId, Boolean) -> Unit,
     val onEdit: (ListItemId) -> Unit,
     val onRemove: (ListItemId, String) -> Unit,
     val onChange: () -> Unit,
+    val onShare: (() -> Unit)?,
     val onHistory: (() -> Unit)?,
 )
 
@@ -349,6 +368,16 @@ private fun Sheet(sections: List<SectionUi>, actions: SheetActions) {
                 icon = painterResource(R.drawable.ic_edit),
                 modifier = Modifier.animateItem().fillMaxWidth().padding(top = 36.dp, end = 4.dp, bottom = 4.dp),
             )
+        }
+        actions.onShare?.let { onShare ->
+            item(key = "share", contentType = "share") {
+                SecondaryButton(
+                    text = stringResource(R.string.list_share),
+                    onClick = onShare,
+                    icon = painterResource(R.drawable.ic_send),
+                    modifier = Modifier.animateItem().fillMaxWidth().padding(top = 16.dp, end = 4.dp, bottom = 4.dp),
+                )
+            }
         }
         actions.onHistory?.let { onHistory ->
             item(key = "history", contentType = "history") {

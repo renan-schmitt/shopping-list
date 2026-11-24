@@ -52,6 +52,16 @@
     <string name="list_change">Mudar a lista</string>
     <!-- Botão no fim da folha e na lista vazia (#66), só quando há compras: abre o histórico -->
     <string name="list_history">O que já comprei</string>
+    <!-- Botão no fim da folha (#67), só com produtos a comprar: manda a lista pelo WhatsApp ou outro app -->
+    <string name="list_share">Mandar a lista</string>
+    <!-- Texto mandado (#67), com o negrito do WhatsApp (*): título no topo -->
+    <string name="share_list_title">*Lista de compras*</string>
+    <!-- Texto mandado: nome da seção, em negrito no WhatsApp -->
+    <string name="share_list_section">*%1$s*</string>
+    <!-- Texto mandado: um produto por linha -->
+    <string name="share_list_item">- %1$s</string>
+    <!-- Texto mandado: produto com a quantidade como aparece na lista, "- Leite desnatado (2 litros)" -->
+    <string name="share_list_item_with_quantity">- %1$s (%2$s)</string>
     <!-- No topo do modo "Mudar a lista" -->
     <string name="list_change_hint">Toque no produto que quer mudar.</string>
     <!-- Ação do TalkBack num produto: abre a edição (modo "Mudar a lista" e linha da lista, #71) -->

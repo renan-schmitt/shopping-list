@@ -39,6 +39,9 @@ sealed interface ListUiState {
         val isShopping: Boolean = sections.any { section -> section.rows.any { it.checked } }
         val remaining: Int = sections.sumOf { section -> section.rows.count { !it.checked } }
 
+        /** Há o que comprar: só então aparece o "Mandar a lista" (#67). */
+        val canShare: Boolean get() = remaining > 0
+
         /** Todos os produtos, riscados ou não: os que saem ao jogar a lista fora (#58). */
         val total: Int = sections.sumOf { it.rows.size }
     }

@@ -79,7 +79,7 @@ O que precisa existir na primeira versão publicada.
 - [ ] Sugestão no topo da lista: "Faz tempo que você não compra café" — um toque adiciona
 
 ### 1.6 Compartilhar (sem backend)
-- [ ] Enviar a lista como texto pelo WhatsApp / outros apps
+- [x] Enviar a lista como texto pelo WhatsApp / outros apps — 2026-11-24, #67: botão **Mandar a lista** no fim da folha, abaixo de "Mudar a lista", só quando há o que comprar; abre a tela de compartilhar do Android. O texto leva só o que falta (sem "Já peguei"), por seção na ordem do mercado, com o negrito do WhatsApp (`*Lista de compras*`, `*Hortifrúti*`) e um produto por linha com a quantidade como na lista: "- Leite desnatado (2 litros)". O evento `lista_compartilhada` entra com o analytics
 - [ ] Colar uma lista recebida (texto) e transformar em itens
 
 ### 1.7 Acessibilidade
