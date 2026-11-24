@@ -52,6 +52,8 @@
     <string name="list_change">Mudar a lista</string>
     <!-- Botão no fim da folha e na lista vazia (#66), só quando há compras: abre o histórico -->
     <string name="list_history">O que já comprei</string>
+    <!-- Abre a tela "Versão completa" (#88); só na versão grátis -->
+    <string name="list_full_version">Versão completa</string>
     <!-- Botão no fim da folha (#67), só com produtos a comprar: manda a lista pelo WhatsApp ou outro app -->
     <string name="list_share">Mandar a lista</string>
     <!-- Texto mandado (#67), com o negrito do WhatsApp (*): título no topo -->
@@ -285,4 +287,28 @@
     <string name="history_purchase_title">%1$s, %2$s</string>
     <!-- Sem compras nos últimos 30 dias. Em HTML escapado, para o negrito chegar ao Compose -->
     <string name="history_empty">Aqui aparecem as compras de quando você toca em &lt;b>Terminei&lt;/b>.</string>
+
+    <!-- Tela "Versão completa" (#88, plano §5): o que vem e como comprar, sem pressão; caixa alta vem do estilo -->
+    <string name="full_version_title">Versão completa</string>
+    <string name="full_version_intro">Pague uma vez e use para sempre.</string>
+    <!-- Preço formatado pela loja: "Por R$ 19,90, uma vez só." -->
+    <string name="full_version_price">Por %1$s, uma vez só.</string>
+    <string name="full_version_includes">O que vem</string>
+    <string name="full_version_feature_no_ads">Sem anúncios</string>
+    <string name="full_version_feature_full_history">O que já comprei, sem limite de tempo</string>
+    <string name="full_version_feature_reminders">Lembretes fora do app</string>
+    <string name="full_version_feature_usual_items">Os de sempre: seus produtos fixos com um toque</string>
+    <string name="full_version_feature_shortcut">Atalho na tela do celular</string>
+    <string name="full_version_feature_section_order">As seções na ordem do seu mercado</string>
+    <string name="full_version_feature_themes">Cores e estilos de papel</string>
+    <string name="full_version_feature_spending">Quanto gastei</string>
+    <string name="full_version_feature_more">E o que entrar depois</string>
+    <string name="full_version_free_note">Fazer a lista e usar no mercado continua de graça.</string>
+    <string name="full_version_buy">Comprar a versão completa</string>
+    <string name="full_version_restore">Já comprei</string>
+    <string name="full_version_thanks">Você tem a versão completa. Obrigado!</string>
+    <string name="full_version_pending">Quando o pagamento for confirmado, a versão completa é liberada sozinha.</string>
+    <string name="full_version_unavailable">Não consegui falar com a loja. Confira a internet e tente de novo.</string>
+    <string name="full_version_failed">Não deu certo. Tente de novo mais tarde.</string>
+    <string name="full_version_nothing_to_restore">Não achei a compra nesta conta do Google.</string>
 </resources>

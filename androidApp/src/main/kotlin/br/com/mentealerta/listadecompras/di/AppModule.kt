@@ -5,6 +5,7 @@ import br.com.mentealerta.listadecompras.billing.createBillingStore
 import br.com.mentealerta.listadecompras.premium.BillingStore
 import br.com.mentealerta.listadecompras.ui.add.AddViewModel
 import br.com.mentealerta.listadecompras.ui.edit.EditViewModel
+import br.com.mentealerta.listadecompras.ui.fullversion.FullVersionViewModel
 import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
 import br.com.mentealerta.listadecompras.ui.list.ListViewModel
 import br.com.mentealerta.listadecompras.voice.AndroidVoiceRecognizer
@@ -25,4 +26,5 @@ val appModule = module {
     single<BillingStore> { createBillingStore(androidContext(), get()) }
     viewModelOf(::EditViewModel)
     viewModelOf(::HistoryViewModel)
+    viewModelOf(::FullVersionViewModel)
 }

@@ -61,6 +61,7 @@
 | Botão de voz (segurar para falar) | "Segure para falar." acima de **Falar**; com o microfone aberto, o botão vira **Terminei** (2026-11-22, #123) |
 | Toque rápido no **Falar**, sem segurar | "Segure o botão enquanto fala." |
 | Fim da primeira semana (uma vez, no 7º dia) | "A partir de amanhã, o app continua de graça, com alguns anúncios. Se preferir sem anúncios, tem a versão completa." · **Certo** · **Conhecer a versão completa** (2026-11-24, #82) |
+| Versão completa | Botão **Versão completa** no fim da folha e na lista vazia, só na versão grátis. Na tela: "Pague uma vez e use para sempre." · "Por R$ 19,90, uma vez só." · **O que vem** (um item por linha, com ✓, terminando em "E o que entrar depois") · "Fazer a lista e usar no mercado continua de graça." · **Comprar a versão completa** · **Já comprei**. Comprada: "Você tem a versão completa. Obrigado!" Recados: "Quando o pagamento for confirmado, a versão completa é liberada sozinha." · "Não consegui falar com a loja. Confira a internet e tente de novo." · "Não deu certo. Tente de novo mais tarde." · "Não achei a compra nesta conta do Google." Desistir na janela da loja não mostra recado (2026-11-24, #88) |
 | Chave de anúncios nos Ajustes | **Anúncios pelo meu interesse** (texto de apoio fica para a #89; 2026-11-24, #82) |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |
 | Voz pt-BR ainda baixando | "Estou baixando a voz para ouvir sem internet. Você pode escrever enquanto isso." (2026-11-22, #123) |

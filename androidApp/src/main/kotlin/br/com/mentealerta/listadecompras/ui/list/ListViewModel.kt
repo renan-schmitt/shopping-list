@@ -9,6 +9,7 @@ import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
@@ -87,7 +88,8 @@ sealed interface ListNotice {
  * mostram só o que falta; os riscados descem para "Já peguei", no fim (#121, plano §1.1). Riscar e tirar
  * o risco (#51), o "Terminei" (#57), o "Jogar a lista fora" (#58) e o "Tirar da lista" do TalkBack
  * (#71) entram na pilha do "Desfazer"; [onUndo] desfaz a última ação. [hasHistory] diz se há compras
- * para mostrar em "O que já comprei" (#66).
+ * para mostrar em "O que já comprei" (#66); [canBuyFullVersion], se aparece o botão "Versão completa"
+ * (#88).
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
@@ -98,6 +100,7 @@ class ListViewModel(
     private val removeItem: RemoveItemUseCase,
     private val undoLastAction: UndoLastActionUseCase,
     observeHistory: ObservePurchaseHistoryUseCase,
+    observePremium: ObservePremiumUseCase,
 ) : ViewModel() {
     private val mutableNotice = MutableStateFlow<ListNotice?>(null)
 
@@ -124,6 +127,11 @@ class ListViewModel(
     val hasHistory: StateFlow<Boolean> = observeHistory()
         .map { it.isNotEmpty() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), false)
+
+    /** Só na versão grátis aparece o botão "Versão completa" (#88); some na hora em que a compra é liberada. */
+    val canBuyFullVersion: StateFlow<Boolean> = observePremium()
+        .map { !it }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), !observePremium().value)
 
     /** Risca o produto que não estava riscado, ou tira o risco de quem estava ([checked] é o estado atual). */
     fun onToggleCheck(id: ListItemId, checked: Boolean) {

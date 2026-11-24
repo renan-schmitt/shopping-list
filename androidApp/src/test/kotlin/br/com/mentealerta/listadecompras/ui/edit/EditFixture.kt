@@ -14,6 +14,7 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
@@ -25,6 +26,7 @@ import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
+import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
 import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
 import br.com.mentealerta.listadecompras.ui.list.ListViewModel
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +62,9 @@ class EditFixture {
     )
 
     val undoStack = UndoStack()
+
+    /** Versão grátis até comprar pela loja falsa. */
+    val premium = FakePremiumRepository()
 
     /** Ordem de entrada de cada item; fica guardada para o item voltar ao mesmo lugar. */
     private val order = mutableMapOf<ListItemId, Long>()
@@ -168,6 +173,7 @@ class EditFixture {
         RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
         observeHistory(),
+        ObservePremiumUseCase(premium),
     )
 
     fun historyViewModel() = HistoryViewModel(observeHistory(), index)

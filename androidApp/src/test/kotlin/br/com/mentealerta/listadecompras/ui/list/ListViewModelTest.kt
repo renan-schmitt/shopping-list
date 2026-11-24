@@ -15,6 +15,7 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
@@ -27,6 +28,7 @@ import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
+import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -116,6 +118,8 @@ class ListViewModelTest {
         override fun observePurchases(since: Instant?) = history
     }
 
+    private val premium = FakePremiumRepository()
+
     @Before
     fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
 
@@ -131,7 +135,17 @@ class ListViewModelTest {
         RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
         ObservePurchaseHistoryUseCase(historyRepository, Clock.System),
+        ObservePremiumUseCase(premium),
     )
+
+    @Test
+    fun showsTheFullVersionButtonOnlyInTheFreeVersion() = runTest {
+        viewModel().canBuyFullVersion.test {
+            assertTrue(awaitItem())
+            premium.isPremium.value = true
+            assertFalse(awaitItem())
+        }
+    }
 
     @Test
     fun showsTheHistoryButtonOnlyWithPurchases() = runTest {

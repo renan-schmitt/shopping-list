@@ -18,6 +18,11 @@ import br.com.mentealerta.listadecompras.ui.add.SampleAdded
 import br.com.mentealerta.listadecompras.ui.edit.EditContent
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditEmptyState
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditState
+import br.com.mentealerta.listadecompras.ui.fullversion.FullVersionContent
+import br.com.mentealerta.listadecompras.ui.fullversion.SampleFullVersionBusyState
+import br.com.mentealerta.listadecompras.ui.fullversion.SampleFullVersionCompleteState
+import br.com.mentealerta.listadecompras.ui.fullversion.SampleFullVersionMessageState
+import br.com.mentealerta.listadecompras.ui.fullversion.SampleFullVersionState
 import br.com.mentealerta.listadecompras.ui.history.HistoryContent
 import br.com.mentealerta.listadecompras.ui.history.HistoryUiState
 import br.com.mentealerta.listadecompras.ui.history.SampleHistoryState
@@ -77,6 +82,16 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "lista vazia" to { ListContent(ListUiState.Empty) },
             "lista com histórico" to { ListContent(SampleListStateNotShopping, hasHistory = true) },
             "lista vazia com histórico" to { ListContent(ListUiState.Empty, hasHistory = true) },
+            "lista com versão completa" to {
+                ListContent(SampleListStateNotShopping, hasHistory = true, canBuyFullVersion = true)
+            },
+            "lista vazia com versão completa" to {
+                ListContent(ListUiState.Empty, hasHistory = true, canBuyFullVersion = true)
+            },
+            "versão completa" to { FullVersionContent(SampleFullVersionState) },
+            "versão completa com recado" to { FullVersionContent(SampleFullVersionMessageState) },
+            "versão completa esperando a loja" to { FullVersionContent(SampleFullVersionBusyState) },
+            "versão completa comprada" to { FullVersionContent(SampleFullVersionCompleteState) },
             "o que já comprei" to { HistoryContent(SampleHistoryState) },
             "o que já comprei vazio" to { HistoryContent(HistoryUiState.Empty) },
             "mudar a lista" to { ChangeListContent(SampleListState) },

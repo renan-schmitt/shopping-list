@@ -59,6 +59,7 @@ import br.com.mentealerta.listadecompras.ui.components.comicStyle
 import br.com.mentealerta.listadecompras.ui.components.halftone
 import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
 import br.com.mentealerta.listadecompras.ui.edit.EditScreen
+import br.com.mentealerta.listadecompras.ui.fullversion.FullVersionScreen
 import br.com.mentealerta.listadecompras.ui.history.HistoryScreen
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -77,8 +78,9 @@ import org.koin.compose.viewmodel.koinViewModel
  * outra tela fecha o aviso. Riscar não mostra aviso (guia).
  * "O que já comprei" (#66) fica no fim da folha e na lista vazia, só quando há compras no histórico.
  * "Mandar a lista" (#67), no fim da folha, abre a tela de compartilhar do Android com o que falta comprar.
- * [editScreen] e [historyScreen] são as telas de edição e do histórico; os testes trocam por outras
- * com o ViewModel deles.
+ * "Versão completa" (#88) fica depois dele e na lista vazia, só na versão grátis.
+ * [editScreen], [historyScreen] e [fullVersionScreen] são as telas de edição, do histórico e da versão
+ * completa; os testes trocam por outras com o ViewModel deles.
  */
 @Composable
 fun ListScreen(
@@ -88,12 +90,14 @@ fun ListScreen(
         EditScreen(id = id, onClose = onClose)
     },
     historyScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> HistoryScreen(onClose = onClose) },
+    fullVersionScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> FullVersionScreen(onClose = onClose) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var adding by rememberSaveable { mutableStateOf(false) }
     var changing by rememberSaveable { mutableStateOf(false) }
-    var viewingHistory by rememberSaveable { mutableStateOf(false) }
+    var viewing by rememberSaveable { mutableStateOf<ExtraScreen?>(null) }
     val hasHistory by viewModel.hasHistory.collectAsStateWithLifecycle()
+    val canBuyFullVersion by viewModel.canBuyFullVersion.collectAsStateWithLifecycle()
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var removedName by rememberSaveable { mutableStateOf<String?>(null) }
     var askingToClear by rememberSaveable { mutableStateOf(false) }
@@ -118,11 +122,12 @@ fun ListScreen(
         editingId = id.value
     }
     val editing = editingId
+    val extra = viewing
     val context = LocalContext.current
     Box(modifier) {
         when {
             adding -> AddScreen(onClose = { adding = false })
-            viewingHistory -> historyScreen { viewingHistory = false }
+            extra != null -> extra.Content(historyScreen, fullVersionScreen) { viewing = null }
             editing != null -> editScreen(ListItemId(editing)) { removed ->
                 editingId = null
                 if (removed != null) removedName = removed
@@ -160,11 +165,16 @@ fun ListScreen(
                 hasHistory = hasHistory,
                 onHistory = {
                     dismissNotice()
-                    viewingHistory = true
+                    viewing = ExtraScreen.History
+                },
+                canBuyFullVersion = canBuyFullVersion,
+                onFullVersion = {
+                    dismissNotice()
+                    viewing = ExtraScreen.FullVersion
                 },
             )
         }
-        if (!adding && !viewingHistory && editing == null) UndoNoticeHost(snackbarHostState)
+        if (!adding && viewing == null && editing == null) UndoNoticeHost(snackbarHostState)
     }
 
     // Se a lista esvaziar com a pergunta aberta, ela some sozinha.
@@ -179,6 +189,23 @@ fun ListScreen(
             },
             onDismiss = { askingToClear = false },
         )
+    }
+}
+
+/** Telas só de ver que abrem por cima da lista a partir de um botão no fim da folha. */
+private enum class ExtraScreen {
+    History,
+    FullVersion,
+    ;
+
+    @Composable
+    fun Content(
+        historyScreen: @Composable (onClose: () -> Unit) -> Unit,
+        fullVersionScreen: @Composable (onClose: () -> Unit) -> Unit,
+        onClose: () -> Unit,
+    ) = when (this) {
+        History -> historyScreen(onClose)
+        FullVersion -> fullVersionScreen(onClose)
     }
 }
 
@@ -254,8 +281,9 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
  * lista", no fim da folha. [onEdit] e [onRemove] são as ações "Mudar" e "Tirar da lista" do TalkBack
  * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. [onShare] é o "Mandar a
  * lista" (#67), no fim da folha quando há o que comprar. Com [hasHistory], o botão
- * "O que já comprei" ([onHistory], #66) aparece no fim da folha ou na lista vazia. Comprando, a tela
- * não apaga.
+ * "O que já comprei" ([onHistory], #66) aparece no fim da folha ou na lista vazia; com
+ * [canBuyFullVersion], o "Versão completa" ([onFullVersion], #88) também, depois dele. Comprando, a
+ * tela não apaga.
  */
 @Composable
 fun ListContent(
@@ -270,8 +298,11 @@ fun ListContent(
     onShare: () -> Unit = {},
     hasHistory: Boolean = false,
     onHistory: () -> Unit = {},
+    canBuyFullVersion: Boolean = false,
+    onFullVersion: () -> Unit = {},
 ) {
     val history = onHistory.takeIf { hasHistory }
+    val fullVersion = onFullVersion.takeIf { canBuyFullVersion }
     val colors = MaterialTheme.colorScheme
     val content = uiState as? ListUiState.Content
     val isShopping = content?.isShopping == true
@@ -302,7 +333,7 @@ fun ListContent(
             ComicCard(modifier = Modifier.fillMaxSize()) {
                 when (uiState) {
                     ListUiState.Loading -> Unit
-                    ListUiState.Empty -> EmptyList(onHistory = history)
+                    ListUiState.Empty -> EmptyList(onHistory = history, onFullVersion = fullVersion)
                     is ListUiState.Content -> Sheet(
                         uiState.sections,
                         SheetActions(
@@ -312,6 +343,7 @@ fun ListContent(
                             onChange = onChange,
                             onShare = onShare.takeIf { uiState.canShare },
                             onHistory = history,
+                            onFullVersion = fullVersion,
                         ),
                     )
                 }
@@ -322,7 +354,7 @@ fun ListContent(
 
 /**
  * O que a folha faz com os produtos, o "Mudar a lista", o "Mandar a lista" (`null`: nada a comprar) e o
- * "O que já comprei" (`null`: sem histórico).
+ * "O que já comprei" (`null`: sem histórico) e o "Versão completa" (`null`: já tem).
  */
 private class SheetActions(
     val onToggleCheck: (ListItemId, Boolean) -> Unit,
@@ -331,6 +363,7 @@ private class SheetActions(
     val onChange: () -> Unit,
     val onShare: (() -> Unit)?,
     val onHistory: (() -> Unit)?,
+    val onFullVersion: (() -> Unit)?,
 )
 
 /**
@@ -387,7 +420,26 @@ private fun Sheet(sections: List<SectionUi>, actions: SheetActions) {
                 )
             }
         }
+        actions.onFullVersion?.let { onFullVersion ->
+            item(key = "full-version", contentType = "full-version") {
+                FullVersionButton(
+                    onClick = onFullVersion,
+                    modifier = Modifier.animateItem().fillMaxWidth().padding(top = 16.dp, end = 4.dp, bottom = 4.dp),
+                )
+            }
+        }
     }
+}
+
+/** "Versão completa" (#88): abre a tela que explica e vende a versão completa. */
+@Composable
+private fun FullVersionButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SecondaryButton(
+        text = stringResource(R.string.list_full_version),
+        onClick = onClick,
+        icon = painterResource(R.drawable.ic_star),
+        modifier = modifier,
+    )
 }
 
 /** "O que já comprei" (#66): abre o histórico. */
@@ -410,10 +462,11 @@ internal fun SectionUi.title(): String = if (bought) stringResource(R.string.lis
  * e "Toque em **Adicionar** para começar sua lista." (guia de linguagem). O texto todo já é Lexend
  * negrito, então o trecho em `<b>` ganha a cor de destaque para se distinguir. Com histórico, embaixo,
  * "O que já comprei" ([onHistory], #66): depois do "Terminei", a lista costuma ficar vazia. Com letra
- * grande, a folha rola em vez de cortar o texto.
+ * grande, a folha rola em vez de cortar o texto. Na versão grátis, por último, "Versão completa"
+ * ([onFullVersion], #88).
  */
 @Composable
-private fun EmptyList(onHistory: (() -> Unit)?) {
+private fun EmptyList(onHistory: (() -> Unit)?, onFullVersion: (() -> Unit)?) {
     val html = AnnotatedString.fromHtml(stringResource(R.string.list_empty))
     val accent = SpanStyle(color = MaterialTheme.colorScheme.primary)
     val text = buildAnnotatedString {
@@ -469,6 +522,9 @@ private fun EmptyList(onHistory: (() -> Unit)?) {
             )
             if (onHistory != null) {
                 HistoryButton(onClick = onHistory, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+            }
+            if (onFullVersion != null) {
+                FullVersionButton(onClick = onFullVersion, modifier = Modifier.fillMaxWidth())
             }
         }
     }
