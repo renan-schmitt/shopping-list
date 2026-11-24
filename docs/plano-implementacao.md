@@ -216,9 +216,23 @@ Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 - A analisar: resolução de conflitos (duas pessoas editando), custo de infraestrutura, LGPD, o que acontece ao trocar de celular.
 
 ### 3.7 Anúncios
-- Risco de toques acidentais nesse público e de punição pelo Google Play.
-- Onde exibir sem atrapalhar (nunca na tela da lista).
-- Receita esperada × impacto na avaliação do app na loja.
+**Decidido (2026-11-24, #82):** a versão grátis tem anúncios; a versão completa não tem nenhum. A concorrência é grande, e "sem anúncios" ajuda a vender a versão completa. Implementação na #89.
+
+- **Formato:** intersticial (tela cheia entre uma tela e outra), com imagem, texto e vídeo. O vídeo começa sem som (`MobileAds.setAppMuted(true)`). Rewarded e banner fora.
+- **Quando aparece:**
+  - ao voltar da tela de adicionar para a lista, **a cada 3 vezes**;
+  - depois de editar um produto, **a cada 3 edições** (contador separado do anterior);
+  - depois do **Terminei**, quando a pessoa toca **Certo** ou **Desfazer** no aviso;
+  - depois de **Jogar a lista fora**, quando a pessoa toca **Certo** ou **Desfazer** no aviso.
+- **Nunca:**
+  - com algum produto riscado (a pessoa está comprando), em nenhum dos momentos acima;
+  - quando o aviso fecha sozinho depois de 15 s (a pessoa pode já ter guardado o celular);
+  - na **primeira semana** de uso.
+- **Limite geral:** no máximo 1 anúncio a cada 5 minutos e 5 por dia, somando todos os momentos. Configurado no bloco de anúncio do AdMob, para ajustar sem versão nova.
+- **Aviso do fim da primeira semana:** no 7º dia, na primeira vez que a pessoa abre o app sem produto riscado, uma vez só, no aviso do meio da tela: "A partir de amanhã, o app continua de graça, com alguns anúncios. Se preferir sem anúncios, tem a versão completa." · **Certo** (principal) · **Conhecer a versão completa** (abre a tela da #88). A tela da versão completa explica o mesmo.
+- **Conteúdo:** classificação máxima **G** (público geral). Categorias bloqueadas, pela marca Mente Alerta (contra golpes): apostas e cassino (inclusive jogos sociais de cassino), enriquecimento rápido, empréstimos e crédito, criptomoedas, namoro, astrologia e simpatias, emagrecimento, remédios e suplementos, procedimentos estéticos, saúde sexual, política e religião. Revisar a central de revisão de anúncios do AdMob de vez em quando, mais no começo.
+- **Consentimento:** UMP integrado, que só pede consentimento onde a lei exige (União Europeia, Reino Unido, alguns estados dos EUA); no Brasil não aparece. Anúncios personalizados no Brasil, com a base legal (legítimo interesse, a validar ao escrever a política) na política de privacidade, e a chave **Anúncios pelo meu interesse** nos Ajustes, ligada por padrão; desligada, o app pede só anúncios não personalizados. No iPhone (fase 5), entra o pedido de rastreamento da Apple (ATT).
+- **Riscos aceitos:** toque acidental (o "X" do anúncio é do Google, o app não controla o tamanho) e impacto na nota da loja. Acompanhar as avaliações e os números do AdMob, e ajustar frequência e limites se preciso.
 
 ### 3.8 Ordem das seções e produtos riscados
 - **Ordem personalizada das seções** ("no meu mercado a padaria fica no fundo"): **decidido (2026-11-24, #79): versão completa**, fase 2, com **uma** ordem só. A ordem padrão continua grátis, e mudar a seção de um produto também (#56). A ordem **por mercado** fica para a fase 4, junto do aviso perto do mercado (3.1). Como reordenar fica para a #85.
@@ -309,7 +323,7 @@ shopping-list/
 | Localização (fase 4) | Google Play Services Geofencing | Depende da análise da seção 3.1 |
 | Backup | Android Auto Backup | |
 | Compras no app | RevenueCat (SDK KMP) sobre o Google Play Billing | Mesmo código no iOS depois |
-| Anúncios | Google Mobile Ads (AdMob) | Só em telas secundárias |
+| Anúncios | Google Mobile Ads (AdMob) + UMP | Intersticiais nos momentos da seção 3.7, nunca durante a compra |
 | Sincronização (fase 3) | Firebase ou Supabase com autenticação anônima | A decidir na fase 3 |
 | Crashes | Firebase Crashlytics + Play Console Android Vitals | Detalhes na seção 4.5 |
 | Uso (analytics) | Firebase Analytics, eventos anônimos | Detalhes na seção 4.5 |
@@ -366,6 +380,7 @@ shopping-list/
 | Crashes | MVP | Firebase Crashlytics + Play Console Android Vitals | Sem dados pessoais nos logs |
 | Uso do app | MVP | Firebase Analytics com lista fechada de eventos | Nunca nome de produto; coleta automática de ID de publicidade desligada; opção para desativar nas configurações |
 | Termos desconhecidos | Fase 2 | Envio agregado, sem identificador | Só com consentimento explícito ("Ajudar a melhorar o app"); filtrar termos de saúde (remédios, etc.) |
+| Anúncios (só grátis) | Fase 2 | Google Mobile Ads (AdMob) + UMP | ID de publicidade só para anúncios; personalização desligável nos Ajustes ("Anúncios pelo meu interesse"); nada da lista vai para o anúncio (seção 3.7) |
 | Conteúdo da lista / histórico | Nunca | — | — |
 
 **Eventos iniciais do analytics (lista fechada):**
@@ -457,7 +472,7 @@ Revisada em 2026-11-24 (#79), à luz do MVP. A tabela diz o que **vai ser** grá
 - **Atalho na tela do celular:** sem versão grátis (o ícone do app já abre direto na lista). O app oferece um botão que põe o atalho sozinho, sem a pessoa procurar o widget (#97).
 - **Ordem das seções:** uma ordem personalizada; a ordem por mercado fica para a fase 4 (seções 3.1 e 3.8).
 - **Quanto gastei:** o app só pede o valor a quem tem a versão completa; o Terminei do grátis fica simples como é (#84).
-- **Anúncios:** se e onde, a #82 decide. Se não houver anúncios, a linha "Sem anúncios" sai, e o resto da tabela continua valendo.
+- **Anúncios:** a versão grátis tem intersticiais em momentos de pausa, nunca durante a compra; a versão completa não tem nenhum (2026-11-24, #82, seção 3.7).
 
 ### Modelo de cobrança (híbrido)
 
@@ -476,7 +491,7 @@ Revisada em 2026-11-24 (#79), à luz do MVP. A tabela diz o que **vai ser** grá
 
 **Ideias de comercialização:**
 - "Dar de presente" via Plano Família: filhos/netos pagam e liberam a versão completa dos pais.
-- Anúncios nunca na tela da lista — só em telas secundárias, como O que já comprei; decisão final na #82.
+- Anúncios só na versão grátis, nos momentos de pausa e nunca durante a compra (seção 3.7, #82). Na primeira semana, sem anúncio; no 7º dia, um aviso diz que o app continua de graça, com anúncios.
 
 ---
 

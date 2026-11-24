@@ -60,6 +60,8 @@
 | Terminei | "Pronto! 8 produtos comprados. Ficaram 3 na lista para a próxima vez." · **Desfazer** · **Certo** |
 | Botão de voz (segurar para falar) | "Segure para falar." acima de **Falar**; com o microfone aberto, o botão vira **Terminei** (2026-11-22, #123) |
 | Toque rápido no **Falar**, sem segurar | "Segure o botão enquanto fala." |
+| Fim da primeira semana (uma vez, no 7º dia) | "A partir de amanhã, o app continua de graça, com alguns anúncios. Se preferir sem anúncios, tem a versão completa." · **Certo** · **Conhecer a versão completa** (2026-11-24, #82) |
+| Chave de anúncios nos Ajustes | **Anúncios pelo meu interesse** (texto de apoio fica para a #89; 2026-11-24, #82) |
 | Voz não entendida | "Não entendi. Pode falar de novo?" |
 | Voz pt-BR ainda baixando | "Estou baixando a voz para ouvir sem internet. Você pode escrever enquanto isso." (2026-11-22, #123) |
 | Voz sem internet (só em erro de rede de verdade) | "Sem internet, não consigo ouvir agora. Você pode escrever." |
