@@ -16,7 +16,8 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Screenshots da tela de adicionar (#53) com fonte em 100% e 200%, no modo claro e no escuro
  * (plano §4.6): produtos achados com quantidade e nome longo, nada achado, a pergunta do produto
- * repetido (#54) e a voz (#60): explicação do microfone, escuta e recado.
+ * repetido (#54), a voz (#60): explicação do microfone, escuta e recado; e a lista colada (#68): o
+ * botão **Colar a lista** e a conferência.
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -115,8 +116,43 @@ class AddScreenshotTest {
     fun alreadyOnList_light_font200() =
         capture("already_on_list_light_font200", SampleAddAlreadyOnListState, SampleAdded)
 
-    private fun capture(name: String, state: AddUiState = SampleAddState, added: List<ListRowUi> = emptyList()) {
-        compose.setContent { ShoppingListTheme { AddContent(state, added = added, canSpeak = true) } }
+    @Test
+    @Config(fontScale = 1.0f)
+    fun review_light_font100() = capture("review_light_font100", SampleAddReviewState)
+
+    @Test
+    @Config(fontScale = 1.5f)
+    fun review_light_font150() = capture("review_light_font150", SampleAddReviewState)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun review_light_font200() = capture("review_light_font200", SampleAddReviewState)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun review_dark_font100() = capture("review_dark_font100", SampleAddReviewState)
+
+    @Test
+    @Config(fontScale = 1.0f)
+    fun paste_light_font100() = capture("paste_light_font100", SampleAddAddedState, SampleAdded, canPaste = true)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun paste_light_font200() = capture("paste_light_font200", SampleAddPastedNothingState, canPaste = true)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun paste_dark_font100() = capture("paste_dark_font100", SampleAddAddedState, SampleAdded, canPaste = true)
+
+    private fun capture(
+        name: String,
+        state: AddUiState = SampleAddState,
+        added: List<ListRowUi> = emptyList(),
+        canPaste: Boolean = false,
+    ) {
+        compose.setContent {
+            ShoppingListTheme { AddContent(state, added = added, canSpeak = true, canPaste = canPaste) }
+        }
         compose.onRoot().captureRoboImage("src/test/screenshots/add_$name.png")
     }
 }

@@ -8,7 +8,9 @@ import br.com.mentealerta.listadecompras.ui.add.SampleAddAddedState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddAlreadyOnListState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddListeningState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddNothingFoundState
+import br.com.mentealerta.listadecompras.ui.add.SampleAddPastedNothingState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddRepeatedState
+import br.com.mentealerta.listadecompras.ui.add.SampleAddReviewState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddVoiceMessageState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddVoiceNoticeState
@@ -61,8 +63,12 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
     }
 
     companion object {
-        private fun add(state: AddUiState, withAdded: Boolean = false): @Composable () -> Unit = {
-            AddContent(state, added = if (withAdded) SampleAdded else emptyList(), canSpeak = true)
+        private fun add(
+            state: AddUiState,
+            withAdded: Boolean = false,
+            canPaste: Boolean = false,
+        ): @Composable () -> Unit = {
+            AddContent(state, added = if (withAdded) SampleAdded else emptyList(), canSpeak = true, canPaste = canPaste)
         }
 
         private val Screens: Map<String, @Composable () -> Unit> = linkedMapOf(
@@ -85,6 +91,9 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "adicionar aviso da voz" to add(SampleAddVoiceNoticeState),
             "adicionar ouvindo" to add(SampleAddListeningState),
             "adicionar recado da voz" to add(SampleAddVoiceMessageState),
+            "adicionar colar a lista" to add(SampleAddAddedState, withAdded = true, canPaste = true),
+            "adicionar colado sem produto" to add(SampleAddPastedNothingState, canPaste = true),
+            "adicionar conferência" to add(SampleAddReviewState),
         )
 
         @JvmStatic

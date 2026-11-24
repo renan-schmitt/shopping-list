@@ -10,6 +10,7 @@ import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
@@ -54,15 +55,25 @@ data class AddUiState(
     val repeated: RepeatedUi? = null,
     /** Falar os produtos (#60): explicação, escuta ou recado; `null` quando a voz não está em uso. */
     val voice: VoiceUi? = null,
+    /** Conferência da lista colada (#68), antes de pôr na lista; `null` fora dela. */
+    val review: ReviewUi? = null,
+    /** O texto colado não tinha produto: "Não achei produtos no texto copiado." */
+    val pastedNothing: Boolean = false,
 ) {
     /**
      * As opções da busca estão na tela (#122): há o que mostrar e nenhuma pergunta, explicação ou
      * escuta na frente. Enquanto isso, "Adicionados" fica escondido.
      */
     val showsOptions: Boolean
-        get() = (found.isNotEmpty() || unknown != null) && repeated == null &&
+        get() = (found.isNotEmpty() || unknown != null) && repeated == null && review == null &&
             voice != VoiceUi.Notice && voice !is VoiceUi.Listening
 }
+
+/**
+ * Conferência (#68): os produtos entendidos na lista colada que ainda não estão na lista ([items]),
+ * na ordem do texto, e os nomes dos que já estão nela ([alreadyOnList]), que não entram de novo.
+ */
+data class ReviewUi(val items: List<AddOptionUi>, val alreadyOnList: List<String> = emptyList())
 
 /**
  * O que entrou na lista: [again] quando a pessoa respondeu "Sim, mais um". Pela voz podem entrar
@@ -131,6 +142,8 @@ data class AddOptionUi(
  * separa os produtos, que entram direto na lista, menos os que já estão nela (#127). (A conferência
  * antes de pôr na lista é a #61.)
  *
+ * Colar a lista (#68) fica no [paste]. Voltar a digitar ou falar deixa a conferência de lado.
+ *
  * O que entrou desde que a tela abriu aparece em [added] ("Adicionados", #122), o mais recente no
  * topo, como está na lista agora ([ObserveListUseCase]): com a quantidade nova depois do "Sim, mais
  * um" e sem o que saiu da lista.
@@ -147,6 +160,7 @@ class AddViewModel(
     removeItem: RemoveItemUseCase,
     undoLastAction: UndoLastActionUseCase,
     private val parseSpeech: ParseSpeechUseCase,
+    parsePastedList: ParsePastedListUseCase,
     private val voiceRecognizer: VoiceRecognizer,
     private val voicePreferences: VoicePreferences,
     observeList: ObserveListUseCase,
@@ -163,6 +177,19 @@ class AddViewModel(
         val items = sections.flatMap { it.items }.associateBy { it.id }
         ids.mapNotNull { items[it]?.toRow(catalogIndex) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), emptyList())
+
+    /** Colar a lista e a conferência (#68). */
+    val paste = PasteReview(
+        scope = viewModelScope,
+        state = _uiState,
+        parsePastedList = parsePastedList,
+        findSameItem = findSameItem,
+        dispatcher = searchDispatcher,
+        toOption = { it.toOption() },
+        put = { items ->
+            addMutex.withLock { addOneByOne(items) }
+        },
+    )
 
     /** Lixeira de "Adicionados" e o aviso dela (2026-11-23). */
     val removal = AddedRemoval(viewModelScope, removeItem, undoLastAction)
@@ -187,7 +214,14 @@ class AddViewModel(
         _uiState.update {
             // Escrever tira o recado da voz; a escuta continua
             val voice = it.voice.takeIf { voice -> voice is VoiceUi.Listening }
-            it.copy(query = text, lastAdded = null, repeated = null, voice = voice)
+            it.copy(
+                query = text,
+                lastAdded = null,
+                repeated = null,
+                voice = voice,
+                review = null,
+                pastedNothing = false,
+            )
         }
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -355,7 +389,7 @@ class AddViewModel(
                 listen(byToggle)
             } else {
                 holding = false
-                _uiState.update { it.copy(voice = voice, lastAdded = null, repeated = null) }
+                _uiState.update { it.copy(voice = voice, lastAdded = null, repeated = null, review = null) }
             }
         }
     }
@@ -363,7 +397,15 @@ class AddViewModel(
     private fun listen(byToggle: Boolean) {
         voiceJob?.cancel()
         toggled = byToggle
-        _uiState.update { it.copy(voice = VoiceUi.Listening(), lastAdded = null, repeated = null) }
+        _uiState.update {
+            it.copy(
+                voice = VoiceUi.Listening(),
+                lastAdded = null,
+                repeated = null,
+                review = null,
+                pastedNothing = false,
+            )
+        }
         voiceJob = viewModelScope.launch {
             val segments = mutableListOf<List<String>>()
             var problem: VoiceUi.Message? = null
@@ -389,17 +431,18 @@ class AddViewModel(
             if (items.isEmpty()) {
                 _uiState.update { it.copy(voice = problem ?: VoiceUi.Message.NOT_UNDERSTOOD) }
             } else {
-                val added = addMutex.withLock { addSpoken(items) }
+                val added = addMutex.withLock { addOneByOne(items) }
                 _uiState.update { it.copy(voice = problem, lastAdded = added) }
             }
         }
     }
 
     /**
-     * Põe na lista o que foi falado, um por vez, menos o que já está nela (#127): o mesmo do "Não"
-     * na pergunta de produto repetido. Um por vez, para o repetido na mesma fala também ficar de fora.
+     * Põe na lista o que foi falado ou colado, um por vez, menos o que já está nela (#127): o mesmo
+     * do "Não" na pergunta de produto repetido. Um por vez, para o repetido na mesma fala também
+     * ficar de fora.
      */
-    private suspend fun addSpoken(items: List<ParsedItem>): AddedUi {
+    private suspend fun addOneByOne(items: List<ParsedItem>): AddedUi {
         val entered = mutableListOf<ParsedItem>()
         val alreadyOnList = mutableListOf<String>()
         items.forEach { item ->
@@ -486,5 +529,70 @@ class AddedRemoval(
     /** Fecha o aviso sem desfazer (a pessoa voltou a digitar ou saiu da tela). */
     fun dismiss() {
         mutableRemoved.value = null
+    }
+}
+
+/**
+ * Colar a lista (#68): o texto copiado vira produtos pelo [ParsePastedListUseCase] e aparece para
+ * conferir ([AddUiState.review]). A pessoa tira o que não quer e toca em **Pôr na lista**; o que já
+ * está na lista não entra de novo, como na voz. [put] põe na lista, um por vez, e diz o que entrou.
+ */
+class PasteReview(
+    private val scope: CoroutineScope,
+    private val state: MutableStateFlow<AddUiState>,
+    private val parsePastedList: ParsePastedListUseCase,
+    private val findSameItem: FindSameItemUseCase,
+    private val dispatcher: CoroutineDispatcher,
+    private val toOption: (ParsedItem) -> AddOptionUi,
+    private val put: suspend (List<ParsedItem>) -> AddedUi,
+) {
+    /**
+     * Tocou em **Colar a lista**: separa os produtos do [text] copiado e abre a conferência com os
+     * que ainda não estão na lista. Se todos já estão, só avisa; sem produto, "Não achei".
+     */
+    fun onPaste(text: String) {
+        scope.launch {
+            val items = withContext(dispatcher) { parsePastedList(text) }
+            val fresh = mutableListOf<ParsedItem>()
+            val alreadyOnList = mutableListOf<String>()
+            items.forEach { item ->
+                val same = findSameItem(item)
+                if (same == null) {
+                    fresh += item
+                } else if (same.name !in alreadyOnList) {
+                    alreadyOnList += same.name
+                }
+            }
+            state.value = when {
+                items.isEmpty() -> AddUiState(pastedNothing = true)
+                fresh.isEmpty() -> AddUiState(lastAdded = AddedUi(name = "", count = 0, alreadyOnList = alreadyOnList))
+                else -> AddUiState(review = ReviewUi(fresh.map(toOption), alreadyOnList))
+            }
+        }
+    }
+
+    /** Lixeira na conferência: o produto não entra. Sem nenhum, a conferência fecha. */
+    fun onRemove(option: AddOptionUi) {
+        state.update { current ->
+            val review = current.review ?: return@update current
+            val items = review.items - option
+            current.copy(review = if (items.isEmpty()) null else review.copy(items = items))
+        }
+    }
+
+    /** **Pôr na lista**: os produtos conferidos entram, um por vez, e o aviso diz quantos. */
+    fun onConfirm() {
+        val review = state.value.review ?: return
+        state.value = AddUiState()
+        scope.launch {
+            val added = put(review.items.map { it.item })
+            val alreadyOnList = (review.alreadyOnList + added.alreadyOnList).distinct()
+            state.update { it.copy(lastAdded = added.copy(alreadyOnList = alreadyOnList)) }
+        }
+    }
+
+    /** **Deixa pra lá** (ou o voltar do celular): nada entra. */
+    fun onDismiss() {
+        state.update { it.copy(review = null) }
     }
 }

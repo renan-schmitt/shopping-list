@@ -8,7 +8,7 @@
 2. **Respeitar sem infantilizar.** Nada de "vovó", excesso de diminutivos, exclamações demais ou emoji em mensagens importantes.
 3. **Botões dizem a ação concreta.** Nunca "OK" ou "Confirmar": usar "Sim, jogar fora" e "Não, deixar como está". Para só fechar um aviso, **Certo** (2026-11-23).
 4. **Nunca culpar a pessoa.** "Não entendi, pode falar de novo?", nunca "Erro no reconhecimento de voz".
-5. **Ícone sempre acompanhado de texto.** Nenhum botão só com ícone. Única exceção: a lixeira de cada produto em **Adicionados**, que se repete em cada linha; o TalkBack lê "Tirar leite da lista" (2026-11-23).
+5. **Ícone sempre acompanhado de texto.** Nenhum botão só com ícone. Única exceção: a lixeira de cada produto em **Adicionados** e na conferência da lista colada, que se repete em cada linha; o TalkBack lê "Tirar leite da lista" (2026-11-23; conferência em 2026-11-24, #68).
 6. **Voltar atrás em vez de pedir confirmação.** Confirmação só para "Jogar a lista fora"; nas outras ações, aviso no meio da tela com **Desfazer** e **Certo** (2026-11-23, no lugar de "Ops, voltar", pedido no teste do app).
 7. **Datas relativas e por extenso:** "ontem", "há 12 dias", "semana passada".
 8. **Sem siglas e sem palavras em inglês.**
@@ -67,5 +67,6 @@
 | Voz para usar sem internet (configurações, Android 13+) | **Baixar a voz para usar sem internet** |
 | Histórico | Botão e título **O que já comprei**; cada compra "Hoje, 2 produtos" · "Ontem, 1 produto" · "Há 12 dias, 8 produtos"; sem compras, "Aqui aparecem as compras de quando você toca em **Terminei**." (2026-11-23, #66) |
 | Mandar a lista | Botão **Mandar a lista** no fim da folha; o texto começa com "Lista de compras" e traz só o que falta, por seção: "- Leite desnatado (2 litros)" (2026-11-24, #67) |
+| Colar uma lista recebida | "Copiou uma lista no WhatsApp?" acima de **Colar a lista**; conferência com o título **Lista recebida**, "Toque na lixeira para tirar o que não quer.", "Leite já está na lista." ou "2 produtos já estão na lista.", **Pôr 5 produtos na lista** · **Deixa pra lá**; sem produto, "Não achei produtos no texto copiado." (2026-11-24, #68) |
 | Sugestão | "Faz 12 dias que você comprou café. Está faltando?" · **Sim, pôr na lista** · **Não** |
 | Lembrete | "Sua lista já tem 20 produtos. Que tal ir ao mercado?" |

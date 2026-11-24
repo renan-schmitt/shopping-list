@@ -147,6 +147,26 @@
         <item quantity="other">Adicionados: %d produtos.</item>
     </plurals>
 
+    <!-- Colar uma lista recebida (#68): o botão só aparece com texto copiado -->
+    <string name="add_paste_hint">Copiou uma lista no WhatsApp?</string>
+    <string name="add_paste">Colar a lista</string>
+    <string name="add_paste_nothing">Não achei produtos no texto copiado.</string>
+    <!-- Conferência da lista colada, antes de pôr na lista (#68) -->
+    <string name="review_title">Lista recebida</string>
+    <string name="review_hint">Toque na lixeira para tirar o que não quer.</string>
+    <string name="review_already_on_list">%1$s já está na lista.</string>
+    <plurals name="review_already_on_list_many">
+        <item quantity="one">%d produto já está na lista.</item>
+        <item quantity="many">%d produtos já estão na lista.</item>
+        <item quantity="other">%d produtos já estão na lista.</item>
+    </plurals>
+    <plurals name="review_confirm">
+        <item quantity="one">Pôr %d produto na lista</item>
+        <item quantity="many">Pôr %d produtos na lista</item>
+        <item quantity="other">Pôr %d produtos na lista</item>
+    </plurals>
+    <string name="review_dismiss">Deixa pra lá</string>
+
     <!-- Edição do produto (#55): tudo é salvo sozinho, não existe "Salvar" -->
     <string name="edit_name_label">Nome</string>
     <string name="edit_quantity_label">Quantidade</string>

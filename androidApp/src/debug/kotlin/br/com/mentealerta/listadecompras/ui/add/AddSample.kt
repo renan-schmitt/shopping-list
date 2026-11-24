@@ -81,6 +81,25 @@ val SampleAddVoiceMessageState = AddUiState(
     lastAdded = AddedUi("arroz", count = 3),
 )
 
+/**
+ * Conferência da lista colada (#68): produtos com quantidade, nome longo e desconhecido, e o que já
+ * está na lista.
+ */
+val SampleAddReviewState = AddUiState(
+    review = ReviewUi(
+        items = listOf(
+            option("Leite desnatado", R.drawable.catalog_fluent_glass_of_milk, Quantity(2.0, QuantityUnit.LITER)),
+            option("Banana", R.drawable.catalog_fluent_banana, Quantity(6.0)),
+            option("Biscoito de polvilho salgado da padaria da esquina", R.drawable.catalog_fluent_rice_cracker),
+            option("Zabumbinha", R.drawable.catalog_fluent_shopping_cart),
+        ),
+        alreadyOnList = listOf("Arroz", "Feijão"),
+    ),
+)
+
+/** O texto colado não tinha produto (#68), com o botão **Colar a lista** ainda na tela. */
+val SampleAddPastedNothingState = AddUiState(pastedNothing = true)
+
 private fun option(name: String, icon: Int, quantity: Quantity? = null) = AddOptionUi(
     item = ParsedItem(name, match = null, quantity, detail = null),
     name = name,
@@ -98,6 +117,12 @@ private fun AddListeningPreview() {
 @Composable
 private fun AddAddedPreview() {
     ShoppingListTheme { AddContent(SampleAddAddedState, added = SampleAdded, canSpeak = true) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddReviewPreview() {
+    ShoppingListTheme { AddContent(SampleAddReviewState, canSpeak = true) }
 }
 
 @Preview(showBackground = true)

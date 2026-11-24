@@ -1,11 +1,13 @@
 package br.com.mentealerta.listadecompras.ui.add
 
 import android.Manifest
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,10 +40,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -72,6 +78,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
+import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.ui.components.BackToListButton
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.HoldButton
@@ -100,6 +107,9 @@ private val AddedDividerWidth = 2.dp
  *
  * O pedido de microfone do Android sai daqui, quando o [AddViewModel] pede ([VoiceUi.AskingPermission]).
  * Se o app sai da tela durante a escuta, o microfone fecha.
+ *
+ * **Colar a lista** (#68) só aparece com texto na área de transferência ([rememberHasCopiedText]); o
+ * texto só é lido no toque. Na conferência, o voltar do celular é o **Deixa pra lá**.
  */
 @Composable
 fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: AddViewModel = koinViewModel()) {
@@ -111,6 +121,8 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
         onClose()
     }
     BackHandler(onBack = close)
+    BackHandler(enabled = uiState.review != null, onBack = viewModel.paste::onDismiss)
+    val hasCopiedText = rememberHasCopiedText()
     val askMicrophone = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
         viewModel::onMicrophonePermission,
@@ -147,6 +159,11 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
             onAcceptNotice = { viewModel.onNoticeAnswer(accepted = true, context.hasMicrophone()) },
             onDeclineNotice = { viewModel.onNoticeAnswer(accepted = false, context.hasMicrophone()) },
             onRemoveItem = viewModel.removal::remove,
+            canPaste = hasCopiedText,
+            onPaste = { context.copiedText()?.let(viewModel.paste::onPaste) },
+            onReviewRemove = viewModel.paste::onRemove,
+            onReviewConfirm = viewModel.paste::onConfirm,
+            onReviewDismiss = viewModel.paste::onDismiss,
             onClose = close,
         )
         UndoNoticeHost(noticeState, Modifier.imePadding())
@@ -155,6 +172,33 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
 
 private fun Context.hasMicrophone(): Boolean =
     checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+
+/**
+ * Se a área de transferência tem texto, pela descrição: ela não lê o conteúdo, então o Android 12+
+ * não mostra o aviso de "colou". Confere quando a janela ganha o foco (sem foco, o Android 10+
+ * esconde a área de transferência) e quando o que foi copiado muda.
+ */
+@Composable
+private fun rememberHasCopiedText(): Boolean {
+    val clipboard = LocalContext.current.getSystemService(ClipboardManager::class.java)
+    val focused = LocalWindowInfo.current.isWindowFocused
+    var hasText by remember { mutableStateOf(false) }
+    DisposableEffect(clipboard, focused) {
+        val check = { hasText = clipboard?.primaryClipDescription?.hasMimeType("text/*") == true }
+        check()
+        clipboard?.addPrimaryClipChangedListener(check)
+        onDispose { clipboard?.removePrimaryClipChangedListener(check) }
+    }
+    return hasText
+}
+
+/** O texto copiado; lido só quando a pessoa toca em **Colar a lista**. Nunca vai para log. */
+private fun Context.copiedText(): String? = getSystemService(ClipboardManager::class.java)
+    ?.primaryClip
+    ?.takeIf { it.itemCount > 0 }
+    ?.getItemAt(0)
+    ?.coerceToText(this)
+    ?.toString()
 
 /**
  * Topo verde com "Voltar para a lista", o campo "Digite ou fale o que quer comprar." e, se o celular
@@ -182,10 +226,16 @@ fun AddContent(
     onAcceptNotice: () -> Unit = {},
     onDeclineNotice: () -> Unit = {},
     onRemoveItem: (ListRowUi) -> Unit = {},
+    canPaste: Boolean = false,
+    onPaste: () -> Unit = {},
+    onReviewRemove: (AddOptionUi) -> Unit = {},
+    onReviewConfirm: () -> Unit = {},
+    onReviewDismiss: () -> Unit = {},
     onClose: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
     val voice = uiState.voice
+    val review = uiState.review
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     LaunchedEffect(voice) {
@@ -195,6 +245,8 @@ fun AddContent(
             else -> focusManager.clearFocus()
         }
     }
+    // Conferindo, o teclado sai da frente.
+    LaunchedEffect(review != null) { if (review != null) focusManager.clearFocus() }
     Column(modifier = modifier.fillMaxSize().background(colors.surface)) {
         AddTopBar(
             query = uiState.query,
@@ -225,21 +277,76 @@ fun AddContent(
                 voice is VoiceUi.Listening -> item(key = "listening", contentType = "listening") {
                     Listening(listening = voice)
                 }
+                review != null -> reviewItems(review, onReviewRemove)
                 repeated != null -> item(key = "repeated", contentType = "repeated") {
                     RepeatedQuestion(name = repeated.name, onAddMore = onAddMore, onKeepAsIs = onKeepAsIs)
                 }
                 searching -> options(uiState, onAdd)
-                else -> {
-                    if (voice is VoiceUi.Message) {
-                        item(key = "voice-message", contentType = "voice-message") { VoiceMessage(voice) }
-                    }
-                    item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
-                    addedList(added, onRemoveItem)
-                }
+                else -> idle(uiState, added, onRemoveItem, onPaste.takeIf { canPaste && uiState.query.isEmpty() })
             }
             item(key = "bottom", contentType = "bottom") { Box(Modifier.navigationBarsPadding()) }
         }
+        review?.let {
+            ReviewButtons(count = it.items.size, onConfirm = onReviewConfirm, onDismiss = onReviewDismiss)
+        }
     }
+}
+
+/**
+ * "Copiou uma lista no WhatsApp?" e **Colar a lista** (#68), no papel, acima de "Adicionados". O
+ * texto de cima é só apoio: o TalkBack lê o botão.
+ */
+@Composable
+private fun PasteButton(onPaste: () -> Unit) {
+    Column(modifier = Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.add_paste_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        SecondaryButton(
+            text = stringResource(R.string.add_paste),
+            onClick = onPaste,
+            icon = painterResource(R.drawable.ic_paste),
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+/** "Não achei produtos no texto copiado.", lido pelo TalkBack assim que aparece. */
+@Composable
+private fun PastedNothing() {
+    Text(
+        text = stringResource(R.string.add_paste_nothing),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .semantics { liveRegion = LiveRegionMode.Polite },
+    )
+}
+
+/**
+ * Sem busca nem pergunta: o recado da voz ou do texto colado, o aviso do que entrou, **Colar a lista**
+ * ([onPaste], `null` sem texto copiado) e "Adicionados".
+ */
+private fun LazyListScope.idle(
+    uiState: AddUiState,
+    added: List<ListRowUi>,
+    onRemoveItem: (ListRowUi) -> Unit,
+    onPaste: (() -> Unit)?,
+) {
+    val voice = uiState.voice
+    if (voice is VoiceUi.Message) {
+        item(key = "voice-message", contentType = "voice-message") { VoiceMessage(voice) }
+    }
+    if (uiState.pastedNothing) {
+        item(key = "pasted-nothing", contentType = "voice-message") { PastedNothing() }
+    }
+    item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
+    if (onPaste != null) item(key = "paste", contentType = "paste") { PasteButton(onPaste) }
+    addedList(added, onRemoveItem)
 }
 
 /** Botão de voz no topo: parado ("Segure para falar.") ou com o microfone aberto ("Terminei"). */
@@ -628,17 +735,37 @@ private fun QuantityBadge(text: String) {
     )
 }
 
-/**
- * Linha de "Adicionados": nome (com detalhe e quantidade) → ícone → lixeira, com uma linha discreta
- * embaixo. Para o TalkBack, o nome é um texto só, em caixa normal, e a lixeira é o botão "Tirar leite
- * da lista".
- */
+/** Linha de "Adicionados", como está na lista agora, com uma linha discreta embaixo. */
 @Composable
 private fun AddedRow(row: ListRowUi, onRemove: () -> Unit) {
+    TrashRow(
+        name = row.name,
+        detail = row.detail,
+        quantity = row.quantity,
+        icon = row.icon,
+        onRemove = onRemove,
+        checked = row.checked,
+    )
+}
+
+/**
+ * Linha com nome (com [detail] e [quantity]) → ícone → lixeira, de "Adicionados" e da conferência
+ * (#68). Para o TalkBack, o nome é um texto só, em caixa normal, e a lixeira é o botão "Tirar leite
+ * da lista". Com [checked], o nome aparece riscado, como na lista.
+ */
+@Composable
+internal fun TrashRow(
+    name: String,
+    detail: String?,
+    quantity: Quantity?,
+    @DrawableRes icon: Int,
+    onRemove: () -> Unit,
+    checked: Boolean = false,
+) {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
-    val name = row.detail?.let { stringResource(R.string.list_item_name_with_detail, row.name, it) } ?: row.name
-    val quantity = row.quantity?.format(LocalContext.current.resources)
-    val label = quantity?.let { stringResource(R.string.list_item_with_quantity, name, it.spoken) } ?: name
+    val fullName = detail?.let { stringResource(R.string.list_item_name_with_detail, name, it) } ?: name
+    val formatted = quantity?.format(LocalContext.current.resources)
+    val label = formatted?.let { stringResource(R.string.list_item_with_quantity, fullName, it.spoken) } ?: fullName
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -657,17 +784,17 @@ private fun AddedRow(row: ListRowUi, onRemove: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             itemVerticalAlignment = Alignment.CenterVertically,
         ) {
-            ItemName(text = name, checked = row.checked)
-            if (quantity != null) ListQuantityBadge(text = quantity.visible, checked = row.checked)
+            ItemName(text = fullName, checked = checked)
+            if (formatted != null) ListQuantityBadge(text = formatted.visible, checked = checked)
         }
         Image(
-            painter = painterResource(row.icon),
+            painter = painterResource(icon),
             contentDescription = null,
             modifier = Modifier.size(OptionIconSize).clearAndSetSemantics {},
         )
         IconOnlyButton(
             icon = painterResource(R.drawable.ic_trash),
-            label = stringResource(R.string.add_added_remove, row.name),
+            label = stringResource(R.string.add_added_remove, name),
             onClick = onRemove,
             modifier = Modifier.padding(bottom = ComicTheme.tokens.smallShadow),
         )

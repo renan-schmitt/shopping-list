@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Prancheta do "Colar a lista" (#68), no mesmo traço grosso dos outros ícones dos botões. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="30dp"
+    android:height="30dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M8,4.5H6.5A1.5,1.5 0,0 0,5 6v14a1.5,1.5 0,0 0,1.5 1.5h11A1.5,1.5 0,0 0,19 20V6a1.5,1.5 0,0 0,-1.5 -1.5H16M9,3h6v3H9zM9,11h6M9,15.5h4"
+        android:strokeWidth="2.6"
+        android:strokeColor="#FF141414"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

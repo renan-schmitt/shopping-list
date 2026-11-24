@@ -148,12 +148,6 @@ class ItemTextParser(private val index: CatalogIndex) {
         /** Pontuação colada nas palavras ("leite." vindo da voz); hífen e apóstrofo ficam. */
         val PUNCTUATION = charArrayOf('.', ',', ';', ':', '!', '?', '"', '(', ')')
 
-        /** Sempre separam produtos. */
-        val SEPARATORS = setOf(';', '\n', '\r')
-
-        /** Separam produtos, menos entre dígitos ("1,5", "0.5"). */
-        val SEPARATORS_OUTSIDE_NUMBERS = setOf(',', '.')
-
         /** Ligam a unidade ao produto: "dois litros **de** leite". Já sem acento. */
         val CONNECTORS = setOf("de", "da", "do", "das", "dos")
 
@@ -165,20 +159,5 @@ class ItemTextParser(private val index: CatalogIndex) {
 
         fun words(text: String): List<String> =
             text.split(WHITESPACE).map { it.trim(*PUNCTUATION) }.filter { it.isNotEmpty() }
-
-        fun splitOnSeparators(text: String): List<String> = buildList {
-            val current = StringBuilder()
-            text.forEachIndexed { i, char ->
-                val betweenDigits = text.getOrNull(i - 1)?.isDigit() == true && text.getOrNull(i + 1)?.isDigit() == true
-                val separates = char in SEPARATORS || (char in SEPARATORS_OUTSIDE_NUMBERS && !betweenDigits)
-                if (separates) {
-                    add(current.toString())
-                    current.clear()
-                } else {
-                    current.append(char)
-                }
-            }
-            add(current.toString())
-        }
     }
 }

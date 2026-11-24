@@ -14,6 +14,7 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
@@ -129,6 +130,7 @@ class AddFixture {
         RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
         ParseSpeechUseCase(ItemTextParser(index)),
+        ParsePastedListUseCase(ItemTextParser(index), index),
         voice,
         voicePreferences,
         ObserveListUseCase(repository),
