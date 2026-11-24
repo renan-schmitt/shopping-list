@@ -1,5 +1,8 @@
 package br.com.mentealerta.listadecompras.di
 
+import br.com.mentealerta.listadecompras.billing.CurrentActivity
+import br.com.mentealerta.listadecompras.billing.createBillingStore
+import br.com.mentealerta.listadecompras.premium.BillingStore
 import br.com.mentealerta.listadecompras.ui.add.AddViewModel
 import br.com.mentealerta.listadecompras.ui.edit.EditViewModel
 import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
@@ -17,6 +20,9 @@ val appModule = module {
     // Sem o despachante da busca: fica o padrão do construtor.
     viewModel { AddViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     single<VoiceRecognizer> { AndroidVoiceRecognizer(androidContext()) }
+    single { CurrentActivity() }
+    // Release: Google Play Billing; debug: loja falsa (src/debug)
+    single<BillingStore> { createBillingStore(androidContext(), get()) }
     viewModelOf(::EditViewModel)
     viewModelOf(::HistoryViewModel)
 }

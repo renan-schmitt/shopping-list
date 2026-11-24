@@ -67,6 +67,8 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    // Versão completa: compra única direto pelo Google Play Billing (plano §4.3, #86)
+    implementation(libs.billing.ktx)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 

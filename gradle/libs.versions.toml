@@ -13,6 +13,7 @@ ksp = "2.3.13"
 room = "3.0.3"
 sqlite = "2.7.1"
 datastore = "1.3.0"
+billing = "9.1.0"
 turbine = "1.2.1"
 junit = "4.13.2"
 robolectric = "4.17"
@@ -49,6 +50,7 @@ room-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 sqlite-bundled-jvm = { module = "androidx.sqlite:sqlite-bundled-jvm", version.ref = "sqlite" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }
 datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 junit = { module = "junit:junit", version.ref = "junit" }

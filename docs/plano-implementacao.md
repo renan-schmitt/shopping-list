@@ -322,7 +322,7 @@ shopping-list/
 | Widget | Jetpack Glance | |
 | Localização (fase 4) | Google Play Services Geofencing | Depende da análise da seção 3.1 |
 | Backup | Android Auto Backup | |
-| Compras no app | RevenueCat (SDK KMP) sobre o Google Play Billing | Mesmo código no iOS depois |
+| Compras no app | Google Play Billing (Billing Library), direto (2026-11-24, #86) | Como no app Mente Alerta: sem serviço de terceiros (só o Google vê a compra), só o produto no Play Console, loja falsa no build debug. A lógica (guardar a compra, confirmar à loja, pendente, restaurar) fica no `shared` atrás da interface `BillingStore`; o iPhone (fase 5) implementa a mesma interface com StoreKit. Sem servidor, a compra não é conferida fora do celular. RevenueCat descartado por ora: reavaliar na fase 3, com a assinatura do Plano Família e o servidor. Passo a passo: [configurar-compras.md](configurar-compras.md) |
 | Anúncios | Google Mobile Ads (AdMob) + UMP | Intersticiais nos momentos da seção 3.7, nunca durante a compra |
 | Sincronização (fase 3) | Firebase ou Supabase com autenticação anônima | A decidir na fase 3 |
 | Crashes | Firebase Crashlytics + Play Console Android Vitals | Detalhes na seção 4.5 |
@@ -486,7 +486,7 @@ Revisada em 2026-11-24 (#79), à luz do MVP. A tabela diz o que **vai ser** grá
 - A sincronização (fase 3) gera custo recorrente — a assinatura entra junto com ela, voltada a quem a aceita melhor (filhos/netos).
 - O Google Play não permite presentear compras dentro do app; o "Dar de presente" só fica viável com celulares pareados (Plano Família).
 - Quem comprou a versão completa mantém tudo o que comprou e ganha o que entrar nela depois, menos o que precisa de servidor (família) — "para sempre" tem que ser para sempre (2026-11-24, #79).
-- "Premium para sempre" é o nome interno (RevenueCat, Play Console). O nome do Plano Família na interface, e como falar da cobrança mensal sem "assinar", fica para a fase 3.
+- "Premium para sempre" é o nome interno; no Play Console, o produto é `versao_completa` (compra única, não consumível; 2026-11-24, #86). O nome do Plano Família na interface, e como falar da cobrança mensal sem "assinar", fica para a fase 3.
 - Meios de pagamento no Google Play Brasil a confirmar (Pix, operadora, vale-presente) — relevantes para quem não tem cartão.
 
 **Ideias de comercialização:**

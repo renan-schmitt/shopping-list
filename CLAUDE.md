@@ -8,6 +8,7 @@ Lista de compras para pessoas **60+**, da família de apps **Mente Alerta**. And
 - [docs/guia-de-linguagem.md](docs/guia-de-linguagem.md) — como escrever todo texto do app
 - [docs/ideias.md](docs/ideias.md) — ideias originais
 - [docs/prototipos/](docs/prototipos/) — protótipos HTML (cores, fontes, ícones)
+- [docs/configurar-compras.md](docs/configurar-compras.md) — compra da versão completa: Play Console e testes em sandbox (debug usa loja falsa)
 - Identidade visual (cores, fontes, tamanhos, linha do produto): [plano §4.8](docs/plano-implementacao.md#48-identidade-visual)
 
 Leia o plano e o guia antes de implementar qualquer tela ou texto.
