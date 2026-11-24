@@ -1,6 +1,6 @@
 # Plano de Implementação — Lista de Compras 60+
 
-> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-11.
+> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-24.
 
 ## Princípios
 
@@ -25,7 +25,7 @@ O que precisa existir na primeira versão publicada.
 - [ ] Botão **Mudar a lista** no fim da folha: abre a lista inteira em modo de mudança; tocar num produto abre a edição. **Jogar a lista fora** fica no fim desse modo, com a confirmação de sempre (2026-11-22)
 - [ ] Produto repetido não duplica: "Leite já está na lista. Quer mais um?"
 - [ ] Marcar como comprado **deslizando ou tocando** — item fica riscado e cinza, com vibração. Tocar só risca: não abre a edição, para evitar toques acidentais (2026-11-22)
-- [ ] "Ops, voltar" para desfazer qualquer ação (marcar, remover, jogar fora)
+- [ ] **Desfazer** qualquer ação (marcar, tirar, jogar fora) — no lugar de "Ops, voltar" desde 2026-11-23
 - [ ] Botão **Terminei**: tira da lista o que foi comprado e grava no histórico
 - [ ] **Tela única que se adapta** (sem "modo No mercado"):
   - Antes de riscar o primeiro produto: botão grande **Adicionar**
@@ -126,6 +126,7 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 - **Problema:** exige permissão de localização "o tempo todo". No Android 11+ essa opção fica escondida nas configurações — difícil para o público 60+. O Google Play exige justificativa e revisão para localização em segundo plano.
 - **Problema 2:** saber onde ficam os mercados exige API paga (ex.: Google Places), o que conflita com "sem backend".
 - **Hipótese a validar:** botão "Estou no mercado" que grava o local na primeira visita; depois um geofence local (limite de 100 por app) avisa nas próximas. Sem API externa.
+- **Versão completa (2026-11-24, #79).** A ordem das seções **por mercado** (seção 3.8) nasce junto com este aviso, que sabe em qual mercado a pessoa está.
 - **A analisar:** taxa de aceitação da permissão nesse público, consumo de bateria, política do Google Play, comportamento no iOS.
 
 ### 3.2 Notificações em geral
@@ -220,7 +221,7 @@ Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 - Receita esperada × impacto na avaliação do app na loja.
 
 ### 3.8 Ordem das seções e produtos riscados
-- **Ordem personalizada das seções** ("no meu mercado a padaria fica no fundo"): candidata a premium na fase 2. Pode se integrar ao aviso perto do mercado (3.1), guardando a ordem por mercado.
+- **Ordem personalizada das seções** ("no meu mercado a padaria fica no fundo"): **decidido (2026-11-24, #79): versão completa**, fase 2, com **uma** ordem só. A ordem padrão continua grátis, e mudar a seção de um produto também (#56). A ordem **por mercado** fica para a fase 4, junto do aviso perto do mercado (3.1). Como reordenar fica para a #85.
 - ~~**Mover riscados para o final da seção:** facilita ver o que falta, mas quebra a metáfora do papel. Testar com usuários na fase 0.~~ **Decidido (2026-11-22):** riscados vão para a seção "Já peguei", no fim da lista (seção 1.1).
 
 ### 3.9 Validação com usuários reais
@@ -414,52 +415,68 @@ Decidida em 2026-11-10 a partir do protótipo [prototipos/cores-destaque.html](p
 | Item riscado | Traço grosso por cima + texto cinza + marca preenchida com ✓ (estado nunca só por cor) |
 | Logo | "Lista de Compras" em Bangers, branco com contorno preto, com "Mente Alerta" pequeno acima. **Na lista vazia (2026-11-23):** a arte do ícone do app (cantos arredondados, contorno e sombra de quadrinhos) e "Mente Alerta" em verde-folha logo acima do título **Lista de Compras** |
 | Ícone do app | Arte da família Mente Alerta: casal 60+ com carrinho e prancheta de lista ([identidade/icone-original.png](identidade/icone-original.png)). **Decidido (2026-11-22, #10):** a arte inteira vale também no celular, sem versão simplificada. Ícone adaptativo com fundo azul-petróleo `#02979F` e a arte na área visível (72 de 108dp): no círculo, rostos, prancheta e carrinho ficam inteiros. Os cantos brancos da arte foram pintados com a cor da borda; na Play Store vai [identidade/icone-play-store.png](identidade/icone-play-store.png) (512 px, quadrado cheio). Sem versão de uma cor (ícone temático do Android 13+): a ilustração não vira silhueta, e o celular mostra o ícone colorido. Se no teste com pessoas 60+ o ícone não for reconhecido a 48 px, volta a ideia da versão simplificada ([prototipos/icone-tamanhos.html](prototipos/icone-tamanhos.html)). O logo fica para outra issue |
-| Modo escuro | Segue o sistema — paleta a definir |
+| Modo escuro | Segue o sistema — paleta a definir. **Grátis (2026-11-24, #79):** modo escuro e a escolha manual de claro ou escuro nos Ajustes nunca são da versão completa |
 
 ---
 
 ## 5. Grátis × Premium
 
-**Regra:** tudo que é essencial para fazer a lista e usar no mercado, e toda a acessibilidade, é grátis. O premium vende **conforto, família e inteligência extra**.
+**Regra:** tudo que é essencial para fazer a lista e usar no mercado, e toda a acessibilidade, é grátis. O premium vende **conforto, família e inteligência extra**. Na interface, o premium se chama **Versão completa** ([guia de linguagem](guia-de-linguagem.md)).
 
-| Funcionalidade | Grátis | Premium |
+Revisada em 2026-11-24 (#79), à luz do MVP. A tabela diz o que **vai ser** grátis ou pago; o que já está pronto se acompanha no board.
+
+| Funcionalidade | Grátis | Versão completa |
 |---|:---:|:---:|
-| Lista única com ícones e categorias | ✅ | ✅ |
+| Lista única, por seção na ordem do mercado, com ícones | ✅ | ✅ |
 | Adicionar digitando, falando e por sugestão | ✅ | ✅ |
-| Normalização de nomes | ✅ | ✅ |
-| Riscar, Terminei, Jogar a lista fora, Ops voltar | ✅ | ✅ |
-| Letras grandes, alto contraste, TalkBack | ✅ | ✅ |
-| Enviar / colar lista pelo WhatsApp | ✅ | ✅ |
+| Nomes do jeito da pessoa: sinônimos, regionalismos, busca aproximada | ✅ | ✅ |
+| Riscar, Terminei, Desfazer | ✅ | ✅ |
+| Mudar a lista: quantidade, detalhe, Tirar da lista, Jogar a lista fora | ✅ | ✅ |
+| Mudar a seção de um produto (o app lembra) | ✅ | ✅ |
+| Letras grandes, alto contraste, TalkBack, tela que não apaga durante a compra | ✅ | ✅ |
+| Modo escuro (segue o celular ou escolhido nos Ajustes) | ✅ | ✅ |
+| Mandar a lista e Colar a lista (WhatsApp), com a conferência "Lista recebida" | ✅ | ✅ |
 | Backup automático (Android Auto Backup) | ✅ | ✅ |
-| Histórico de compras (últimos 30 dias) | ✅ | ✅ |
-| Sugestões básicas ("faz tempo que não compra") | ✅ | ✅ |
+| O que já comprei (últimos 30 dias) | ✅ | ✅ |
+| Sugestões dentro do app: "Está faltando?" e "Você costuma comprar" | ✅ | ✅ |
 | **Sem anúncios** | — | ✅ |
-| Histórico completo (sem limite de tempo) | — | ✅ |
-| Notificações inteligentes (lista grande, produto atrasado) | — | ✅ |
-| Aviso ao chegar perto do mercado | — | ✅ |
-| Lista compartilhada em tempo real com a família | — | ✅ |
-| "Quanto gastei" e estatísticas de gastos | — | ✅ |
-| Widget na tela inicial | — | ✅ |
+| O que já comprei sem limite de tempo | — | ✅ |
+| Lembretes fora do app (lista grande, produto atrasado) | — | ✅ |
 | "Os de sempre" (pôr os produtos fixos na lista com um toque) | — | ✅ |
-| Temas de cor / estilos de papel | — | ✅ |
+| Atalho na tela do celular (widget) | — | ✅ |
+| Ordem das seções do meu mercado | — | ✅ |
+| Temas decorativos: cores e estilos de papel | — | ✅ |
+| "Quanto gastei" e estatísticas de gastos | — | ✅ |
+| Aviso ao chegar perto do mercado (fase 4) | — | ✅ |
+| Lista compartilhada em tempo real com a família (fase 3) | — | Plano Família |
+
+**Fronteiras decididas (2026-11-24, #79):**
+- **Sugestões:** o grátis sugere **dentro do app**, quando a pessoa abre, e ela põe **um a um**. A versão completa avisa **fora do app** (notificação) e tem a **lista fixa da pessoa**, que entra toda de uma vez. As sugestões do grátis usam o **histórico inteiro**, não só os 30 dias que a tela mostra: a inteligência básica não piora para quem não paga.
+- **Histórico:** as compras antigas ficam no celular (e no backup); quem compra a versão completa vê tudo na hora.
+- **Temas:** todos com contraste de pelo menos 4,5:1, os mesmos tamanhos e o estado nunca só por cor. Tema **mais fácil de ler** que o padrão vai para o grátis: a versão completa vende enfeite, nunca legibilidade.
+- **Atalho na tela do celular:** sem versão grátis (o ícone do app já abre direto na lista). O app oferece um botão que põe o atalho sozinho, sem a pessoa procurar o widget (#97).
+- **Ordem das seções:** uma ordem personalizada; a ordem por mercado fica para a fase 4 (seções 3.1 e 3.8).
+- **Quanto gastei:** o app só pede o valor a quem tem a versão completa; o Terminei do grátis fica simples como é (#84).
+- **Anúncios:** se e onde, a #82 decide. Se não houver anúncios, a linha "Sem anúncios" sai, e o resto da tabela continua valendo.
 
 ### Modelo de cobrança (híbrido)
 
 | Produto | Tipo | Fase | Quem paga | O que libera |
 |---|---|---|---|---|
-| **Premium para sempre** | Compra única | 2 | O próprio usuário | Tudo da coluna Premium, exceto a lista compartilhada |
-| **Plano Família** | Assinatura (mensal/anual) | 3 | Filho/neto | Lista compartilhada em tempo real + premium liberado em todos os celulares pareados |
+| **Premium para sempre** (na interface: **Versão completa**) | Compra única | 2 | O próprio usuário | Tudo da coluna Versão completa, de hoje e do futuro, exceto a lista compartilhada |
+| **Plano Família** | Assinatura (mensal/anual) | 3 | Filho/neto | Lista compartilhada em tempo real + versão completa liberada em todos os celulares pareados |
 
 **Por quê:**
 - O público 60+ desconfia de assinatura; sem backend não há custo recorrente que a justifique.
 - A sincronização (fase 3) gera custo recorrente — a assinatura entra junto com ela, voltada a quem a aceita melhor (filhos/netos).
 - O Google Play não permite presentear compras dentro do app; o "Dar de presente" só fica viável com celulares pareados (Plano Família).
-- Quem comprou o Premium para sempre mantém tudo o que comprou.
+- Quem comprou a versão completa mantém tudo o que comprou e ganha o que entrar nela depois, menos o que precisa de servidor (família) — "para sempre" tem que ser para sempre (2026-11-24, #79).
+- "Premium para sempre" é o nome interno (RevenueCat, Play Console). O nome do Plano Família na interface, e como falar da cobrança mensal sem "assinar", fica para a fase 3.
 - Meios de pagamento no Google Play Brasil a confirmar (Pix, operadora, vale-presente) — relevantes para quem não tem cartão.
 
 **Ideias de comercialização:**
-- "Dar de presente" via Plano Família: filhos/netos pagam e liberam o premium dos pais.
-- Anúncios nunca na tela da lista — só em telas secundárias (histórico, sugestões).
+- "Dar de presente" via Plano Família: filhos/netos pagam e liberam a versão completa dos pais.
+- Anúncios nunca na tela da lista — só em telas secundárias, como O que já comprei; decisão final na #82.
 
 ---
 
@@ -469,7 +486,7 @@ Decidida em 2026-11-10 a partir do protótipo [prototipos/cores-destaque.html](p
 |---|---|
 | **0 — Fundação** | Decidir stack, montar catálogo inicial e ícones, protótipo navegável, teste com 3–5 pessoas 60+ |
 | **1 — MVP Android (grátis)** | Seção 1 completa, publicação na Play Store |
-| **2 — Monetização** | Anúncios + premium (sem anúncios, histórico completo, notificações, widget, "Os de sempre") |
+| **2 — Monetização** | Anúncios + versão completa (sem anúncios, histórico completo, lembretes, atalho na tela do celular, "Os de sempre", ordem das seções) |
 | **3 — Família** | Backend com login anônimo, lista compartilhada em tempo real |
 | **4 — Localização** | Aviso perto do mercado (após análise da seção 3.1) |
 | **5 — iPhone** | Publicação na App Store |

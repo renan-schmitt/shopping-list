@@ -14,7 +14,7 @@ Leia o plano e o guia antes de implementar qualquer tela ou texto.
 
 ## Regras que não se negociam
 
-- **Todo texto exibido segue o guia de linguagem** ("Tirar da lista", "Terminei", "Ops, voltar"; nada de "OK", "excluir", "desfazer").
+- **Todo texto exibido segue o guia de linguagem** ("Tirar da lista", "Terminei", "Desfazer"; nada de "OK", "excluir", "apagar").
 - **Acessibilidade nunca é premium.** Áreas de toque grandes, TalkBack, escala de fonte até 200%, estado nunca só por cor.
 - **O conteúdo da lista e o histórico nunca saem do celular** — nem em logs, crashes ou analytics (só a lista fechada de eventos do [plano §4.5](docs/plano-implementacao.md#45-privacidade-métricas-e-coleta-de-dados)).
 - **Ícone sempre acompanha o nome**, ao lado do texto — nunca por cima, nunca no lugar dele.
