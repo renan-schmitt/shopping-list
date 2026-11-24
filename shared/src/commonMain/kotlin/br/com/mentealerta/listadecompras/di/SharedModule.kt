@@ -15,6 +15,7 @@ import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.GetPremiumPriceUseCase
 import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveFeaturesUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
@@ -76,6 +77,7 @@ val sharedModule = module {
     factoryOf(::FinishShoppingUseCase)
     factoryOf(::UndoLastActionUseCase)
     factoryOf(::ObservePremiumUseCase)
+    factoryOf(::ObserveFeaturesUseCase)
     factoryOf(::GetPremiumPriceUseCase)
     factoryOf(::BuyPremiumUseCase)
     factoryOf(::RestorePremiumUseCase)
