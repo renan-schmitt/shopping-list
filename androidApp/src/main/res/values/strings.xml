@@ -293,6 +293,9 @@
     <string name="history_purchase_title">%1$s, %2$s</string>
     <!-- Sem compras nos últimos 30 dias. Em HTML escapado, para o negrito chegar ao Compose -->
     <string name="history_empty">Aqui aparecem as compras de quando você toca em &lt;b>Terminei&lt;/b>.</string>
+    <!-- Versão grátis com compras de mais de 30 dias, no fim da tela (#90) -->
+    <string name="history_older_note">As compras de mais de 30 dias continuam guardadas. Com a versão completa, você vê todas.</string>
+    <string name="history_full_version">Conhecer a versão completa</string>
 
     <!-- Tela "Versão completa" (#88, plano §5): o que vem e como comprar, sem pressão; caixa alta vem do estilo -->
     <string name="full_version_title">Versão completa</string>

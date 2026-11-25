@@ -14,6 +14,7 @@ import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
+import br.com.mentealerta.listadecompras.domain.ObserveFeaturesUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
@@ -120,6 +121,8 @@ class ListViewModelTest {
     private val history = MutableStateFlow(emptyList<Purchase>())
     private val historyRepository = object : PurchaseHistoryRepository {
         override fun observePurchases(since: Instant?) = history
+
+        override fun observeHasPurchasesBefore(before: Instant) = flowOf(false)
     }
 
     private val premium = FakePremiumRepository()
@@ -146,7 +149,7 @@ class ListViewModelTest {
         ClearListUseCase(repository, undoStack),
         RemoveItemUseCase(repository, undoStack),
         UndoLastActionUseCase(repository, undoStack),
-        ObservePurchaseHistoryUseCase(historyRepository, Clock.System),
+        ObservePurchaseHistoryUseCase(historyRepository, ObserveFeaturesUseCase(premium), Clock.System),
         ObservePremiumUseCase(premium),
         ads.useCases,
     )

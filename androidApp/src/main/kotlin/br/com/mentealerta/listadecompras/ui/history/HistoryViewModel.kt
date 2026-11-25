@@ -20,11 +20,17 @@ sealed interface HistoryUiState {
     /** O banco ainda não respondeu. */
     data object Loading : HistoryUiState
 
-    /** Nenhuma compra nos dias que a versão mostra. */
-    data object Empty : HistoryUiState
+    /**
+     * Nenhuma compra nos dias que a versão mostra. Com [hasOlder], há compras mais antigas que só a
+     * versão completa mostra (#90).
+     */
+    data class Empty(val hasOlder: Boolean = false) : HistoryUiState
 
-    /** Compras da mais recente para a mais antiga. */
-    data class Content(val purchases: List<PurchaseUi>) : HistoryUiState
+    /**
+     * Compras da mais recente para a mais antiga. Com [hasOlder], há compras mais antigas que só a
+     * versão completa mostra (#90).
+     */
+    data class Content(val purchases: List<PurchaseUi>, val hasOlder: Boolean = false) : HistoryUiState
 }
 
 /** Compra feita há [daysAgo] dias (0 é hoje), com os produtos na ordem em que estavam na lista. */
@@ -35,13 +41,18 @@ data class PurchasedRowUi(val name: String, val quantity: Quantity?, @DrawableRe
 
 /**
  * "O que já comprei" (#66, plano §1.5): o histórico gravado pelo "Terminei", só para ver. Na versão
- * grátis, os últimos 30 dias ([ObservePurchaseHistoryUseCase]).
+ * grátis, os últimos 30 dias, com o recado da versão completa quando há compras mais antigas; na
+ * versão completa, tudo (#90, [ObservePurchaseHistoryUseCase]).
  */
 class HistoryViewModel(observeHistory: ObservePurchaseHistoryUseCase, private val catalogIndex: CatalogIndex) :
     ViewModel() {
     val uiState: StateFlow<HistoryUiState> = observeHistory()
-        .map { purchases ->
-            if (purchases.isEmpty()) HistoryUiState.Empty else HistoryUiState.Content(purchases.map { it.toUi() })
+        .map { (purchases, hasOlder) ->
+            if (purchases.isEmpty()) {
+                HistoryUiState.Empty(hasOlder)
+            } else {
+                HistoryUiState.Content(purchases.map { it.toUi() }, hasOlder)
+            }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), HistoryUiState.Loading)
 

@@ -1,6 +1,9 @@
 package br.com.mentealerta.listadecompras.domain
 
 import app.cash.turbine.test
+import br.com.mentealerta.listadecompras.premium.PremiumRepository
+import br.com.mentealerta.listadecompras.premium.PurchaseResult
+import br.com.mentealerta.listadecompras.premium.RestoreResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -20,7 +23,8 @@ class ObservePurchaseHistoryUseCaseTest {
         override fun now(): Instant = Instant.parse("2026-11-23T04:00:00Z")
     }
     private val repository = FakeHistoryRepository()
-    private val useCase = ObservePurchaseHistoryUseCase(repository, clock, timeZone)
+    private val premium = FakePremiumRepository()
+    private val useCase = ObservePurchaseHistoryUseCase(repository, ObserveFeaturesUseCase(premium), clock, timeZone)
 
     @Test
     fun countsCalendarDaysInThePhoneTimeZone() = runTest {
@@ -32,7 +36,7 @@ class ObservePurchaseHistoryUseCaseTest {
         useCase().test {
             assertEquals(
                 listOf(PastPurchase(thisMorning, 0), PastPurchase(lastNight, 1), PastPurchase(twelveDaysAgo, 12)),
-                awaitItem(),
+                awaitItem().purchases,
             )
         }
     }
@@ -43,15 +47,42 @@ class ObservePurchaseHistoryUseCaseTest {
         val thirtyOneDaysAgo = purchase("2026-10-24T02:59:59Z") // 23/10, 23h59
         repository.purchases.value = listOf(thirtyDaysAgo, thirtyOneDaysAgo)
 
-        useCase().test { assertEquals(listOf(PastPurchase(thirtyDaysAgo, 30)), awaitItem()) }
+        useCase().test {
+            assertEquals(PurchaseHistory(listOf(PastPurchase(thirtyDaysAgo, 30)), hasOlder = true), awaitItem())
+        }
     }
 
     @Test
-    fun withoutLimitShowsEverything() = runTest {
+    fun freeVersionWithoutOlderPurchasesHasNothingHidden() = runTest {
+        val yesterday = purchase("2026-11-22T12:00:00Z")
+        repository.purchases.value = listOf(yesterday)
+
+        useCase().test {
+            assertEquals(PurchaseHistory(listOf(PastPurchase(yesterday, 1)), hasOlder = false), awaitItem())
+        }
+    }
+
+    @Test
+    fun completeVersionShowsEverything() = runTest {
+        premium.isPremium.value = true
         val longAgo = purchase("2025-01-10T12:00:00Z")
         repository.purchases.value = listOf(longAgo)
 
-        useCase(historyDays = null).test { assertEquals(listOf(PastPurchase(longAgo, 682)), awaitItem()) }
+        useCase().test {
+            assertEquals(PurchaseHistory(listOf(PastPurchase(longAgo, 682)), hasOlder = false), awaitItem())
+        }
+    }
+
+    @Test
+    fun buyingTheCompleteVersionShowsEverythingRightAway() = runTest {
+        val longAgo = purchase("2025-01-10T12:00:00Z")
+        repository.purchases.value = listOf(longAgo)
+
+        useCase().test {
+            assertEquals(PurchaseHistory(emptyList(), hasOlder = true), awaitItem())
+            premium.isPremium.value = true
+            assertEquals(PurchaseHistory(listOf(PastPurchase(longAgo, 682)), hasOlder = false), awaitItem())
+        }
     }
 
     @Test
@@ -59,7 +90,7 @@ class ObservePurchaseHistoryUseCaseTest {
         val future = purchase("2026-11-25T12:00:00Z")
         repository.purchases.value = listOf(future)
 
-        useCase().test { assertEquals(listOf(PastPurchase(future, 0)), awaitItem()) }
+        useCase().test { assertEquals(listOf(PastPurchase(future, 0)), awaitItem().purchases) }
     }
 
     private fun purchase(date: String) = Purchase.create(
@@ -73,5 +104,20 @@ class ObservePurchaseHistoryUseCaseTest {
 
         override fun observePurchases(since: Instant?): Flow<List<Purchase>> =
             purchases.map { all -> all.filter { since == null || it.date >= since } }
+
+        override fun observeHasPurchasesBefore(before: Instant): Flow<Boolean> =
+            purchases.map { all -> all.any { it.date < before } }
+    }
+
+    private class FakePremiumRepository : PremiumRepository {
+        override val isPremium = MutableStateFlow(false)
+
+        override fun start() = Unit
+
+        override suspend fun price(): String? = null
+
+        override suspend fun buy(): PurchaseResult = PurchaseResult.Failed
+
+        override suspend fun restore(): RestoreResult = RestoreResult.Failed
     }
 }

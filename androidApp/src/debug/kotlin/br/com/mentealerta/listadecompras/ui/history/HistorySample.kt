@@ -58,5 +58,5 @@ private fun HistoryDarkPreview() {
 @Preview(name = "O que já comprei — vazio", widthDp = 411, heightDp = 800)
 @Composable
 private fun HistoryEmptyPreview() {
-    ShoppingListTheme(darkTheme = false) { HistoryContent(HistoryUiState.Empty) }
+    ShoppingListTheme(darkTheme = false) { HistoryContent(HistoryUiState.Empty()) }
 }

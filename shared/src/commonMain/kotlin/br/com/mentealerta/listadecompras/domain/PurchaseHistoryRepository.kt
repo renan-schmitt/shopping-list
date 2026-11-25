@@ -13,4 +13,7 @@ interface PurchaseHistoryRepository {
      * produtos na ordem em que estavam. Emite de novo a cada mudança.
      */
     fun observePurchases(since: Instant?): Flow<List<Purchase>>
+
+    /** Se há compra feita antes de [before]. Emite de novo a cada mudança. */
+    fun observeHasPurchasesBefore(before: Instant): Flow<Boolean>
 }

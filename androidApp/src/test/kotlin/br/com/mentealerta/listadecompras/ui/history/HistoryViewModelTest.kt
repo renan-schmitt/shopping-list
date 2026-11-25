@@ -15,6 +15,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import kotlin.time.Duration.Companion.hours
@@ -32,7 +34,7 @@ class HistoryViewModelTest {
     @Test
     fun withoutPurchasesShowsEmpty() = runTest {
         fixture.historyViewModel().uiState.test {
-            assertEquals(HistoryUiState.Empty, awaitLoaded())
+            assertEquals(HistoryUiState.Empty(), awaitLoaded())
         }
     }
 
@@ -74,11 +76,50 @@ class HistoryViewModelTest {
     }
 
     @Test
-    fun leavesOutPurchasesOlderThanThirtyDays() = runTest {
+    fun freeVersionLeavesOutPurchasesOlderThanThirtyDaysAndSaysSo() = runTest {
+        val recent = purchase(hoursAgo = 2, ListItem.create("feijão", "beans", "pantry"))
+        fixture.putPurchase(purchase(hoursAgo = 31 * 24, ListItem.create("feijão", "beans", "pantry")))
+        fixture.putPurchase(recent)
+
+        fixture.historyViewModel().uiState.test {
+            val state = awaitLoaded() as HistoryUiState.Content
+            assertEquals(listOf(recent.id.value), state.purchases.map { it.id })
+            assertTrue(state.hasOlder)
+        }
+    }
+
+    @Test
+    fun freeVersionWithOnlyOldPurchasesIsEmptyAndSaysSo() = runTest {
         fixture.putPurchase(purchase(hoursAgo = 31 * 24, ListItem.create("feijão", "beans", "pantry")))
 
         fixture.historyViewModel().uiState.test {
-            assertEquals(HistoryUiState.Empty, awaitLoaded())
+            assertEquals(HistoryUiState.Empty(hasOlder = true), awaitLoaded())
+        }
+    }
+
+    @Test
+    fun completeVersionShowsEveryPurchaseRightAfterBuying() = runTest {
+        val old = purchase(hoursAgo = 400 * 24, ListItem.create("feijão", "beans", "pantry"))
+        fixture.putPurchase(old)
+
+        fixture.historyViewModel().uiState.test {
+            assertEquals(HistoryUiState.Empty(hasOlder = true), awaitLoaded())
+            fixture.premium.isPremium.value = true
+            val state = awaitItem() as HistoryUiState.Content
+            assertEquals(listOf(PurchaseUi(old.id.value, 400, state.purchases.single().rows)), state.purchases)
+            assertFalse(state.hasOlder)
+        }
+    }
+
+    @Test
+    fun historyButtonOnTheListFollowsTheVersion() = runTest {
+        fixture.putPurchase(purchase(hoursAgo = 31 * 24, ListItem.create("feijão", "beans", "pantry")))
+
+        fixture.listViewModel().hasHistory.test {
+            // Grátis: só compras antigas, nada a mostrar.
+            assertFalse(awaitItem())
+            fixture.premium.isPremium.value = true
+            assertTrue(awaitItem())
         }
     }
 

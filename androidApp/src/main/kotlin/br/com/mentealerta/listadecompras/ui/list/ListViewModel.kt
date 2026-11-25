@@ -142,9 +142,12 @@ class ListViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), ListUiState.Loading)
 
-    /** Se há compras no histórico (com o limite da versão grátis): só então aparece "O que já comprei". */
+    /**
+     * Se há compras para mostrar no histórico (na versão grátis, nos últimos 30 dias; na completa, em
+     * qualquer data): só então aparece "O que já comprei".
+     */
     val hasHistory: StateFlow<Boolean> = observeHistory()
-        .map { it.isNotEmpty() }
+        .map { it.purchases.isNotEmpty() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), false)
 
     /** Só na versão grátis aparece o botão "Versão completa" (#88); some na hora em que a compra é liberada. */

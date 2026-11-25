@@ -97,7 +97,9 @@ fun ListScreen(
     editScreen: @Composable (id: ListItemId, onClose: (EditOutcome) -> Unit) -> Unit = { id, onClose ->
         EditScreen(id = id, onClose = onClose)
     },
-    historyScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> HistoryScreen(onClose = onClose) },
+    historyScreen: @Composable (onClose: () -> Unit, onFullVersion: () -> Unit) -> Unit = { onClose, onFullVersion ->
+        HistoryScreen(onClose = onClose, onFullVersion = onFullVersion)
+    },
     fullVersionScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> FullVersionScreen(onClose = onClose) },
     settingsScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> SettingsScreen(onClose = onClose) },
 ) {
@@ -140,7 +142,13 @@ fun ListScreen(
                     viewModel.onBackFromAdd()
                 },
             )
-            extra != null -> extra.Content(historyScreen, fullVersionScreen, settingsScreen) { viewing = null }
+            extra != null -> extra.Content(
+                historyScreen = historyScreen,
+                fullVersionScreen = fullVersionScreen,
+                settingsScreen = settingsScreen,
+                onOpen = { viewing = it },
+                onClose = { viewing = null },
+            )
             editing != null -> editScreen(ListItemId(editing)) { outcome ->
                 editingId = null
                 viewModel.onEditClosed(outcome)
@@ -219,12 +227,14 @@ private enum class ExtraScreen {
 
     @Composable
     fun Content(
-        historyScreen: @Composable (onClose: () -> Unit) -> Unit,
+        historyScreen: @Composable (onClose: () -> Unit, onFullVersion: () -> Unit) -> Unit,
         fullVersionScreen: @Composable (onClose: () -> Unit) -> Unit,
         settingsScreen: @Composable (onClose: () -> Unit) -> Unit,
+        onOpen: (ExtraScreen) -> Unit,
         onClose: () -> Unit,
     ) = when (this) {
-        History -> historyScreen(onClose)
+        // "Conhecer a versão completa" no fim do histórico (#90); voltar de lá leva à lista.
+        History -> historyScreen(onClose) { onOpen(FullVersion) }
         FullVersion -> fullVersionScreen(onClose)
         Settings -> settingsScreen(onClose)
     }

@@ -13,6 +13,7 @@ import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
+import br.com.mentealerta.listadecompras.domain.ObserveFeaturesUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
@@ -93,6 +94,9 @@ class EditFixture {
     val historyRepository = object : PurchaseHistoryRepository {
         override fun observePurchases(since: Instant?): Flow<List<Purchase>> =
             purchaseState.map { all -> all.filter { since == null || it.date >= since } }
+
+        override fun observeHasPurchasesBefore(before: Instant): Flow<Boolean> =
+            purchaseState.map { all -> all.any { it.date < before } }
     }
 
     /** Põe o item direto na lista, sem passar pela pilha do "Desfazer". */
@@ -183,5 +187,6 @@ class EditFixture {
 
     fun historyViewModel() = HistoryViewModel(observeHistory(), index)
 
-    private fun observeHistory() = ObservePurchaseHistoryUseCase(historyRepository, clock, TimeZone.UTC)
+    private fun observeHistory() =
+        ObservePurchaseHistoryUseCase(historyRepository, ObserveFeaturesUseCase(premium), clock, TimeZone.UTC)
 }

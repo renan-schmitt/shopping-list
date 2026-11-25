@@ -33,6 +33,10 @@ internal interface PurchaseDao {
     @Query("SELECT * FROM purchase WHERE date >= :since ORDER BY date DESC, id")
     fun observeSince(since: Instant): Flow<List<PurchaseWithItems>>
 
+    /** Se há compra feita antes de [before]: as que a versão grátis não mostra (#90). */
+    @Query("SELECT EXISTS(SELECT 1 FROM purchase WHERE date < :before)")
+    fun observeHasAnyBefore(before: Instant): Flow<Boolean>
+
     @Query("DELETE FROM purchase WHERE id = :id")
     suspend fun deleteById(id: String)
 }

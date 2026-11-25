@@ -67,6 +67,17 @@ class PurchaseDaoTest {
     }
 
     @Test
+    fun tellsWhetherThereArePurchasesBeforeTheGivenMoment() = runTest {
+        dao.observeHasAnyBefore(secondPurchase.date).test {
+            assertEquals(false, awaitItem())
+            insert(secondPurchase)
+            assertEquals(false, awaitItem())
+            insert(firstPurchase)
+            assertEquals(true, awaitItem())
+        }
+    }
+
+    @Test
     fun deletingThePurchaseDeletesItsItems() = runTest {
         insert(firstPurchase)
         insert(secondPurchase)

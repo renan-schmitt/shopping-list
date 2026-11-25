@@ -70,7 +70,7 @@ val sharedModule = module {
     factoryOf(::GetSectionsUseCase)
     factoryOf(::ObserveListUseCase)
     // Fuso do celular lido a cada tela aberta: o padrão do construtor.
-    factory { ObservePurchaseHistoryUseCase(get(), get()) }
+    factory { ObservePurchaseHistoryUseCase(get(), get(), get()) }
     factoryOf(::AddItemsUseCase)
     factoryOf(::FindSameItemUseCase)
     factoryOf(::SearchProductsUseCase)

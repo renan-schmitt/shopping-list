@@ -1,6 +1,8 @@
 package br.com.mentealerta.listadecompras.ui.history
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.Text
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasText
@@ -29,7 +31,8 @@ import kotlin.time.Duration.Companion.days
 /**
  * "O que já comprei" (#66) pela tela da lista: o botão só aparece com compras no histórico; abre a
  * tela com as compras da mais recente para a mais antiga, com a data por extenso, e volta para a
- * lista pelo botão ou pelo voltar do celular.
+ * lista pelo botão ou pelo voltar do celular. Na versão grátis, as compras de mais de 30 dias ficam de
+ * fora, com o recado que leva à versão completa; na completa, aparecem todas (#90).
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -49,7 +52,13 @@ class HistoryFlowTest {
             ShoppingListTheme(darkTheme = false) {
                 ListScreen(
                     viewModel = listViewModel,
-                    historyScreen = { onClose -> HistoryScreen(onClose, viewModel = historyViewModel) },
+                    historyScreen = { onClose, onFullVersion ->
+                        HistoryScreen(onClose, onFullVersion = onFullVersion, viewModel = historyViewModel)
+                    },
+                    fullVersionScreen = { onClose ->
+                        Text("Tela da versão completa")
+                        BackHandler(onBack = onClose)
+                    },
                 )
             }
         }
@@ -94,6 +103,34 @@ class HistoryFlowTest {
         button("Voltar para a lista").performClick()
         compose.onNode(hasText("O que já comprei") and isHeading()).assertDoesNotExist()
         button("O que já comprei").assertExists()
+    }
+
+    @Test
+    fun freeVersionWithOldPurchasesLeadsToTheFullVersion() {
+        fixture.putPurchase(Purchase.create(fixture.now - 1.days, listOf(ListItem.create("Café", "coffee", "pantry"))))
+        fixture.putPurchase(Purchase.create(fixture.now - 40.days, listOf(ListItem.create("Arroz", null, "pantry"))))
+        show()
+
+        button("O que já comprei").performClick()
+        compose.onNode(hasText("Ontem, 1 produto") and isHeading()).assertExists()
+        compose.onNodeWithText("Arroz").assertDoesNotExist()
+        compose.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Conhecer a versão completa"))
+        compose.onNodeWithText("As compras de mais de 30 dias continuam guardadas.", substring = true).assertExists()
+
+        button("Conhecer a versão completa").performClick()
+        compose.onNodeWithText("Tela da versão completa").assertExists()
+    }
+
+    @Test
+    fun completeVersionShowsOldPurchasesWithoutTheNote() {
+        fixture.premium.isPremium.value = true
+        fixture.putPurchase(Purchase.create(fixture.now - 40.days, listOf(ListItem.create("Arroz", null, "pantry"))))
+        show()
+
+        button("O que já comprei").performClick()
+        compose.onNode(hasText("Há 40 dias, 1 produto") and isHeading()).assertExists()
+        compose.onNodeWithText("Arroz").assertExists()
+        button("Conhecer a versão completa").assertDoesNotExist()
     }
 
     @Test

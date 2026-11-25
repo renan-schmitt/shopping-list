@@ -475,7 +475,7 @@ Revisada em 2026-11-24 (#79), à luz do MVP. A tabela diz o que **vai ser** grá
 
 **Fronteiras decididas (2026-11-24, #79):**
 - **Sugestões:** o grátis sugere **dentro do app**, quando a pessoa abre, e ela põe **um a um**. A versão completa avisa **fora do app** (notificação) e tem a **lista fixa da pessoa**, que entra toda de uma vez. As sugestões do grátis usam o **histórico inteiro**, não só os 30 dias que a tela mostra: a inteligência básica não piora para quem não paga.
-- **Histórico:** as compras antigas ficam no celular (e no backup); quem compra a versão completa vê tudo na hora.
+- **Histórico:** as compras antigas ficam no celular (e no backup); quem compra a versão completa vê tudo na hora. Feito em 2026-11-25 (#90): na versão grátis, quando há compras de mais de 30 dias, o fim de "O que já comprei" diz que elas continuam guardadas, com o botão **Conhecer a versão completa**; sem compras antigas, nada de recado. Na versão completa, o botão "O que já comprei" aparece com qualquer compra.
 - **Temas:** todos com contraste de pelo menos 4,5:1, os mesmos tamanhos e o estado nunca só por cor. Tema **mais fácil de ler** que o padrão vai para o grátis: a versão completa vende enfeite, nunca legibilidade.
 - **Atalho na tela do celular:** sem versão grátis (o ícone do app já abre direto na lista). O app oferece um botão que põe o atalho sozinho, sem a pessoa procurar o widget (#97).
 - **Ordem das seções:** uma ordem personalizada; a ordem por mercado fica para a fase 4 (seções 3.1 e 3.8).

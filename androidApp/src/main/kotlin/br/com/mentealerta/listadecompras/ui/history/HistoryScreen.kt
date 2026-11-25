@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.components.BackToListButton
+import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.list.ItemName
@@ -55,17 +58,28 @@ private val RowMinHeight = 72.dp
  * "O que já comprei" (#66, plano §1.5): abre por cima da lista, como o modo de mudar. Topo verde com
  * "Voltar para a lista"; embaixo, o título e as compras da mais recente para a mais antiga, cada
  * uma com a data por extenso na faixa ("Ontem, 8 produtos") e os produtos. Só para ver: tocar não
- * faz nada.
+ * faz nada. Na versão grátis, com compras de mais de 30 dias, termina com o recado e o botão
+ * "Conhecer a versão completa" ([onFullVersion], #90).
  */
 @Composable
-fun HistoryScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: HistoryViewModel = koinViewModel()) {
+fun HistoryScreen(
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+    onFullVersion: () -> Unit = {},
+    viewModel: HistoryViewModel = koinViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BackHandler(onBack = onClose)
-    HistoryContent(uiState = uiState, onClose = onClose, modifier = modifier)
+    HistoryContent(uiState = uiState, onClose = onClose, onFullVersion = onFullVersion, modifier = modifier)
 }
 
 @Composable
-fun HistoryContent(uiState: HistoryUiState, modifier: Modifier = Modifier, onClose: () -> Unit = {}) {
+fun HistoryContent(
+    uiState: HistoryUiState,
+    modifier: Modifier = Modifier,
+    onClose: () -> Unit = {},
+    onFullVersion: () -> Unit = {},
+) {
     val colors = MaterialTheme.colorScheme
     Scaffold(
         modifier = modifier,
@@ -96,7 +110,10 @@ fun HistoryContent(uiState: HistoryUiState, modifier: Modifier = Modifier, onClo
             }
             when (uiState) {
                 HistoryUiState.Loading -> Unit
-                HistoryUiState.Empty -> item(key = "empty", contentType = "empty") { EmptyHistory() }
+                // Só compras antigas: o recado já diz que elas estão guardadas.
+                is HistoryUiState.Empty -> if (!uiState.hasOlder) {
+                    item(key = "empty", contentType = "empty") { EmptyHistory() }
+                }
                 is HistoryUiState.Content -> uiState.purchases.forEach { purchase ->
                     item(key = "purchase-${purchase.id}", contentType = "purchase") {
                         SectionTitle(
@@ -113,7 +130,40 @@ fun HistoryContent(uiState: HistoryUiState, modifier: Modifier = Modifier, onClo
                     }
                 }
             }
+            if (uiState.hasOlder) {
+                item(key = "older", contentType = "older") { OlderPurchasesNote(onFullVersion) }
+            }
         }
+    }
+}
+
+private val HistoryUiState.hasOlder: Boolean
+    get() = when (this) {
+        HistoryUiState.Loading -> false
+        is HistoryUiState.Empty -> hasOlder
+        is HistoryUiState.Content -> hasOlder
+    }
+
+/**
+ * Versão grátis com compras de mais de 30 dias (#90): avisa que elas continuam guardadas e leva à
+ * tela "Versão completa", sem pressão.
+ */
+@Composable
+private fun OlderPurchasesNote(onFullVersion: () -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(top = 32.dp)) {
+        Text(
+            text = stringResource(R.string.history_older_note),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(16.dp))
+        SecondaryButton(
+            text = stringResource(R.string.history_full_version),
+            onClick = onFullVersion,
+            icon = painterResource(R.drawable.ic_star),
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
