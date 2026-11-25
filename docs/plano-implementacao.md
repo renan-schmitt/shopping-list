@@ -1,6 +1,6 @@
 # Plano de Implementação — Lista de Compras 60+
 
-> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-24.
+> Documento vivo. Baseado em [ideias.md](ideias.md). Última revisão: 2026-11-25.
 
 ## Princípios
 
@@ -75,8 +75,8 @@ O que precisa existir na primeira versão publicada.
 - [ ] Histórico de compras (data + produtos comprados + quantidade) gravado a cada "Terminei"
 - [x] Tela **O que já comprei** — 2026-11-23, #66: compras da mais recente para a mais antiga, cada uma com a data por extenso na faixa ("Hoje, 2 produtos", "Ontem", "Há 12 dias", em dias do calendário no fuso do celular; sem "semana passada", ambíguo) e os produtos com ícone e quantidade, só para ver. Grátis mostra os últimos 30 dias (de hoje até há 30 dias); as compras antigas ficam no banco para a previsão e o premium. Entrada pelo botão **O que já comprei** no fim da folha, abaixo de "Mudar a lista", e na lista vazia, só quando há compra nesses 30 dias
 - [ ] Previsões no MVP usam só a frequência; quantidade fica gravada para uso futuro
-- [ ] Modelo simples: intervalo médio entre compras de cada produto
-- [ ] Sugestão no topo da lista: "Faz tempo que você não compra café" — um toque adiciona
+- [ ] Modelo simples: intervalo entre compras de cada produto (mediana dos últimos 5, a partir de 3 compras; parâmetros na §3.4, 2026-11-25, #62)
+- [ ] Sugestão no topo da lista: "Faz 12 dias que você comprou café. Está faltando?" — **Sim, pôr na lista** adiciona (§3.4)
 
 ### 1.6 Compartilhar (sem backend)
 - [x] Enviar a lista como texto pelo WhatsApp / outros apps — 2026-11-24, #67: botão **Mandar a lista** no fim da folha, abaixo de "Mudar a lista", só quando há o que comprar; abre a tela de compartilhar do Android. O texto leva só o que falta (sem "Já peguei"), por seção na ordem do mercado, com o negrito do WhatsApp (`*Lista de compras*`, `*Hortifrúti*`) e um produto por linha com a quantidade como na lista: "- Leite desnatado (2 litros)". O evento `lista_compartilhada` entra com o analytics
@@ -181,9 +181,26 @@ Funcionalidades com risco técnico, de política das lojas ou de UX que exigem e
 Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 
 ### 3.4 Modelos de padrão de compra
-- Quantas compras são necessárias até a sugestão ser confiável?
-- Produtos comprados juntos (coocorrência) — vale no MVP?
-- Como explicar a sugestão de forma simples ("você costuma comprar a cada 10 dias").
+
+**Decidido (2026-11-25, #62).** Vale para "Está faltando?" (#64) e "Você costuma comprar" (#65); o cálculo fica no `shared/prediction` (#63).
+
+**Quando confiar:**
+- **3 compras** do produto (2 intervalos) antes da primeira sugestão. Com 2, um intervalo por acaso já viraria sugestão errada, e a pessoa deixa de confiar.
+- **Intervalo** = **mediana dos últimos 5 intervalos**: uma viagem de um mês não estraga o "costuma".
+- Conta em **dias do calendário, no fuso do celular**, como em "O que já comprei"; duas compras do mesmo produto no mesmo dia valem uma.
+- Intervalo de **menos de 2 dias** não gera sugestão (pão de todo dia).
+- **Atrasado** quando os dias desde a última compra passam de **1,2× o intervalo** (folga de 20%).
+- **Para de sugerir** depois de **3× o intervalo** sem comprar (a pessoa deixou de usar); volta sozinho quando ela compra de novo.
+- Produto que **já está na lista** não é sugerido.
+- Usa o **histórico inteiro**, também no grátis (§5); o produto é o do catálogo (`productId`, vale para qualquer nome dele) ou, se desconhecido, o nome normalizado, como a escolha de seção (§1.4).
+- **"Não" dispensa até o próximo ciclo:** volta só depois de mais um intervalo inteiro, contado do "Não"; comprar recomeça a contagem.
+
+**Como explicar:**
+- **"Está faltando?"** diz só o tempo desde a última compra, fato que a pessoa confere na memória: "Faz 12 dias que você comprou café. Está faltando?" · **Sim, pôr na lista** · **Não**. "Faz N dias" em `<plurals>`. O "a cada 10 dias" não aparece (frase longa em 200%), nem no TalkBack, para ser igual para todos; pode servir ao lembrete fora do app (#96).
+- **"Você costuma comprar"** é só o título, com os produtos embaixo, sem número em cada um.
+- Descartados: tempo e costume juntos ("...Você costuma comprar a cada 10 dias..."), longo demais; só o costume, que a pessoa não consegue conferir.
+
+**Produtos comprados juntos (coocorrência): fora do MVP.** Precisa de muitas compras para valer (uns 2 meses com compra semanal), seria um terceiro tipo de sugestão na tela e é difícil de explicar. O histórico já guarda os produtos de cada compra, então dá para ligar depois sem mudar o banco. Avaliar junto de "Os de sempre: sugestão baseada no histórico" (#93, fase 2).
 
 ### 3.5 Curadoria do catálogo e dos ícones
 
