@@ -15,7 +15,8 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Screenshots da tela da lista com a fonte do sistema em 100%, 150% e 200%, no modo claro e no
  * escuro (plano §4.6), comprando (com riscados, rodapé com "Terminei") e antes de riscar (só o
- * "Adicionar" grande, #52), da lista vazia e do modo "Mudar a lista" (#121).
+ * "Adicionar" grande, #52), da lista vazia, do "Está faltando?" no topo (#64) e do modo "Mudar a
+ * lista" (#121).
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -74,6 +75,30 @@ class ListScreenshotTest {
 
     @Test
     @Config(fontScale = 1.0f)
+    fun suggestion_light_font100() = capture("suggestion_light_font100", SampleListStateNotShopping, SampleSuggestion)
+
+    @Test
+    @Config(fontScale = 1.5f)
+    fun suggestion_light_font150() = capture("suggestion_light_font150", SampleListStateNotShopping, SampleSuggestion)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun suggestion_light_font200() = capture("suggestion_light_font200", SampleListStateNotShopping, SampleSuggestion)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun suggestion_dark_font100() = capture("suggestion_dark_font100", SampleListStateNotShopping, SampleSuggestion)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 2.0f)
+    fun suggestion_dark_font200() = capture("suggestion_dark_font200", SampleListStateNotShopping, SampleSuggestion)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.0f)
+    fun suggestionEmpty_light_font100() = capture("suggestion_empty_light_font100", ListUiState.Empty, SampleSuggestion)
+
+    @Test
+    @Config(fontScale = 1.0f)
     fun change_light_font100() = captureChange("light_font100")
 
     @Test
@@ -88,8 +113,8 @@ class ListScreenshotTest {
     @Config(qualifiers = "+night", fontScale = 2.0f)
     fun change_dark_font200() = captureChange("dark_font200")
 
-    private fun capture(name: String, state: ListUiState = SampleListState) {
-        compose.setContent { ShoppingListTheme { ListContent(state) } }
+    private fun capture(name: String, state: ListUiState = SampleListState, suggestion: SuggestionUi? = null) {
+        compose.setContent { ShoppingListTheme { ListContent(state, suggestion = suggestion) } }
         compose.onRoot().captureRoboImage("src/test/screenshots/list_$name.png")
     }
 

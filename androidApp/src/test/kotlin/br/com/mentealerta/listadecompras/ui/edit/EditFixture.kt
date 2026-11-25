@@ -6,7 +6,9 @@ import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
+import br.com.mentealerta.listadecompras.domain.AcceptSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
+import br.com.mentealerta.listadecompras.domain.DismissSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.FinishedShopping
@@ -16,6 +18,7 @@ import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveFeaturesUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveOverdueProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
@@ -31,6 +34,7 @@ import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import br.com.mentealerta.listadecompras.ui.FakePreferredTermRepository
 import br.com.mentealerta.listadecompras.ui.FakeSectionChoiceRepository
+import br.com.mentealerta.listadecompras.ui.FakeSuggestionDismissalRepository
 import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
 import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
 import br.com.mentealerta.listadecompras.ui.list.AdsFixture
@@ -175,6 +179,9 @@ class EditFixture {
     val sectionChoices = FakeSectionChoiceRepository()
     private val rememberSection get() = RememberSectionUseCase(index, sectionChoices)
 
+    /** O "Não" do "Está faltando?" (#64). */
+    val dismissals = FakeSuggestionDismissalRepository()
+
     fun editViewModel() = EditViewModel(
         ObserveListUseCase(repository),
         index,
@@ -195,6 +202,9 @@ class EditFixture {
         observeHistory(),
         ObservePremiumUseCase(premium),
         ads.useCases,
+        ObserveOverdueProductsUseCase(historyRepository, repository, dismissals, index, clock, TimeZone.UTC),
+        AcceptSuggestionUseCase(repository, rememberSection, index),
+        DismissSuggestionUseCase(dismissals, clock),
     )
 
     fun historyViewModel() = HistoryViewModel(observeHistory(), index)

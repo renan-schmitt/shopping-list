@@ -60,6 +60,16 @@
     <string name="week_notice">A partir de amanhã, o app continua de graça, com alguns anúncios. Se preferir sem anúncios, tem a versão completa.</string>
     <!-- Botão do aviso do fim da primeira semana: abre a tela "Versão completa" -->
     <string name="week_notice_full_version">Conhecer a versão completa</string>
+    <!-- Sugestão no topo da lista (#64): só o tempo desde a última compra, com o nome que a pessoa usa -->
+    <plurals name="suggestion_question">
+        <item quantity="one">Faz %1$d dia que você comprou %2$s. Está faltando?</item>
+        <item quantity="many">Faz %1$d dias que você comprou %2$s. Está faltando?</item>
+        <item quantity="other">Faz %1$d dias que você comprou %2$s. Está faltando?</item>
+    </plurals>
+    <!-- Botão da sugestão: põe o produto na lista -->
+    <string name="suggestion_accept">Sim, pôr na lista</string>
+    <!-- Botão da sugestão: o produto só volta a ser sugerido no próximo ciclo -->
+    <string name="suggestion_dismiss">Não</string>
     <!-- Botão no fim da folha (#67), só com produtos a comprar: manda a lista pelo WhatsApp ou outro app -->
     <string name="list_share">Mandar a lista</string>
     <!-- Texto mandado (#67), com o negrito do WhatsApp (*): título no topo -->

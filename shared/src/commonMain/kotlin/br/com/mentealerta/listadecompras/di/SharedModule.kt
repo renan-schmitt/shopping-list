@@ -7,14 +7,17 @@ import br.com.mentealerta.listadecompras.data.RoomPreferredTermRepository
 import br.com.mentealerta.listadecompras.data.RoomPurchaseHistoryRepository
 import br.com.mentealerta.listadecompras.data.RoomSectionChoiceRepository
 import br.com.mentealerta.listadecompras.data.RoomShoppingListRepository
+import br.com.mentealerta.listadecompras.data.RoomSuggestionDismissalRepository
 import br.com.mentealerta.listadecompras.data.StorePremiumRepository
 import br.com.mentealerta.listadecompras.data.database.AppDatabase
 import br.com.mentealerta.listadecompras.data.preferences.DataStoreAdPreferences
 import br.com.mentealerta.listadecompras.data.preferences.DataStoreVoicePreferences
+import br.com.mentealerta.listadecompras.domain.AcceptSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.AdsUseCases
 import br.com.mentealerta.listadecompras.domain.BuyPremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
+import br.com.mentealerta.listadecompras.domain.DismissSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
@@ -40,6 +43,7 @@ import br.com.mentealerta.listadecompras.domain.SectionChoiceRepository
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.SetPersonalizedAdsUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
+import br.com.mentealerta.listadecompras.domain.SuggestionDismissalRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
@@ -67,6 +71,7 @@ val sharedModule = module {
     singleOf(::RoomPurchaseHistoryRepository) bind PurchaseHistoryRepository::class
     singleOf(::RoomPreferredTermRepository) bind PreferredTermRepository::class
     singleOf(::RoomSectionChoiceRepository) bind SectionChoiceRepository::class
+    singleOf(::RoomSuggestionDismissalRepository) bind SuggestionDismissalRepository::class
     single { get<AppDatabase>().listItemDao() }
     single { get<AppDatabase>().purchaseDao() }
     single { get<AppDatabase>().learnedPreferenceDao() }
@@ -80,7 +85,9 @@ val sharedModule = module {
     factoryOf(::ObserveListUseCase)
     // Fuso do celular lido a cada tela aberta: o padrão do construtor.
     factory { ObservePurchaseHistoryUseCase(get(), get(), get()) }
-    factory { ObserveOverdueProductsUseCase(get(), get(), get(), get()) }
+    factory { ObserveOverdueProductsUseCase(get(), get(), get(), get(), get()) }
+    factoryOf(::AcceptSuggestionUseCase)
+    factoryOf(::DismissSuggestionUseCase)
     factoryOf(::LearnPreferredTermUseCase)
     factoryOf(::RememberSectionUseCase)
     factoryOf(::AddItemsUseCase)

@@ -29,7 +29,8 @@ class ObserveOverdueProductsUseCaseTest {
     }
     private val history = FakeHistoryRepository()
     private val list = FakeListRepository()
-    private val useCase = ObserveOverdueProductsUseCase(history, list, index, clock, timeZone)
+    private val dismissals = FakeDismissalRepository()
+    private val useCase = ObserveOverdueProductsUseCase(history, list, dismissals, index, clock, timeZone)
 
     @Test
     fun mostOverdueComesFirst() = runTest {
@@ -85,6 +86,24 @@ class ObserveOverdueProductsUseCaseTest {
         }
     }
 
+    @Test
+    fun noHidesTheProductUntilAnotherInterval() = runTest {
+        // Café de 10 em 10 dias, última há 13.
+        history.purchases.value = buyEvery("coffee", "Café", "2026-10-23", 10, 10)
+
+        useCase().test {
+            assertEquals(listOf("Café"), awaitItem().map { it.pattern.name })
+
+            // "Não" há 9 dias, às 23h de Brasília (já 2h do dia seguinte em UTC): ainda escondido.
+            dismissals.values.value = mapOf("coffee" to Instant.parse("2026-11-17T02:00:00Z"))
+            assertEquals(emptyList(), awaitItem())
+
+            // "Não" há 10 dias: passou um intervalo inteiro, volta.
+            dismissals.values.value = mapOf("coffee" to Instant.parse("2026-11-15T15:00:00Z"))
+            assertEquals(listOf("Café"), awaitItem().map { it.pattern.name })
+        }
+    }
+
     /** Compras ao meio-dia em Brasília a partir de [first], com os intervalos dados em dias. */
     private fun buyEvery(productId: String?, name: String, first: String, vararg intervals: Int): List<Purchase> {
         var day = LocalDate.parse(first)
@@ -109,6 +128,16 @@ class ObserveOverdueProductsUseCaseTest {
 
         override fun observeHasPurchasesBefore(before: Instant): Flow<Boolean> =
             purchases.map { all -> all.any { it.date < before } }
+    }
+
+    private class FakeDismissalRepository : SuggestionDismissalRepository {
+        val values = MutableStateFlow(emptyMap<String, Instant>())
+
+        override fun observeDismissals(): Flow<Map<String, Instant>> = values
+
+        override suspend fun dismiss(key: String, at: Instant) {
+            values.value += key to at
+        }
     }
 
     /** Só a leitura da lista; as seções não importam para a previsão. */

@@ -4,10 +4,11 @@ import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
+import kotlinx.coroutines.flow.Flow
 
 /**
- * O que o app aprende com a pessoa: termo preferido e seção escolhida para cada produto. Gravar
- * substitui o valor anterior (`REPLACE`, ver [ListItemDao]).
+ * O que o app aprende com a pessoa: termo preferido, seção escolhida e o "Não" das sugestões para
+ * cada produto. Gravar substitui o valor anterior (`REPLACE`, ver [ListItemDao]).
  */
 @Dao
 internal interface LearnedPreferenceDao {
@@ -25,4 +26,10 @@ internal interface LearnedPreferenceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertSectionChoice(sectionChoice: SectionChoiceEntity)
+
+    @Query("SELECT * FROM suggestion_dismissal")
+    fun observeSuggestionDismissals(): Flow<List<SuggestionDismissalEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertSuggestionDismissal(dismissal: SuggestionDismissalEntity)
 }

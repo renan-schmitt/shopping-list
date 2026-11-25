@@ -8,7 +8,9 @@ import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
+import br.com.mentealerta.listadecompras.domain.AcceptSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
+import br.com.mentealerta.listadecompras.domain.DismissSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.FinishedShopping
 import br.com.mentealerta.listadecompras.domain.ListItem
@@ -16,12 +18,14 @@ import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveFeaturesUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveOverdueProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
+import br.com.mentealerta.listadecompras.domain.RememberSectionUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
@@ -29,6 +33,8 @@ import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
+import br.com.mentealerta.listadecompras.ui.FakeSectionChoiceRepository
+import br.com.mentealerta.listadecompras.ui.FakeSuggestionDismissalRepository
 import br.com.mentealerta.listadecompras.ui.components.NoticeResult
 import br.com.mentealerta.listadecompras.ui.edit.EditOutcome
 import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
@@ -73,12 +79,15 @@ class ListViewModelTest {
     /** Itens que o repositório falso conhece, para riscar e tirar o risco. */
     private val stored = mutableMapOf<ListItemId, ListItem>()
     private val checkedCalls = mutableListOf<Pair<ListItemId, Boolean>>()
+    private val added = mutableListOf<ListItem>()
     private val undoStack = UndoStack()
 
     private val repository = object : ShoppingListRepository {
         override fun observeSections() = sections
 
-        override suspend fun add(item: ListItem) = Unit
+        override suspend fun add(item: ListItem) {
+            added += item
+        }
 
         override suspend fun update(item: ListItem): ListItem? = null
 
@@ -126,6 +135,7 @@ class ListViewModelTest {
     }
 
     private val premium = FakePremiumRepository()
+    private val dismissals = FakeSuggestionDismissalRepository()
 
     /** Para os anúncios, a lista é o que está em [stored]. */
     private val ads = AdsFixture(
@@ -152,6 +162,9 @@ class ListViewModelTest {
         ObservePurchaseHistoryUseCase(historyRepository, ObserveFeaturesUseCase(premium), Clock.System),
         ObservePremiumUseCase(premium),
         ads.useCases,
+        ObserveOverdueProductsUseCase(historyRepository, repository, dismissals, index, Clock.System),
+        AcceptSuggestionUseCase(repository, RememberSectionUseCase(index, FakeSectionChoiceRepository()), index),
+        DismissSuggestionUseCase(dismissals, Clock.System),
     )
 
     @Test
@@ -172,6 +185,30 @@ class ListViewModelTest {
             )
             assertTrue(awaitItem())
         }
+    }
+
+    @Test
+    fun suggestionAnsweredTwiceCountsOnce() = runTest {
+        // Banana de 7 em 7 dias, última há 16: está faltando.
+        val now = Clock.System.now()
+        history.value = listOf(30, 23, 16).map { daysAgo ->
+            Purchase.create(now - daysAgo.days, listOf(ListItem.create("Banana", "banana", "produce")))
+        }
+        val viewModel = viewModel()
+
+        viewModel.suggestion.test {
+            assertNull(awaitItem())
+            sections.emit(emptyList())
+            val suggestion = checkNotNull(awaitItem())
+            assertEquals("Banana" to 16, suggestion.name to suggestion.days)
+
+            viewModel.onAcceptSuggestion(suggestion)
+            assertNull(awaitItem())
+            viewModel.onAcceptSuggestion(suggestion)
+            viewModel.onDismissSuggestion(suggestion)
+        }
+        assertEquals(listOf("banana"), added.map { it.productId })
+        assertEquals(emptyMap<String, Instant>(), dismissals.dismissals)
     }
 
     @Test

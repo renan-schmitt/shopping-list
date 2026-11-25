@@ -3,10 +3,15 @@ package br.com.mentealerta.listadecompras.ui.list
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.mentealerta.listadecompras.R
+import br.com.mentealerta.listadecompras.catalog.CatalogIcon
 import br.com.mentealerta.listadecompras.domain.ListItemId
+import br.com.mentealerta.listadecompras.domain.OverdueProduct
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
+import br.com.mentealerta.listadecompras.prediction.PurchasePattern
+import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
+import kotlinx.datetime.LocalDate
 
 private val banana = row("banana", "Banana", R.drawable.catalog_fluent_banana, Quantity(6.0))
 private val bread = row("bread", "Pão francês", R.drawable.catalog_fluent_baguette_bread, Quantity(10.0))
@@ -120,3 +125,14 @@ private fun ChangeListPreview() {
 private fun EmptyListPreview() {
     ShoppingListTheme(darkTheme = false) { ListContent(ListUiState.Empty) }
 }
+
+/** "Está faltando?" de exemplo (#64): café, comprado há 12 dias. */
+val SampleSuggestion = SuggestionUi(
+    product = OverdueProduct(
+        PurchasePattern("coffee", "coffee", "Café", LocalDate(2026, 11, 13), intervalDays = 10.0),
+        daysSinceLastPurchase = 12,
+    ),
+    name = "Café",
+    days = 12,
+    icon = checkNotNull(CatalogIcon.Own("coffee_package").drawableRes()),
+)

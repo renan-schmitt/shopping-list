@@ -5,18 +5,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.mentealerta.listadecompras.ads.AdMoment
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
+import br.com.mentealerta.listadecompras.catalog.CatalogSection
+import br.com.mentealerta.listadecompras.domain.AcceptSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.AdsUseCases
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
+import br.com.mentealerta.listadecompras.domain.DismissSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveOverdueProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
+import br.com.mentealerta.listadecompras.domain.OverdueProduct
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
+import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
 import br.com.mentealerta.listadecompras.ui.catalog.iconRes
 import br.com.mentealerta.listadecompras.ui.components.NoticeResult
 import br.com.mentealerta.listadecompras.ui.edit.EditOutcome
@@ -24,8 +30,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /** Estado da tela da lista. */
@@ -75,6 +83,12 @@ data class ListRowUi(
     @DrawableRes val icon: Int,
 )
 
+/**
+ * "Está faltando?" no topo da folha (#64): "Faz [days] dias que você comprou [name]. Está faltando?",
+ * com o ícone do produto. [product] volta para o ViewModel no **Sim** ou no **Não**.
+ */
+data class SuggestionUi(val product: OverdueProduct, val name: String, val days: Int, @DrawableRes val icon: Int)
+
 /** Aviso no meio da tela: com "Desfazer" depois de uma ação, ou o do fim da primeira semana. */
 sealed interface ListNotice {
     /** "Terminei" (#57): [bought] produtos comprados, [remaining] ficaram na lista. */
@@ -99,7 +113,7 @@ sealed interface ListNotice {
  * o risco (#51), o "Terminei" (#57), o "Jogar a lista fora" (#58) e o "Tirar da lista" do TalkBack
  * (#71) entram na pilha do "Desfazer"; [onUndo] desfaz a última ação. [hasHistory] diz se há compras
  * para mostrar em "O que já comprei" (#66); [canBuyFullVersion], se aparece o botão "Versão completa"
- * (#88).
+ * (#88). [suggestion] é o "Está faltando?" do topo da folha (#64), um produto por vez.
  *
  * Anúncios da versão grátis (#89, plano §3.7), pelos [ads]: ao voltar da tela de adicionar e ao sair
  * da edição com algo mudado, a cada 3 vezes; depois de **Certo** ou **Desfazer** no aviso do
@@ -117,6 +131,9 @@ class ListViewModel(
     observeHistory: ObservePurchaseHistoryUseCase,
     observePremium: ObservePremiumUseCase,
     private val ads: AdsUseCases,
+    observeOverdue: ObserveOverdueProductsUseCase,
+    private val acceptSuggestion: AcceptSuggestionUseCase,
+    private val dismissSuggestion: DismissSuggestionUseCase,
 ) : ViewModel() {
     private val mutableNotice = MutableStateFlow<ListNotice?>(null)
 
@@ -160,6 +177,37 @@ class ListViewModel(
      * versão grátis. A tela completa vem na #70.
      */
     val hasSettings: StateFlow<Boolean> = canBuyFullVersion
+
+    /** Produtos já respondidos nesta tela: o cartão some no toque, sem esperar o banco (e sem toque duplo). */
+    private val answered = MutableStateFlow(emptySet<String>())
+
+    /**
+     * "Está faltando?" (#64): o produto mais atrasado, um por vez; respondido, vem o próximo. `null`
+     * quando nada está faltando.
+     */
+    val suggestion: StateFlow<SuggestionUi?> = combine(observeOverdue(), answered) { overdue, answered ->
+        overdue.firstOrNull { it.pattern.key !in answered }?.toSuggestion(catalogIndex)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
+
+    /** **Sim, pôr na lista**: o produto entra na lista, na seção dele. */
+    fun onAcceptSuggestion(suggestion: SuggestionUi) {
+        if (!answer(suggestion)) return
+        viewModelScope.launch { acceptSuggestion(suggestion.product) }
+    }
+
+    /** **Não**: o produto só volta no próximo ciclo (plano §3.4). */
+    fun onDismissSuggestion(suggestion: SuggestionUi) {
+        if (!answer(suggestion)) return
+        viewModelScope.launch { dismissSuggestion(suggestion.product) }
+    }
+
+    /** Marca a sugestão como respondida; `false` se já tinha sido (toque duplo). */
+    private fun answer(suggestion: SuggestionUi): Boolean {
+        val key = suggestion.product.pattern.key
+        if (key in answered.value) return false
+        answered.update { it + key }
+        return true
+    }
 
     /** Risca o produto que não estava riscado, ou tira o risco de quem estava ([checked] é o estado atual). */
     fun onToggleCheck(id: ListItemId, checked: Boolean) {
@@ -249,6 +297,14 @@ class ListViewModel(
         /** Mantém a coleta numa rotação de tela, sem reabrir a consulta. */
         const val STOP_TIMEOUT_MILLIS = 5_000L
     }
+}
+
+/** O cartão do produto que está faltando, com o ícone do item que entraria na lista. */
+private fun OverdueProduct.toSuggestion(index: CatalogIndex): SuggestionUi {
+    val icon = index.icon(pattern.productId, CatalogSection.OTHER_ID).let { icon ->
+        checkNotNull(icon.drawableRes()) { "Ícone $icon sem recurso convertido" }
+    }
+    return SuggestionUi(this, pattern.name, daysSinceLastPurchase, icon)
 }
 
 /** Linha do item, também usada na lista "Adicionados" da tela de adicionar (#122). */

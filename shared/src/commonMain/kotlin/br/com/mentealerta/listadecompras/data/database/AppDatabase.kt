@@ -6,7 +6,9 @@ import androidx.room3.Database
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.migration.Migration
+import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import androidx.sqlite.execSQL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
@@ -24,8 +26,9 @@ import kotlinx.coroutines.IO
         PurchasedItemEntity::class,
         PreferredTermEntity::class,
         SectionChoiceEntity::class,
+        SuggestionDismissalEntity::class,
     ],
-    version = 1,
+    version = 2,
 )
 @ColumnTypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -46,8 +49,18 @@ internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatab
 /** Nome do arquivo do banco. Mudou? Atualize as regras de backup em `androidApp/src/main/res/xml`. */
 internal const val DATABASE_FILE_NAME = "shopping-list.db"
 
-/** Migrations de uma versão para a seguinte, em ordem. Vazia enquanto o banco está na versão 1. */
-internal val MIGRATIONS: List<Migration> = emptyList()
+/** 1 → 2 (#64): a tabela do "Não" das sugestões. */
+internal val MIGRATION_1_2 = object : Migration(1, 2) {
+    override suspend fun migrate(connection: SQLiteConnection) {
+        connection.execSQL(
+            "CREATE TABLE IF NOT EXISTS `suggestion_dismissal` (`product_key` TEXT NOT NULL, " +
+                "`dismissed_at` INTEGER NOT NULL, PRIMARY KEY(`product_key`))",
+        )
+    }
+}
+
+/** Migrations de uma versão para a seguinte, em ordem. */
+internal val MIGRATIONS: List<Migration> = listOf(MIGRATION_1_2)
 
 /**
  * Termina de montar o banco a partir do builder de cada plataforma: SQLite embarcado (mesma versão

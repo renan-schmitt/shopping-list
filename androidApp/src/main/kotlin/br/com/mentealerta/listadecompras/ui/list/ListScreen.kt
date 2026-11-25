@@ -119,6 +119,7 @@ fun ListScreen(
     val hasHistory by viewModel.hasHistory.collectAsStateWithLifecycle()
     val canBuyFullVersion by viewModel.canBuyFullVersion.collectAsStateWithLifecycle()
     val hasSettings by viewModel.hasSettings.collectAsStateWithLifecycle()
+    val suggestion by viewModel.suggestion.collectAsStateWithLifecycle()
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var askingToClear by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -216,6 +217,9 @@ fun ListScreen(
                     dismissNotice()
                     viewing = ExtraScreen.Settings
                 },
+                suggestion = suggestion,
+                onAcceptSuggestion = viewModel::onAcceptSuggestion,
+                onDismissSuggestion = viewModel::onDismissSuggestion,
             )
         }
         if (!adding && viewing == null && editing == null) UndoNoticeHost(snackbarHostState)
@@ -329,7 +333,8 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
  * lista" (#67), no fim da folha quando há o que comprar. Com [hasHistory], o botão
  * "O que já comprei" ([onHistory], #66) aparece no fim da folha ou na lista vazia; com
  * [canBuyFullVersion], o "Versão completa" ([onFullVersion], #88) também, depois dele; com
- * [hasSettings], o "Ajustes" ([onSettings], #89), por último. Comprando, a tela não apaga.
+ * [hasSettings], o "Ajustes" ([onSettings], #89), por último. Com [suggestion], o "Está faltando?"
+ * (#64) fica no topo da folha, também na lista vazia. Comprando, a tela não apaga.
  */
 @Composable
 fun ListContent(
@@ -348,7 +353,20 @@ fun ListContent(
     onFullVersion: () -> Unit = {},
     hasSettings: Boolean = false,
     onSettings: () -> Unit = {},
+    suggestion: SuggestionUi? = null,
+    onAcceptSuggestion: (SuggestionUi) -> Unit = {},
+    onDismissSuggestion: (SuggestionUi) -> Unit = {},
 ) {
+    val suggestionCard: (@Composable (Modifier) -> Unit)? = suggestion?.let {
+        { cardModifier ->
+            SuggestionCard(
+                suggestion = it,
+                onAccept = { onAcceptSuggestion(it) },
+                onDismiss = { onDismissSuggestion(it) },
+                modifier = cardModifier,
+            )
+        }
+    }
     val history = onHistory.takeIf { hasHistory }
     val fullVersion = onFullVersion.takeIf { canBuyFullVersion }
     val settings = onSettings.takeIf { hasSettings }
@@ -383,6 +401,7 @@ fun ListContent(
                 when (uiState) {
                     ListUiState.Loading -> Unit
                     ListUiState.Empty -> EmptyList(
+                        suggestion = suggestionCard,
                         onHistory = history,
                         onFullVersion = fullVersion,
                         onSettings = settings,
@@ -399,6 +418,7 @@ fun ListContent(
                             onFullVersion = fullVersion,
                             onSettings = settings,
                         ),
+                        suggestion = suggestionCard,
                     )
                 }
             }
@@ -423,15 +443,21 @@ private class SheetActions(
 )
 
 /**
- * A folha: seções com o que falta e "Já peguei" no fim. Riscar move o produto de seção com
- * animação, para a pessoa ver para onde ele foi.
+ * A folha: o "Está faltando?" ([suggestion], #64) no topo, seções com o que falta e "Já peguei" no
+ * fim. Riscar move o produto de seção com animação, para a pessoa ver para onde ele foi.
  */
 @Composable
-private fun Sheet(sections: List<SectionUi>, actions: SheetActions) {
+private fun Sheet(sections: List<SectionUi>, actions: SheetActions, suggestion: (@Composable (Modifier) -> Unit)?) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 16.dp),
     ) {
+        // "Está faltando?" (#64) antes da primeira seção; a chave muda com o produto, que entra animado.
+        suggestion?.let { card ->
+            item(key = "suggestion", contentType = "suggestion") {
+                card(Modifier.animateItem().fillMaxWidth().padding(top = 8.dp, end = 4.dp, bottom = 8.dp))
+            }
+        }
         sections.forEach { section ->
             item(key = "section-${section.id}", contentType = "section") {
                 SectionTitle(
@@ -537,11 +563,17 @@ internal fun SectionUi.title(): String = if (bought) stringResource(R.string.lis
  * e "Toque em **Adicionar** para começar sua lista." (guia de linguagem). O texto todo já é Lexend
  * negrito, então o trecho em `<b>` ganha a cor de destaque para se distinguir. Com histórico, embaixo,
  * "O que já comprei" ([onHistory], #66): depois do "Terminei", a lista costuma ficar vazia. Com letra
- * grande, a folha rola em vez de cortar o texto. Na versão grátis, por último, "Versão completa"
+ * grande, a folha rola em vez de cortar o texto. Com [suggestion], o "Está faltando?" (#64) fica
+ * acima do logo. Na versão grátis, por último, "Versão completa"
  * ([onFullVersion], #88) e "Ajustes" ([onSettings], #89).
  */
 @Composable
-private fun EmptyList(onHistory: (() -> Unit)?, onFullVersion: (() -> Unit)?, onSettings: (() -> Unit)?) {
+private fun EmptyList(
+    suggestion: (@Composable (Modifier) -> Unit)?,
+    onHistory: (() -> Unit)?,
+    onFullVersion: (() -> Unit)?,
+    onSettings: (() -> Unit)?,
+) {
     val html = AnnotatedString.fromHtml(stringResource(R.string.list_empty))
     val accent = SpanStyle(color = MaterialTheme.colorScheme.primary)
     val text = buildAnnotatedString {
@@ -559,6 +591,8 @@ private fun EmptyList(onHistory: (() -> Unit)?, onFullVersion: (() -> Unit)?, on
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            // Depois do "Terminei" a lista costuma ficar vazia: a hora de perguntar o que está faltando.
+            suggestion?.invoke(Modifier.fillMaxWidth())
             // Decorativa: o nome logo abaixo já diz o que é.
             Image(
                 painter = painterResource(R.drawable.logo_app),

@@ -34,6 +34,7 @@ import br.com.mentealerta.listadecompras.ui.list.ListContent
 import br.com.mentealerta.listadecompras.ui.list.ListUiState
 import br.com.mentealerta.listadecompras.ui.list.SampleListState
 import br.com.mentealerta.listadecompras.ui.list.SampleListStateNotShopping
+import br.com.mentealerta.listadecompras.ui.list.SampleSuggestion
 import br.com.mentealerta.listadecompras.ui.list.WeekNoticeSample
 import br.com.mentealerta.listadecompras.ui.settings.SettingsContent
 import br.com.mentealerta.listadecompras.ui.settings.SettingsUiState
@@ -86,6 +87,8 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "lista antes de comprar" to { ListContent(SampleListStateNotShopping) },
             "lista vazia" to { ListContent(ListUiState.Empty) },
             "lista com histórico" to { ListContent(SampleListStateNotShopping, hasHistory = true) },
+            "lista com está faltando" to { ListContent(SampleListStateNotShopping, suggestion = SampleSuggestion) },
+            "lista vazia com está faltando" to { ListContent(ListUiState.Empty, suggestion = SampleSuggestion) },
             "lista vazia com histórico" to { ListContent(ListUiState.Empty, hasHistory = true) },
             "lista com versão completa" to {
                 ListContent(SampleListStateNotShopping, hasHistory = true, canBuyFullVersion = true)
