@@ -98,7 +98,7 @@ val SampleAddReviewState = AddUiState(
 )
 
 /** O texto colado não tinha produto (#68), com o botão **Colar a lista** ainda na tela. */
-val SampleAddPastedNothingState = AddUiState(pastedNothing = true)
+val SampleAddPastedNothingState = AddUiState(pastedNothing = PasteSource.COPIED)
 
 private fun option(name: String, icon: Int, quantity: Quantity? = null) = AddOptionUi(
     item = ParsedItem(name, match = null, quantity, detail = null),

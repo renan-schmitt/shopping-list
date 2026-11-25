@@ -111,9 +111,18 @@ private val AddedDividerWidth = 2.dp
  *
  * **Colar a lista** (#68) só aparece com texto na área de transferência ([rememberHasCopiedText]); o
  * texto só é lido no toque. Na conferência, o voltar do celular é o **Deixa pra lá**.
+ *
+ * [receivedText] é a lista que chegou pelo "Compartilhar" do Android (#135): abre a conferência e
+ * [onReceivedTextConsume] avisa que ela já foi lida, para não abrir de novo.
  */
 @Composable
-fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: AddViewModel = koinViewModel()) {
+fun AddScreen(
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+    receivedText: String? = null,
+    onReceivedTextConsume: () -> Unit = {},
+    viewModel: AddViewModel = koinViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val added by viewModel.added.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -132,6 +141,12 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
         if (uiState.voice == VoiceUi.AskingPermission) askMicrophone.launch(Manifest.permission.RECORD_AUDIO)
     }
     LaunchedEffect(Unit) { viewModel.onOpen() }
+    val currentOnReceivedTextHandled by rememberUpdatedState(onReceivedTextConsume)
+    LaunchedEffect(receivedText) {
+        val text = receivedText ?: return@LaunchedEffect
+        viewModel.paste.onShared(text)
+        currentOnReceivedTextHandled()
+    }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onSpeakRelease() }
     val removed by viewModel.removal.removed.collectAsStateWithLifecycle()
     val noticeState = remember { SnackbarHostState() }
@@ -316,9 +331,13 @@ private fun PasteButton(onPaste: () -> Unit) {
 
 /** "Não achei produtos no texto copiado.", lido pelo TalkBack assim que aparece. */
 @Composable
-private fun PastedNothing() {
+private fun PastedNothing(source: PasteSource) {
+    val text = when (source) {
+        PasteSource.COPIED -> R.string.add_paste_nothing
+        PasteSource.SHARED -> R.string.add_shared_nothing
+    }
     Text(
-        text = stringResource(R.string.add_paste_nothing),
+        text = stringResource(text),
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier
@@ -342,8 +361,8 @@ private fun LazyListScope.idle(
     if (voice is VoiceUi.Message) {
         item(key = "voice-message", contentType = "voice-message") { VoiceMessage(voice) }
     }
-    if (uiState.pastedNothing) {
-        item(key = "pasted-nothing", contentType = "voice-message") { PastedNothing() }
+    uiState.pastedNothing?.let { source ->
+        item(key = "pasted-nothing", contentType = "voice-message") { PastedNothing(source) }
     }
     item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
     if (onPaste != null) item(key = "paste", contentType = "paste") { PasteButton(onPaste) }

@@ -87,13 +87,22 @@ import org.koin.compose.viewmodel.koinViewModel
  * "Versão completa" (#88) fica depois dele e na lista vazia, só na versão grátis, assim como "Ajustes"
  * (#89). Ao abrir o app, pode aparecer o aviso do fim da primeira semana, com **Conhecer a versão
  * completa** (#89); os anúncios da versão grátis ficam com o [ListViewModel].
- * [editScreen], [historyScreen], [fullVersionScreen] e [settingsScreen] são as telas de edição, do
- * histórico, da versão completa e dos ajustes; os testes trocam por outras com o ViewModel deles.
+ * Uma lista que chega pelo "Compartilhar" do Android ([receivedText], #135) fecha o que estiver aberto
+ * e abre a tela de adicionar na conferência; [onReceivedTextConsume] avisa que ela já foi lida.
+ * [addScreen], [editScreen], [historyScreen], [fullVersionScreen] e [settingsScreen] são as telas de
+ * adicionar, de edição, do histórico, da versão completa e dos ajustes; os testes trocam por outras
+ * com o ViewModel deles.
  */
 @Composable
 fun ListScreen(
     modifier: Modifier = Modifier,
+    receivedText: String? = null,
+    onReceivedTextConsume: () -> Unit = {},
     viewModel: ListViewModel = koinViewModel(),
+    addScreen: @Composable (receivedText: String?, onReceivedTextConsume: () -> Unit, onClose: () -> Unit) -> Unit =
+        { text, onHandled, onClose ->
+            AddScreen(onClose = onClose, receivedText = text, onReceivedTextConsume = onHandled)
+        },
     editScreen: @Composable (id: ListItemId, onClose: (EditOutcome) -> Unit) -> Unit = { id, onClose ->
         EditScreen(id = id, onClose = onClose)
     },
@@ -122,6 +131,17 @@ fun ListScreen(
         onFullVersion = { viewing = ExtraScreen.FullVersion },
     )
 
+    // Chegou uma lista pelo "Compartilhar" (#135): o que estiver aberto fecha e a de adicionar abre.
+    LaunchedEffect(receivedText) {
+        if (receivedText == null) return@LaunchedEffect
+        snackbarHostState.currentSnackbarData?.dismiss()
+        editingId = null
+        viewing = null
+        changing = false
+        askingToClear = false
+        adding = true
+    }
+
     // Sem produtos, não há o que mudar: volta para a lista vazia.
     LaunchedEffect(uiState) { if (uiState == ListUiState.Empty) changing = false }
 
@@ -136,12 +156,10 @@ fun ListScreen(
     val context = LocalContext.current
     Box(modifier) {
         when {
-            adding -> AddScreen(
-                onClose = {
-                    adding = false
-                    viewModel.onBackFromAdd()
-                },
-            )
+            adding -> addScreen(receivedText, onReceivedTextConsume) {
+                adding = false
+                viewModel.onBackFromAdd()
+            }
             extra != null -> extra.Content(
                 historyScreen = historyScreen,
                 fullVersionScreen = fullVersionScreen,

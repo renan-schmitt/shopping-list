@@ -57,8 +57,11 @@ data class AddUiState(
     val voice: VoiceUi? = null,
     /** Conferência da lista colada (#68), antes de pôr na lista; `null` fora dela. */
     val review: ReviewUi? = null,
-    /** O texto colado não tinha produto: "Não achei produtos no texto copiado." */
-    val pastedNothing: Boolean = false,
+    /**
+     * O texto colado ou recebido não tinha produto: de onde ele veio, para o recado ("Não achei
+     * produtos no texto copiado." ou "Não achei produtos na mensagem."); `null` fora dele.
+     */
+    val pastedNothing: PasteSource? = null,
 ) {
     /**
      * As opções da busca estão na tela (#122): há o que mostrar e nenhuma pergunta, explicação ou
@@ -68,6 +71,9 @@ data class AddUiState(
         get() = (found.isNotEmpty() || unknown != null) && repeated == null && review == null &&
             voice != VoiceUi.Notice && voice !is VoiceUi.Listening
 }
+
+/** De onde veio a lista: copiada e colada (#68) ou recebida pelo "Compartilhar" do Android (#135). */
+enum class PasteSource { COPIED, SHARED }
 
 /**
  * Conferência (#68): os produtos entendidos na lista colada que ainda não estão na lista ([items]),
@@ -220,7 +226,7 @@ class AddViewModel(
                 repeated = null,
                 voice = voice,
                 review = null,
-                pastedNothing = false,
+                pastedNothing = null,
             )
         }
         searchJob?.cancel()
@@ -403,7 +409,7 @@ class AddViewModel(
                 lastAdded = null,
                 repeated = null,
                 review = null,
-                pastedNothing = false,
+                pastedNothing = null,
             )
         }
         voiceJob = viewModelScope.launch {
@@ -533,9 +539,10 @@ class AddedRemoval(
 }
 
 /**
- * Colar a lista (#68): o texto copiado vira produtos pelo [ParsePastedListUseCase] e aparece para
- * conferir ([AddUiState.review]). A pessoa tira o que não quer e toca em **Pôr na lista**; o que já
- * está na lista não entra de novo, como na voz. [put] põe na lista, um por vez, e diz o que entrou.
+ * Colar a lista (#68) e receber pelo "Compartilhar" (#135): o texto vira produtos pelo
+ * [ParsePastedListUseCase] e aparece para conferir ([AddUiState.review]). A pessoa tira o que não
+ * quer e toca em **Pôr na lista**; o que já está na lista não entra de novo, como na voz. [put] põe
+ * na lista, um por vez, e diz o que entrou.
  */
 class PasteReview(
     private val scope: CoroutineScope,
@@ -550,7 +557,15 @@ class PasteReview(
      * Tocou em **Colar a lista**: separa os produtos do [text] copiado e abre a conferência com os
      * que ainda não estão na lista. Se todos já estão, só avisa; sem produto, "Não achei".
      */
-    fun onPaste(text: String) {
+    fun onPaste(text: String) = review(text, PasteSource.COPIED)
+
+    /**
+     * Chegou um texto pelo "Compartilhar" do Android (#135): o mesmo do [onPaste], e uma conferência
+     * aberta dá lugar à nova. O texto nunca vai para log.
+     */
+    fun onShared(text: String) = review(text, PasteSource.SHARED)
+
+    private fun review(text: String, source: PasteSource) {
         scope.launch {
             val items = withContext(dispatcher) { parsePastedList(text) }
             val fresh = mutableListOf<ParsedItem>()
@@ -564,7 +579,7 @@ class PasteReview(
                 }
             }
             state.value = when {
-                items.isEmpty() -> AddUiState(pastedNothing = true)
+                items.isEmpty() -> AddUiState(pastedNothing = source)
                 fresh.isEmpty() -> AddUiState(lastAdded = AddedUi(name = "", count = 0, alreadyOnList = alreadyOnList))
                 else -> AddUiState(review = ReviewUi(fresh.map(toOption), alreadyOnList))
             }

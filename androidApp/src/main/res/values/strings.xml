@@ -159,6 +159,8 @@
     <string name="add_paste_hint">Copiou uma lista no WhatsApp?</string>
     <string name="add_paste">Colar a lista</string>
     <string name="add_paste_nothing">Não achei produtos no texto copiado.</string>
+    <!-- Receber pelo "Compartilhar" do Android (#135): o nome na tela de compartilhar é o app_name -->
+    <string name="add_shared_nothing">Não achei produtos na mensagem.</string>
     <!-- Conferência da lista colada, antes de pôr na lista (#68) -->
     <string name="review_title">Lista recebida</string>
     <string name="review_hint">Toque na lixeira para tirar o que não quer.</string>

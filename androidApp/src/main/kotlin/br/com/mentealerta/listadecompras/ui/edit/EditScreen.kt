@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -61,8 +62,8 @@ private val ProductIconSize = 64.dp
 /**
  * Edição do produto [id] (#55, plano §1.1): ocupa a tela toda, por cima da lista, como a de
  * adicionar. [onClose] volta para a lista e diz como a edição acabou: mudou, não mudou ou o produto
- * saiu da lista (com o nome, para o aviso "Feijão saiu da lista."). O rascunho é gravado ao sair e
- * quando o app vai para segundo plano.
+ * saiu da lista (com o nome, para o aviso "Feijão saiu da lista."). O rascunho é gravado ao sair,
+ * quando o app vai para segundo plano e quando a tela é fechada por fora.
  */
 @Composable
 fun EditScreen(
@@ -82,6 +83,8 @@ fun EditScreen(
         }
     }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onSave() }
+    // Fechada por fora (uma lista chegou pelo "Compartilhar", #135): o rascunho também é gravado.
+    DisposableEffect(viewModel) { onDispose { viewModel.onSave() } }
     val close = { onClose(viewModel.onClose()) }
     BackHandler(onBack = close)
     EditContent(

@@ -14,7 +14,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-/** Colar uma lista recebida (#68): conferência, tirar, pôr na lista, deixar pra lá. */
+/**
+ * Colar uma lista recebida (#68) ou recebê-la pelo "Compartilhar" (#135): conferência, tirar, pôr
+ * na lista, deixar pra lá.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddPasteViewModelTest {
     private val fixture = AddFixture()
@@ -125,9 +128,39 @@ class AddPasteViewModelTest {
         viewModel.paste.onPaste("*Lista de compras*\n\n:)")
 
         val state = viewModel.uiState.value
-        assertTrue(state.pastedNothing)
+        assertEquals(PasteSource.COPIED, state.pastedNothing)
         assertNull(state.review)
         viewModel.onQueryChange("b")
-        assertEquals(false, viewModel.uiState.value.pastedNothing)
+        assertNull(viewModel.uiState.value.pastedNothing)
+    }
+
+    @Test
+    fun sharedTextOpensTheReview() {
+        val viewModel = fixture.viewModel()
+
+        viewModel.paste.onShared(whatsApp)
+
+        val review = viewModel.uiState.value.review!!
+        assertEquals(listOf("Banana", "Maçã", "Bergamota"), review.items.map { it.name })
+        assertTrue(fixture.added.isEmpty())
+    }
+
+    @Test
+    fun sharedTextReplacesAnOpenReview() {
+        val viewModel = fixture.viewModel()
+        viewModel.paste.onPaste(whatsApp)
+
+        viewModel.paste.onShared("arroz\nfeijão")
+
+        assertEquals(listOf("arroz", "feijão"), viewModel.uiState.value.review!!.items.map { it.name })
+    }
+
+    @Test
+    fun sharedTextWithoutProducts() {
+        val viewModel = fixture.viewModel()
+
+        viewModel.paste.onShared("*Lista de compras*")
+
+        assertEquals(PasteSource.SHARED, viewModel.uiState.value.pastedNothing)
     }
 }
