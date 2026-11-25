@@ -192,7 +192,7 @@ class ListViewModel(
     /** **Sim, pôr na lista**: o produto entra na lista, na seção dele. */
     fun onAcceptSuggestion(suggestion: SuggestionUi) {
         if (!answer(suggestion)) return
-        viewModelScope.launch { acceptSuggestion(suggestion.product) }
+        viewModelScope.launch { acceptSuggestion(suggestion.product.pattern) }
     }
 
     /** **Não**: o produto só volta no próximo ciclo (plano §3.4). */

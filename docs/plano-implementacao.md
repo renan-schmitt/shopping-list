@@ -45,7 +45,7 @@ O que precisa existir na primeira versão publicada.
   - Produto repetido: "Sim, mais um" e "Não" com a mesma fonte
 - [ ] Digitando, com busca aproximada ("maca" encontra "maçã")
 - [ ] Falando — inclusive vários itens de uma vez ("arroz, feijão e dois litros de leite")
-- [ ] Escolhendo de sugestões (mais comprados / sugestões do histórico)
+- [x] Escolhendo de sugestões (mais comprados / sugestões do histórico) — 2026-11-25, #65: na tela de adicionar, com o campo vazio, **Você costuma comprar** (só o título, sem número nos produtos) entre "Colar a lista" e "Adicionados", no mesmo cartão das opções da busca. Entram os produtos de costume pela regra do §3.4 (3 compras, intervalo de 2 dias ou mais, até 3× o intervalo sem comprar), mesmo sem estar faltando, fora os que já estão na lista; do mais perto de acabar para o menos, no máximo 8. O "Não" do "Está faltando?" não esconde o produto aqui: na tela de adicionar a pessoa está escolhendo. O nome é o termo preferido da pessoa (#44) ou o da última compra. Um toque põe na lista sem quantidade, na seção do produto (ou na escolhida), com "Adicionado: Café."; o produto sai das sugestões, vai para "Adicionados" e volta se a pessoa tirá-lo da lista
 - [ ] Produto desconhecido é aceito normalmente, com ícone da categoria ou ícone genérico
 - [ ] Separação automática do texto/fala em quantidade + unidade + produto + detalhe ("dois litros de leite", "meio quilo de carne moída", "uma dúzia de ovos")
 - [ ] Unidades reconhecidas: unidade, kg, grama, litro, dúzia, meia dúzia, pacote, caixa, lata, garrafa, maço, bandeja, pote

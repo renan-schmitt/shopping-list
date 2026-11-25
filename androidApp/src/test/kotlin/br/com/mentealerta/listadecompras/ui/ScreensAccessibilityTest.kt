@@ -16,6 +16,8 @@ import br.com.mentealerta.listadecompras.ui.add.SampleAddState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddVoiceMessageState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddVoiceNoticeState
 import br.com.mentealerta.listadecompras.ui.add.SampleAdded
+import br.com.mentealerta.listadecompras.ui.add.SampleUsual
+import br.com.mentealerta.listadecompras.ui.add.UsualUi
 import br.com.mentealerta.listadecompras.ui.edit.EditContent
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditChoosingSectionState
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditEmptyState
@@ -78,8 +80,15 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             state: AddUiState,
             withAdded: Boolean = false,
             canPaste: Boolean = false,
+            usual: List<UsualUi> = emptyList(),
         ): @Composable () -> Unit = {
-            AddContent(state, added = if (withAdded) SampleAdded else emptyList(), canSpeak = true, canPaste = canPaste)
+            AddContent(
+                state,
+                added = if (withAdded) SampleAdded else emptyList(),
+                usual = usual,
+                canSpeak = true,
+                canPaste = canPaste,
+            )
         }
 
         private val Screens: Map<String, @Composable () -> Unit> = linkedMapOf(
@@ -119,6 +128,7 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "adicionar nada achado" to add(SampleAddNothingFoundState),
             "adicionar repetido" to add(SampleAddRepeatedState),
             "adicionar adicionados" to add(SampleAddAddedState, withAdded = true),
+            "adicionar você costuma comprar" to add(SampleAddAddedState, withAdded = true, usual = SampleUsual),
             "adicionar já na lista" to add(SampleAddAlreadyOnListState, withAdded = true),
             "adicionar aviso da voz" to add(SampleAddVoiceNoticeState),
             "adicionar ouvindo" to add(SampleAddListeningState),

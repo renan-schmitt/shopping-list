@@ -114,6 +114,8 @@
     <string name="add_found">Adicionar na lista de compras</string>
     <!-- Título da lista do que entrou desde que a tela abriu (#122) -->
     <string name="add_added_title">Adicionados</string>
+    <!-- Título dos produtos de costume na tela de adicionar (#65); caixa alta pelo estilo -->
+    <string name="add_usual_title">Você costuma comprar</string>
     <!-- TalkBack na lixeira de cada produto de "Adicionados" (2026-11-23): "Tirar leite da lista" -->
     <string name="add_added_remove">Tirar %1$s da lista</string>
     <!-- Sem nenhum produto achado, acima da opção de pôr o texto como está -->

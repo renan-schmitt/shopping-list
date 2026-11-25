@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -129,6 +130,7 @@ fun AddScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val added by viewModel.added.collectAsStateWithLifecycle()
+    val usual by viewModel.usual.products.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val close = {
         viewModel.onClose()
@@ -169,6 +171,8 @@ fun AddScreen(
         AddContent(
             uiState = uiState,
             added = added,
+            usual = usual,
+            onAddUsual = viewModel.usual::onAdd,
             canSpeak = viewModel.canSpeak,
             onQueryChange = viewModel::onQueryChange,
             onAdd = viewModel::onAdd,
@@ -248,7 +252,8 @@ data class ReviewEditActions(
  * Topo verde com "Voltar para a lista", o campo "Digite ou fale o que quer comprar." e, se o celular
  * tem voz ([canSpeak]), o botão **Falar**. Com busca, as opções aparecem embaixo, no mesmo verde do
  * topo, cada uma numa caixa de papel. Sem busca, no papel: o aviso do que entrou ("Adicionado:
- * Leite.") e a lista **Adicionados** ([added], #122), para a pessoa ver que o produto entrou. O campo
+ * Leite."), **Você costuma comprar** ([usual], #65, só com o campo vazio) e a lista **Adicionados**
+ * ([added], #122), para a pessoa ver que o produto entrou. O campo
  * abre com o teclado. Com o produto repetido (#54), a pergunta toma o lugar
  * do aviso e das opções até a pessoa responder; o mesmo vale para a explicação do microfone e a
  * escuta (#60), que escondem o teclado. Depois de um recado que sugere escrever, o teclado volta.
@@ -258,6 +263,8 @@ fun AddContent(
     uiState: AddUiState,
     modifier: Modifier = Modifier,
     added: List<ListRowUi> = emptyList(),
+    usual: List<UsualUi> = emptyList(),
+    onAddUsual: (UsualUi) -> Unit = {},
     canSpeak: Boolean = false,
     onQueryChange: (String) -> Unit = {},
     onAdd: (AddOptionUi) -> Unit = {},
@@ -341,7 +348,14 @@ fun AddContent(
                     RepeatedQuestion(name = repeated.name, onAddMore = onAddMore, onKeepAsIs = onKeepAsIs)
                 }
                 searching -> options(uiState, onAdd)
-                else -> idle(uiState, added, onRemoveItem, onPaste.takeIf { canPaste && uiState.query.isEmpty() })
+                else -> idle(
+                    uiState = uiState,
+                    added = added,
+                    usual = usual.takeIf { uiState.query.isEmpty() }.orEmpty(),
+                    onAddUsual = onAddUsual,
+                    onRemoveItem = onRemoveItem,
+                    onPaste = onPaste.takeIf { canPaste && uiState.query.isEmpty() },
+                )
             }
             item(key = "bottom", contentType = "bottom") { Box(Modifier.navigationBarsPadding()) }
         }
@@ -419,11 +433,13 @@ private fun PastedNothing(source: PasteSource) {
 
 /**
  * Sem busca nem pergunta: o recado da voz ou do texto colado, o aviso do que entrou, **Colar a lista**
- * ([onPaste], `null` sem texto copiado) e "Adicionados".
+ * ([onPaste], `null` sem texto copiado), "Você costuma comprar" ([usual]) e "Adicionados".
  */
 private fun LazyListScope.idle(
     uiState: AddUiState,
     added: List<ListRowUi>,
+    usual: List<UsualUi>,
+    onAddUsual: (UsualUi) -> Unit,
     onRemoveItem: (ListRowUi) -> Unit,
     onPaste: (() -> Unit)?,
 ) {
@@ -436,7 +452,28 @@ private fun LazyListScope.idle(
     }
     item(key = "added", contentType = "added") { AddedNotice(uiState.lastAdded) }
     if (onPaste != null) item(key = "paste", contentType = "paste") { PasteButton(onPaste) }
+    usualList(usual, onAddUsual)
     addedList(added, onRemoveItem)
+}
+
+/**
+ * "Você costuma comprar" (#65): só o título e os produtos, sem número em cada um (plano §3.4), no
+ * mesmo cartão das opções da busca. Um toque põe o produto na lista.
+ */
+private fun LazyListScope.usualList(usual: List<UsualUi>, onAdd: (UsualUi) -> Unit) {
+    if (usual.isEmpty()) return
+    item(key = "usual-title", contentType = "title") {
+        OptionsTitle(stringResource(R.string.add_usual_title), color = MaterialTheme.colorScheme.onSurface)
+    }
+    items(usual, key = { "usual-${it.product.pattern.key}" }, contentType = { "option" }) {
+        OptionCard(label = it.name, icon = it.icon, onClick = { onAdd(it) }) {
+            Text(
+                text = it.name.toUpperCase(LocaleList.current),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
 }
 
 /** Botão de voz no topo: parado ("Segure para falar.") ou com o microfone aberto ("Terminei"). */
@@ -753,13 +790,34 @@ private fun NothingFound() {
  */
 @Composable
 private fun OptionButton(option: AddOptionUi, unknown: Boolean, onClick: () -> Unit) {
-    val colors = MaterialTheme.colorScheme
-    val tokens = ComicTheme.tokens
     val named = option.detail?.let { stringResource(R.string.list_item_name_with_detail, option.name, it) }
         ?: option.name
     val name = if (unknown) stringResource(R.string.add_unknown, named) else named
     val quantity = option.quantity?.format(LocalContext.current.resources)
     val label = quantity?.let { stringResource(R.string.list_item_with_quantity, name, it.spoken) } ?: name
+    OptionCard(label = label, icon = option.icon, onClick = onClick) {
+        Text(
+            text = if (unknown) name else name.toUpperCase(LocaleList.current),
+            style = if (unknown) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        if (quantity != null) QuantityBadge(quantity.visible)
+    }
+}
+
+/**
+ * Cartão de pôr na lista: "+" → [content] (o nome, que quebra a linha) → [icon], com no mínimo 72dp.
+ * Para o TalkBack é um botão só, lido como [label], em caixa normal.
+ */
+@Composable
+private fun OptionCard(
+    label: String,
+    @DrawableRes icon: Int,
+    onClick: () -> Unit,
+    content: @Composable FlowRowScope.() -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val tokens = ComicTheme.tokens
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -795,16 +853,10 @@ private fun OptionButton(option: AddOptionUi, unknown: Boolean, onClick: () -> U
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
             itemVerticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = if (unknown) name else name.toUpperCase(LocaleList.current),
-                style = if (unknown) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
-                color = colors.onSurface,
-            )
-            if (quantity != null) QuantityBadge(quantity.visible)
-        }
+            content = content,
+        )
         Image(
-            painter = painterResource(option.icon),
+            painter = painterResource(icon),
             contentDescription = null,
             modifier = Modifier.size(OptionIconSize),
         )

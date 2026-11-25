@@ -3,14 +3,8 @@ package br.com.mentealerta.listadecompras.domain
 import app.cash.turbine.test
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.EmbeddedCatalog
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.plus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Clock
@@ -27,9 +21,9 @@ class ObserveOverdueProductsUseCaseTest {
     private val clock = object : Clock {
         override fun now(): Instant = Instant.parse("2026-11-25T04:00:00Z")
     }
-    private val history = FakeHistoryRepository()
-    private val list = FakeListRepository()
-    private val dismissals = FakeDismissalRepository()
+    private val history = InMemoryHistoryRepository()
+    private val list = ReadOnlyListRepository(index)
+    private val dismissals = InMemoryDismissalRepository()
     private val useCase = ObserveOverdueProductsUseCase(history, list, dismissals, index, clock, timeZone)
 
     @Test
@@ -102,68 +96,5 @@ class ObserveOverdueProductsUseCaseTest {
             dismissals.values.value = mapOf("coffee" to Instant.parse("2026-11-15T15:00:00Z"))
             assertEquals(listOf("Café"), awaitItem().map { it.pattern.name })
         }
-    }
-
-    /** Compras ao meio-dia em Brasília a partir de [first], com os intervalos dados em dias. */
-    private fun buyEvery(productId: String?, name: String, first: String, vararg intervals: Int): List<Purchase> {
-        var day = LocalDate.parse(first)
-        val days = listOf(day) + intervals.map {
-            day = day.plus(it, DateTimeUnit.DAY)
-            day
-        }
-        return days.map { buy(productId, name, it.toString()) }
-    }
-
-    private fun buy(productId: String?, name: String, day: String) = Purchase(
-        PurchaseId.random(),
-        Instant.parse("${day}T15:00:00Z"),
-        listOf(PurchasedItem(productId, name, quantity = null)),
-    )
-
-    private class FakeHistoryRepository : PurchaseHistoryRepository {
-        val purchases = MutableStateFlow(emptyList<Purchase>())
-
-        override fun observePurchases(since: Instant?): Flow<List<Purchase>> =
-            purchases.map { all -> all.filter { since == null || it.date >= since } }
-
-        override fun observeHasPurchasesBefore(before: Instant): Flow<Boolean> =
-            purchases.map { all -> all.any { it.date < before } }
-    }
-
-    private class FakeDismissalRepository : SuggestionDismissalRepository {
-        val values = MutableStateFlow(emptyMap<String, Instant>())
-
-        override fun observeDismissals(): Flow<Map<String, Instant>> = values
-
-        override suspend fun dismiss(key: String, at: Instant) {
-            values.value += key to at
-        }
-    }
-
-    /** Só a leitura da lista; as seções não importam para a previsão. */
-    private inner class FakeListRepository : ShoppingListRepository {
-        val items = MutableStateFlow(emptyList<ListItem>())
-
-        override fun observeSections(): Flow<List<ListSection>> = items.map { items ->
-            items.groupBy {
-                it.sectionId
-            }.map { (sectionId, inSection) -> ListSection(index.section(sectionId)!!, inSection) }
-        }
-
-        override suspend fun add(item: ListItem) = error("não usado")
-
-        override suspend fun update(item: ListItem): ListItem? = error("não usado")
-
-        override suspend fun setChecked(id: ListItemId, checked: Boolean): ListItem? = error("não usado")
-
-        override suspend fun remove(id: ListItemId): RemovedItems = error("não usado")
-
-        override suspend fun clear(): RemovedItems = error("não usado")
-
-        override suspend fun restore(removed: RemovedItems) = error("não usado")
-
-        override suspend fun finishShopping(): FinishedShopping? = error("não usado")
-
-        override suspend fun undoFinishShopping(finished: FinishedShopping) = error("não usado")
     }
 }

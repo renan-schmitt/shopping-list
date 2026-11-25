@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
+import br.com.mentealerta.listadecompras.domain.AcceptSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveUsualProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
@@ -17,6 +19,8 @@ import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
+import br.com.mentealerta.listadecompras.domain.UsualProduct
+import br.com.mentealerta.listadecompras.domain.productKey
 import br.com.mentealerta.listadecompras.domain.toListItem
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
 import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
@@ -30,11 +34,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -138,6 +145,9 @@ sealed interface VoiceUi {
 /** A pergunta do produto repetido: [name] é o nome do item que já está na lista; [option], a tocada. */
 data class RepeatedUi(val name: String, val option: AddOptionUi)
 
+/** Produto de "Você costuma comprar" (#65): um toque põe na lista, com o [name] que a pessoa usa. */
+data class UsualUi(val product: UsualProduct, val name: String, @DrawableRes val icon: Int)
+
 /** Opção da busca: um toque põe o [item] na lista. */
 data class AddOptionUi(
     val item: ParsedItem,
@@ -164,6 +174,9 @@ data class AddOptionUi(
  *
  * Colar a lista (#68) fica no [paste]. Voltar a digitar ou falar deixa a conferência de lado.
  *
+ * Com o campo vazio, "Você costuma comprar" ([usual], #65) mostra os produtos de costume que não
+ * estão na lista; um toque põe o produto na lista, sem pergunta.
+ *
  * O que entrou desde que a tela abriu aparece em [added] ("Adicionados", #122), o mais recente no
  * topo, como está na lista agora ([ObserveListUseCase]): com a quantidade nova depois do "Sim, mais
  * um" e sem o que saiu da lista.
@@ -184,7 +197,9 @@ class AddViewModel(
     parsePastedList: ParsePastedListUseCase,
     private val voiceRecognizer: VoiceRecognizer,
     private val voicePreferences: VoicePreferences,
-    observeList: ObserveListUseCase,
+    private val observeList: ObserveListUseCase,
+    observeUsualProducts: ObserveUsualProductsUseCase,
+    private val acceptSuggestion: AcceptSuggestionUseCase,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AddUiState())
@@ -198,6 +213,26 @@ class AddViewModel(
         val items = sections.flatMap { it.items }.associateBy { it.id }
         ids.mapNotNull { items[it]?.toRow(catalogIndex) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), emptyList())
+
+    /** "Você costuma comprar" (#65): os produtos de costume que não estão na lista. */
+    val usual = UsualSuggestions(
+        scope = viewModelScope,
+        products = observeUsualProducts().map { products -> products.map { it.toUsual() } },
+        put = { usual ->
+            addMutex.withLock {
+                val key = usual.product.pattern.key
+                val onList = observeList().first().flatMap { it.items }
+                    .any { productKey(it.productId, it.name, catalogIndex) == key }
+                if (!onList) {
+                    remember(listOf(acceptSuggestion(usual.product.pattern, usual.name).id))
+                    _uiState.update { state ->
+                        val added = AddedUi(usual.name)
+                        if (state.query.isEmpty()) AddUiState(lastAdded = added) else state.copy(lastAdded = added)
+                    }
+                }
+            }
+        },
+    )
 
     /** Colar a lista e a conferência (#68). */
     val paste = PasteReview(
@@ -510,6 +545,12 @@ class AddViewModel(
         const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 
+    /** O ícone é o do produto do catálogo; o desconhecido fica com o carrinho, como no "Está faltando?". */
+    private fun UsualProduct.toUsual(): UsualUi {
+        val icon = catalogIndex.icon(pattern.productId, CatalogSection.OTHER_ID)
+        return UsualUi(this, name, checkNotNull(icon.drawableRes()) { "Ícone $icon sem recurso convertido" })
+    }
+
     private fun ParsedItem.toOption(): AddOptionUi {
         val product = match?.product
         val icon = catalogIndex.icon(product?.id, product?.sectionId ?: CatalogSection.OTHER_ID)
@@ -520,6 +561,39 @@ class AddViewModel(
             quantity = quantity,
             icon = checkNotNull(icon.drawableRes()) { "Ícone $icon sem recurso convertido" },
         )
+    }
+}
+
+/**
+ * "Você costuma comprar" (#65): os [products] de costume e o toque num deles ([onAdd]), que [put] põe
+ * na lista e avisa. O produto tocado some na hora, sem esperar o banco, e um segundo toque não faz
+ * nada; ele sai de [pending] quando a lista atualizada já o deixa de fora, para voltar se a pessoa
+ * tirar o produto da lista.
+ */
+class UsualSuggestions(
+    private val scope: CoroutineScope,
+    products: Flow<List<UsualUi>>,
+    private val put: suspend (UsualUi) -> Unit,
+) {
+    private val pending = MutableStateFlow(emptySet<String>())
+
+    val products: StateFlow<List<UsualUi>> = combine(products, pending) { usual, putting ->
+        val keys = usual.mapTo(HashSet()) { it.product.pattern.key }
+        if (putting.any { it !in keys }) pending.update { current -> current.filterTo(HashSet()) { it in keys } }
+        usual.filter { it.product.pattern.key !in putting }
+    }.stateIn(scope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), emptyList())
+
+    /** Tocou num produto: entra na lista com o nome que a pessoa usa. */
+    fun onAdd(usual: UsualUi) {
+        val key = usual.product.pattern.key
+        if (key in pending.value) return
+        pending.update { it + key }
+        scope.launch { put(usual) }
+    }
+
+    private companion object {
+        /** Mantém a coleta numa rotação de tela, sem reabrir a consulta. */
+        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }
 

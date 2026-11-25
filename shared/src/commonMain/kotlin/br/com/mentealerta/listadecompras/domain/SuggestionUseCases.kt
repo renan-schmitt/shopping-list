@@ -2,12 +2,14 @@ package br.com.mentealerta.listadecompras.domain
 
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
+import br.com.mentealerta.listadecompras.prediction.PurchasePattern
 import kotlin.time.Clock
 
 /**
- * **Sim, pôr na lista** do "Está faltando?" (plano §1.5, #64): o produto entra com o nome da última
- * compra, que já é o que a pessoa usa, sem quantidade, na seção do catálogo (desconhecido, em
- * "Outros") ou na que ela escolheu para ele ([RememberSectionUseCase]).
+ * **Sim, pôr na lista** do "Está faltando?" (plano §1.5, #64) e o toque num produto de "Você costuma
+ * comprar" (#65): o produto entra sem quantidade, com o [name] dado (por padrão, o da última compra,
+ * que já é o que a pessoa usa), na seção do catálogo (desconhecido, em "Outros") ou na que ela
+ * escolheu para ele ([RememberSectionUseCase]).
  */
 class AcceptSuggestionUseCase(
     private val repository: ShoppingListRepository,
@@ -15,11 +17,10 @@ class AcceptSuggestionUseCase(
     private val index: CatalogIndex,
 ) {
     /** Devolve o item como entrou na lista. */
-    suspend operator fun invoke(product: OverdueProduct): ListItem {
-        val pattern = product.pattern
+    suspend operator fun invoke(pattern: PurchasePattern, name: String = pattern.name): ListItem {
         val catalogProduct = pattern.productId?.let { index.product(it) }
         val item = ListItem.create(
-            name = pattern.name,
+            name = name,
             productId = catalogProduct?.id ?: pattern.productId,
             sectionId = catalogProduct?.sectionId ?: CatalogSection.OTHER_ID,
         )

@@ -6,10 +6,13 @@ import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
+import br.com.mentealerta.listadecompras.domain.UsualProduct
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
+import br.com.mentealerta.listadecompras.prediction.PurchasePattern
 import br.com.mentealerta.listadecompras.ui.edit.EditUiState
 import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
+import kotlinx.datetime.LocalDate
 
 /**
  * Tela de adicionar de exemplo para preview e screenshot (#53): "2 litros de lei" com produtos
@@ -114,8 +117,28 @@ val SampleAddReviewEditingState = AddUiState(
     ),
 )
 
+/**
+ * "Você costuma comprar" de exemplo (#65), do mais perto de acabar para o menos, com o termo da
+ * pessoa ("cacetinho") e um nome longo de produto desconhecido.
+ */
+val SampleUsual = listOf(
+    usual("coffee", "Café", R.drawable.catalog_own_coffee_package),
+    usual("french_bread", "cacetinho", R.drawable.catalog_fluent_baguette_bread),
+    usual("milk", "Leite", R.drawable.catalog_own_milk_carton),
+    usual(null, "Ração do cachorro da marca de sempre", R.drawable.catalog_fluent_shopping_cart),
+)
+
 /** O texto colado não tinha produto (#68), com o botão **Colar a lista** ainda na tela. */
 val SampleAddPastedNothingState = AddUiState(pastedNothing = PasteSource.COPIED)
+
+private fun usual(productId: String?, name: String, icon: Int) = UsualUi(
+    product = UsualProduct(
+        PurchasePattern(productId ?: name, productId, name, LocalDate.parse("2026-11-20"), intervalDays = 10.0),
+        name,
+    ),
+    name = name,
+    icon = icon,
+)
 
 private fun option(name: String, icon: Int, quantity: Quantity? = null) = AddOptionUi(
     item = ParsedItem(name, match = null, quantity, detail = null),
@@ -134,6 +157,12 @@ private fun AddListeningPreview() {
 @Composable
 private fun AddAddedPreview() {
     ShoppingListTheme { AddContent(SampleAddAddedState, added = SampleAdded, canSpeak = true) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddUsualPreview() {
+    ShoppingListTheme { AddContent(AddUiState(), usual = SampleUsual, added = SampleAdded.take(1), canSpeak = true) }
 }
 
 @Preview(showBackground = true)

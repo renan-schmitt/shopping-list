@@ -160,14 +160,35 @@ class AddScreenshotTest {
     @Config(qualifiers = "+night", fontScale = 1.0f)
     fun paste_dark_font100() = capture("paste_dark_font100", SampleAddAddedState, SampleAdded, canPaste = true)
 
+    @Test
+    @Config(fontScale = 1.0f)
+    fun usual_light_font100() =
+        capture("usual_light_font100", SampleAddAddedState, SampleAdded.take(1), usual = SampleUsual)
+
+    @Test
+    @Config(fontScale = 1.5f)
+    fun usual_light_font150() =
+        capture("usual_light_font150", SampleAddAddedState, SampleAdded.take(1), usual = SampleUsual)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun usual_light_font200() =
+        capture("usual_light_font200", SampleAddAddedState, SampleAdded.take(1), usual = SampleUsual)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun usual_dark_font100() =
+        capture("usual_dark_font100", SampleAddAddedState, SampleAdded.take(1), usual = SampleUsual)
+
     private fun capture(
         name: String,
         state: AddUiState = SampleAddState,
         added: List<ListRowUi> = emptyList(),
         canPaste: Boolean = false,
+        usual: List<UsualUi> = emptyList(),
     ) {
         compose.setContent {
-            ShoppingListTheme { AddContent(state, added = added, canSpeak = true, canPaste = canPaste) }
+            ShoppingListTheme { AddContent(state, added = added, usual = usual, canSpeak = true, canPaste = canPaste) }
         }
         compose.onRoot().captureRoboImage("src/test/screenshots/add_$name.png")
     }

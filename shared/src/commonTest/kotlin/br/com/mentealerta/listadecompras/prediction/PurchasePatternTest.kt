@@ -146,6 +146,15 @@ class PurchasePatternTest {
     }
 
     @Test
+    fun activeUntilThreeTimesTheInterval() {
+        val pattern = pattern(lastPurchase = LocalDate(2026, 11, 1), interval = 10.0)
+
+        assertTrue(pattern.isActive(LocalDate(2026, 11, 2))) // 1 dia: ainda não falta, mas é de costume
+        assertTrue(pattern.isActive(LocalDate(2026, 12, 1))) // 30 dias = 3×
+        assertFalse(pattern.isActive(LocalDate(2026, 12, 2))) // 31 dias
+    }
+
+    @Test
     fun halfDayIntervalUsesTheExactLimit() {
         val pattern = pattern(lastPurchase = LocalDate(2026, 11, 1), interval = 2.5)
 

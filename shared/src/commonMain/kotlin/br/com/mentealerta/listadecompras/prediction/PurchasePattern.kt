@@ -31,6 +31,12 @@ data class PurchasePattern(
     fun overdueRatio(today: LocalDate): Double = daysSinceLastPurchase(today) / intervalDays
 
     /**
+     * Se a pessoa ainda compra o produto em [today]: não passou de [STOP_FACTOR] × o intervalo desde a
+     * última compra. Depois disso ela deixou de usar, e o produto só volta quando ela comprar.
+     */
+    fun isActive(today: LocalDate): Boolean = daysSinceLastPurchase(today) <= intervalDays * STOP_FACTOR
+
+    /**
      * Se o produto está faltando em [today]: passou de 1,2 × o intervalo (folga de 20%) desde a última
      * compra e ainda não de [STOP_FACTOR] × (aí a pessoa deixou de usar; volta quando ela comprar).
      *
@@ -40,7 +46,7 @@ data class PurchasePattern(
     fun isOverdue(today: LocalDate, dismissedOn: LocalDate? = null): Boolean {
         val days = daysSinceLastPurchase(today)
         // dias > 1,2 × intervalo, em quintos para não cair em erro de arredondamento.
-        val overdue = days * FIFTHS > intervalDays * OVERDUE_FIFTHS && days <= intervalDays * STOP_FACTOR
+        val overdue = days * FIFTHS > intervalDays * OVERDUE_FIFTHS && isActive(today)
         val dismissal = dismissedOn?.takeIf { it >= lastPurchase }
         return overdue && (dismissal == null || dismissal.daysUntil(today) >= intervalDays)
     }

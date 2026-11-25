@@ -33,7 +33,7 @@ class SuggestionUseCasesTest {
 
     @Test
     fun yesPutsTheProductWithTheNameOfTheLastPurchaseInItsSection() = runTest {
-        accept(overdue(key = "cassava", productId = "cassava", name = "aipim"))
+        accept(pattern(key = "cassava", productId = "cassava", name = "aipim"))
 
         val sections = repository.observeSections().first()
         assertEquals(listOf("produce"), sections.map { it.section.id })
@@ -47,12 +47,21 @@ class SuggestionUseCasesTest {
     fun yesUsesTheSectionThePersonChose() = runTest {
         sectionChoices.sections["coffee"] = "beverages"
 
-        assertEquals("beverages", accept(overdue(key = "coffee", productId = "coffee", name = "Café")).sectionId)
+        assertEquals("beverages", accept(pattern(key = "coffee", productId = "coffee", name = "Café")).sectionId)
+    }
+
+    @Test
+    fun usualProductEntersWithTheGivenName() = runTest {
+        val item =
+            accept(pattern(key = "french_bread", productId = "french_bread", name = "pão francês"), name = "cacetinho")
+
+        assertEquals("cacetinho", item.name)
+        assertEquals("french_bread", item.productId)
     }
 
     @Test
     fun yesPutsAnUnknownProductInOthers() = runTest {
-        val item = accept(overdue(key = "sabao de coco", productId = null, name = "Sabão de coco"))
+        val item = accept(pattern(key = "sabao de coco", productId = null, name = "Sabão de coco"))
 
         assertEquals(CatalogSection.OTHER_ID, item.sectionId)
         assertEquals(null, item.productId)
@@ -71,8 +80,9 @@ class SuggestionUseCasesTest {
         assertEquals(mapOf("cassava" to now), dismissals.observeDismissals().first())
     }
 
-    private fun overdue(key: String, productId: String?, name: String) = OverdueProduct(
-        PurchasePattern(key, productId, name, LocalDate.parse("2026-11-10"), intervalDays = 10.0),
-        daysSinceLastPurchase = 15,
-    )
+    private fun pattern(key: String, productId: String?, name: String) =
+        PurchasePattern(key, productId, name, LocalDate.parse("2026-11-10"), intervalDays = 10.0)
+
+    private fun overdue(key: String, productId: String?, name: String) =
+        OverdueProduct(pattern(key, productId, name), daysSinceLastPurchase = 15)
 }

@@ -6,6 +6,7 @@ import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.CatalogProduct
 import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.catalog.IconFit
+import br.com.mentealerta.listadecompras.domain.AcceptSuggestionUseCase
 import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
@@ -15,8 +16,13 @@ import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveUsualProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
+import br.com.mentealerta.listadecompras.domain.Purchase
+import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
+import br.com.mentealerta.listadecompras.domain.PurchaseId
+import br.com.mentealerta.listadecompras.domain.PurchasedItem
 import br.com.mentealerta.listadecompras.domain.RememberSectionUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
@@ -38,12 +44,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.datetime.TimeZone
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 /**
  * Catálogo pequeno e repositório falso para os testes da tela de adicionar: guarda o que entrou na
  * lista em [added] e a lista como está em [items], observada como no banco. O "Desfazer" fica
- * na [undoStack]. A voz é o [voice], que entrega o que o teste mandar.
+ * na [undoStack]. A voz é o [voice], que entrega o que o teste mandar. O histórico ([buyEvery10Days])
+ * alimenta "Você costuma comprar" (#65), com hoje em 25/11/2026 (UTC).
  */
 class AddFixture {
     private val produce = CatalogSection("produce", "Hortifrúti", 1, CatalogIcon.Fluent("Leafy green"))
@@ -126,6 +135,32 @@ class AddFixture {
         override suspend fun undoFinishShopping(finished: FinishedShopping) = Unit
     }
 
+    private val purchases = MutableStateFlow(emptyList<Purchase>())
+
+    private val history = object : PurchaseHistoryRepository {
+        override fun observePurchases(since: Instant?): Flow<List<Purchase>> = purchases
+
+        override fun observeHasPurchasesBefore(before: Instant): Flow<Boolean> = purchases.map { it.isNotEmpty() }
+    }
+
+    private val clock = object : Clock {
+        override fun now(): Instant = Instant.parse("2026-11-25T12:00:00Z")
+    }
+
+    /**
+     * Três compras do produto, de 10 em 10 dias, a última há 5 dias: vira produto de costume, sem
+     * estar faltando.
+     */
+    fun buyEvery10Days(productId: String?, name: String) {
+        purchases.value += listOf("2026-10-31", "2026-11-10", "2026-11-20").map { day ->
+            Purchase(
+                PurchaseId.random(),
+                Instant.parse("${day}T12:00:00Z"),
+                listOf(PurchasedItem(productId, name, null)),
+            )
+        }
+    }
+
     /** Termos que a pessoa usa (#44), aprendidos ao pôr e ao renomear. */
     val preferredTerms = FakePreferredTermRepository()
     private val learnPreferredTerm get() = LearnPreferredTermUseCase(index, preferredTerms)
@@ -148,6 +183,8 @@ class AddFixture {
         voice,
         voicePreferences,
         ObserveListUseCase(repository),
+        ObserveUsualProductsUseCase(history, repository, preferredTerms, index, clock, TimeZone.UTC),
+        AcceptSuggestionUseCase(repository, rememberSection, index),
         searchDispatcher,
     )
 }
