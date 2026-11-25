@@ -10,6 +10,15 @@ kotlin {
     jvmToolchain(21)
 }
 
+/** IDs de teste do Google: anúncios de verdade, sem cobrança nem risco para a conta do AdMob. */
+val admobTestAppId = "ca-app-pub-3940256099942544~3347511713"
+val admobTestInterstitialId = "ca-app-pub-3940256099942544/1033173712"
+
+fun com.android.build.api.dsl.ApplicationBuildType.admobIds(appId: String, interstitialId: String) {
+    manifestPlaceholders["admobAppId"] = appId
+    buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$interstitialId\"")
+}
+
 android {
     namespace = "br.com.mentealerta.listadecompras"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -23,13 +32,23 @@ android {
     }
 
     buildTypes {
+        // Anúncios (plano §3.7, #89): o debug sempre usa os IDs de teste do Google; o release usa os
+        // do AdMob em gradle.properties (docs/configurar-anuncios.md) e, sem eles, os de teste.
+        debug {
+            admobIds(appId = admobTestAppId, interstitialId = admobTestInterstitialId)
+        }
         release {
             isMinifyEnabled = false
+            admobIds(
+                appId = providers.gradleProperty("admob.appId").getOrElse(admobTestAppId),
+                interstitialId = providers.gradleProperty("admob.interstitialId").getOrElse(admobTestInterstitialId),
+            )
         }
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     androidResources {
@@ -69,6 +88,9 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     // Versão completa: compra única direto pelo Google Play Billing (plano §4.3, #86)
     implementation(libs.billing.ktx)
+    // Anúncios da versão grátis e o consentimento onde a lei exige (plano §3.7, #89)
+    implementation(libs.play.services.ads)
+    implementation(libs.ump)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 

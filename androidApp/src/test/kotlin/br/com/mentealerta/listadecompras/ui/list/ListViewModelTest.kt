@@ -28,11 +28,14 @@ import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.domain.undo.UndoableAction
+import br.com.mentealerta.listadecompras.ui.components.NoticeResult
+import br.com.mentealerta.listadecompras.ui.edit.EditOutcome
 import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -45,6 +48,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -120,6 +124,14 @@ class ListViewModelTest {
 
     private val premium = FakePremiumRepository()
 
+    /** Para os anúncios, a lista é o que está em [stored]. */
+    private val ads = AdsFixture(
+        premium,
+        object : ShoppingListRepository by repository {
+            override fun observeSections() = flowOf(listOf(ListSection(produce, stored.values.toList())))
+        },
+    )
+
     @Before
     fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
 
@@ -136,6 +148,7 @@ class ListViewModelTest {
         UndoLastActionUseCase(repository, undoStack),
         ObservePurchaseHistoryUseCase(historyRepository, Clock.System),
         ObservePremiumUseCase(premium),
+        ads.useCases,
     )
 
     @Test
@@ -311,10 +324,12 @@ class ListViewModelTest {
         val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
         stored[tomato.id] = tomato
 
-        viewModel().onToggleCheck(tomato.id, checked = false)
+        val viewModel = viewModel()
+        viewModel.onToggleCheck(tomato.id, checked = false)
         assertEquals(UndoableAction.ItemChecked(tomato), undoStack.lastAction.value)
 
-        viewModel().onUndo()
+        // Riscar não mostra aviso; o "Desfazer" que vale é o do próximo aviso.
+        viewModel.onNoticeClosed(ListNotice.Removed("Tomate"), NoticeResult.Action)
         assertEquals(false, stored.getValue(tomato.id).checked)
         assertNull(undoStack.lastAction.value)
     }
@@ -331,7 +346,7 @@ class ListViewModelTest {
 
         assertEquals(ListNotice.Finished(bought = 2, remaining = 1), viewModel.notice.value)
         assertEquals(listOf(beans), stored.values.toList())
-        viewModel.onNoticeShown()
+        viewModel.onNoticeClosed(ListNotice.Finished(bought = 2, remaining = 1), NoticeResult.Dismissed)
         assertNull(viewModel.notice.value)
     }
 
@@ -358,7 +373,7 @@ class ListViewModelTest {
 
         assertEquals(ListNotice.Cleared, viewModel.notice.value)
         assertTrue(stored.isEmpty())
-        viewModel.onUndo()
+        viewModel.onNoticeClosed(ListNotice.Cleared, NoticeResult.Action)
         assertEquals(setOf(tomato, beans), stored.values.toSet())
     }
 
@@ -372,7 +387,7 @@ class ListViewModelTest {
 
         assertEquals(ListNotice.Removed("Feijão"), viewModel.notice.value)
         assertTrue(stored.isEmpty())
-        viewModel.onUndo()
+        viewModel.onNoticeClosed(ListNotice.Removed("Feijão"), NoticeResult.Action)
         assertEquals(listOf(beans), stored.values.toList())
     }
 
@@ -418,5 +433,182 @@ class ListViewModelTest {
 
         assertEquals(3, state.total)
         assertEquals(2, state.remaining)
+    }
+
+    @Test
+    fun backFromAddShowsAnAdEveryThirdTime() = runTest {
+        ads.startAds()
+        val viewModel = viewModel()
+
+        repeat(2) { viewModel.onBackFromAdd() }
+        assertTrue(ads.ads.shows.isEmpty())
+        viewModel.onBackFromAdd()
+        assertEquals(listOf(true), ads.ads.shows)
+    }
+
+    @Test
+    fun noAdInTheFirstWeek() = runTest {
+        ads.firstOpenedAgo(3.days)
+        val viewModel = viewModel()
+
+        repeat(3) { viewModel.onBackFromAdd() }
+
+        assertTrue(ads.ads.shows.isEmpty())
+    }
+
+    @Test
+    fun noAdWithACheckedItem() = runTest {
+        ads.startAds()
+        stored[ListItemId("1")] = ListItem(ListItemId("1"), "Tomate", null, "produce", checked = true)
+        val viewModel = viewModel()
+
+        repeat(3) { viewModel.onBackFromAdd() }
+
+        assertTrue(ads.ads.shows.isEmpty())
+    }
+
+    @Test
+    fun noAdWithTheFullVersion() = runTest {
+        ads.startAds()
+        premium.isPremium.value = true
+        val viewModel = viewModel()
+
+        repeat(3) { viewModel.onBackFromAdd() }
+        viewModel.onNoticeClosed(ListNotice.Cleared, NoticeResult.Dismissed)
+
+        assertTrue(ads.ads.shows.isEmpty())
+    }
+
+    @Test
+    fun adAfterCertoOnTheFinishNotice() = runTest {
+        ads.startAds()
+        val viewModel = viewModel()
+
+        viewModel.onNoticeClosed(ListNotice.Finished(bought = 2, remaining = 0), NoticeResult.Dismissed)
+
+        assertEquals(1, ads.ads.shows.size)
+    }
+
+    @Test
+    fun noAdWhenTheNoticeClosesByItself() = runTest {
+        ads.startAds()
+        val viewModel = viewModel()
+
+        viewModel.onNoticeClosed(ListNotice.Finished(bought = 2, remaining = 0), NoticeResult.Closed)
+        viewModel.onNoticeClosed(ListNotice.Cleared, NoticeResult.Closed)
+
+        assertTrue(ads.ads.shows.isEmpty())
+    }
+
+    @Test
+    fun undoOnTheFinishNoticeBringsTheItemsBackAndShowsTheAd() = runTest {
+        ads.startAds()
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce", checked = true)
+        stored[tomato.id] = tomato
+        val viewModel = viewModel()
+        viewModel.onFinish()
+
+        viewModel.onNoticeClosed(ListNotice.Finished(bought = 1, remaining = 0), NoticeResult.Action)
+
+        // Os riscados voltam, mas foi depois do aviso: não conta como "estar comprando".
+        assertEquals(listOf(tomato), stored.values.toList())
+        assertEquals(1, ads.ads.shows.size)
+    }
+
+    @Test
+    fun removingAProductIsNoAdMoment() = runTest {
+        ads.startAds()
+        val viewModel = viewModel()
+
+        viewModel.onNoticeClosed(ListNotice.Removed("Feijão"), NoticeResult.Dismissed)
+
+        assertTrue(ads.ads.shows.isEmpty())
+    }
+
+    @Test
+    fun editingShowsAnAdEveryThirdChange() = runTest {
+        ads.startAds()
+        val viewModel = viewModel()
+
+        viewModel.onEditClosed(EditOutcome.Unchanged)
+        repeat(2) { viewModel.onEditClosed(EditOutcome.Changed) }
+        assertTrue(ads.ads.shows.isEmpty())
+        viewModel.onEditClosed(EditOutcome.Changed)
+        assertEquals(1, ads.ads.shows.size)
+    }
+
+    @Test
+    fun removedInTheEditionWaitsForTheNoticeBeforeTheAd() = runTest {
+        ads.startAds()
+        val viewModel = viewModel()
+        repeat(2) { viewModel.onEditClosed(EditOutcome.Changed) }
+
+        viewModel.onEditClosed(EditOutcome.Removed("Feijão"))
+
+        val notice = viewModel.notice.value
+        assertEquals(ListNotice.Removed("Feijão"), notice)
+        assertTrue(ads.ads.shows.isEmpty())
+        viewModel.onNoticeClosed(notice!!, NoticeResult.Dismissed)
+        assertEquals(1, ads.ads.shows.size)
+    }
+
+    @Test
+    fun removedInTheEditionNoAdWhenTheNoticeClosesByItself() = runTest {
+        ads.startAds()
+        val viewModel = viewModel()
+        repeat(2) { viewModel.onEditClosed(EditOutcome.Changed) }
+        viewModel.onEditClosed(EditOutcome.Removed("Feijão"))
+
+        viewModel.onNoticeClosed(viewModel.notice.value!!, NoticeResult.Closed)
+
+        assertTrue(ads.ads.shows.isEmpty())
+    }
+
+    @Test
+    fun weekNoticeAppearsOnTheSeventhDayOnceOnly() = runTest {
+        ads.firstOpenedAgo(6.days)
+        val viewModel = viewModel()
+
+        viewModel.onAppOpened()
+
+        assertEquals(ListNotice.WeekEnding, viewModel.notice.value)
+        assertEquals(ads.now, ads.preferences.current.weekNoticeShownAt)
+        viewModel.onNoticeClosed(ListNotice.WeekEnding, NoticeResult.Action)
+        viewModel.onAppOpened()
+        assertNull(viewModel.notice.value)
+    }
+
+    @Test
+    fun weekNoticeActionDoesNotUndo() = runTest {
+        ads.firstOpenedAgo(6.days)
+        val tomato = ListItem(ListItemId("1"), "Tomate", null, "produce")
+        stored[tomato.id] = tomato
+        val viewModel = viewModel()
+        viewModel.onToggleCheck(tomato.id, checked = false)
+        viewModel.onToggleCheck(tomato.id, checked = true)
+
+        viewModel.onNoticeClosed(ListNotice.WeekEnding, NoticeResult.Action)
+
+        assertEquals(UndoableAction.ItemChecked(tomato.check()), undoStack.lastAction.value)
+    }
+
+    @Test
+    fun noWeekNoticeBeforeTheSeventhDay() = runTest {
+        ads.firstOpenedAgo(5.days)
+        val viewModel = viewModel()
+
+        viewModel.onAppOpened()
+
+        assertNull(viewModel.notice.value)
+    }
+
+    @Test
+    fun settingsOnlyInTheFreeVersion() = runTest {
+        val viewModel = viewModel()
+        viewModel.hasSettings.test {
+            assertTrue(awaitItem())
+            premium.isPremium.value = true
+            assertFalse(awaitItem())
+        }
     }
 }

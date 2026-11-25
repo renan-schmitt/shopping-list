@@ -60,14 +60,14 @@ private val ProductIconSize = 64.dp
 
 /**
  * Edição do produto [id] (#55, plano §1.1): ocupa a tela toda, por cima da lista, como a de
- * adicionar. [onClose] volta para a lista, com o nome do produto quando ele saiu da lista (para o
- * aviso "Feijão saiu da lista.") ou `null`. O rascunho é gravado ao sair e quando o app vai para
- * segundo plano.
+ * adicionar. [onClose] volta para a lista e diz como a edição acabou: mudou, não mudou ou o produto
+ * saiu da lista (com o nome, para o aviso "Feijão saiu da lista."). O rascunho é gravado ao sair e
+ * quando o app vai para segundo plano.
  */
 @Composable
 fun EditScreen(
     id: ListItemId,
-    onClose: (removedName: String?) -> Unit,
+    onClose: (EditOutcome) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditViewModel = koinViewModel(),
 ) {
@@ -78,14 +78,11 @@ fun EditScreen(
         (uiState as? EditUiState.Closed)?.let {
             // Consome o fechamento: o próximo produto aberto não pode herdar o aviso deste.
             viewModel.onClosedHandled()
-            currentOnClose(it.removedName)
+            currentOnClose(it.removedName?.let(EditOutcome::Removed) ?: EditOutcome.Unchanged)
         }
     }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.onSave() }
-    val close = {
-        viewModel.onClose()
-        onClose(null)
-    }
+    val close = { onClose(viewModel.onClose()) }
     BackHandler(onBack = close)
     EditContent(
         uiState = uiState,

@@ -232,6 +232,14 @@ Se a escuta não reabrir bem, revemos a escolha do reconhecedor.
 - **Aviso do fim da primeira semana:** no 7º dia, na primeira vez que a pessoa abre o app sem produto riscado, uma vez só, no aviso do meio da tela: "A partir de amanhã, o app continua de graça, com alguns anúncios. Se preferir sem anúncios, tem a versão completa." · **Certo** (principal) · **Conhecer a versão completa** (abre a tela da #88). A tela da versão completa explica o mesmo.
 - **Conteúdo:** classificação máxima **G** (público geral). Categorias bloqueadas, pela marca Mente Alerta (contra golpes): apostas e cassino (inclusive jogos sociais de cassino), enriquecimento rápido, empréstimos e crédito, criptomoedas, namoro, astrologia e simpatias, emagrecimento, remédios e suplementos, procedimentos estéticos, saúde sexual, política e religião. Revisar a central de revisão de anúncios do AdMob de vez em quando, mais no começo.
 - **Consentimento:** UMP integrado, que só pede consentimento onde a lei exige (União Europeia, Reino Unido, alguns estados dos EUA); no Brasil não aparece. Anúncios personalizados no Brasil, com a base legal (legítimo interesse, a validar ao escrever a política) na política de privacidade, e a chave **Anúncios pelo meu interesse** nos Ajustes, ligada por padrão; desligada, o app pede só anúncios não personalizados. No iPhone (fase 5), entra o pedido de rastreamento da Apple (ATT).
+- **Implementação (2026-11-25, #89):**
+  - Se a pessoa não abrir o app no 7º dia, o aviso aparece na primeira abertura depois dele, sem produto riscado; os anúncios só começam no dia seguinte ao aviso, para o "a partir de amanhã" ser sempre verdade.
+  - Conta como edição sair da tela de edição com algo mudado ou com o produto tirado da lista. Tirado da lista, o anúncio espera o aviso "Feijão saiu da lista." e só vem depois de **Certo** ou **Desfazer**, como no Terminei.
+  - Os contadores voltam a zero na 3ª vez mesmo que o anúncio seja bloqueado (produto riscado, limite do AdMob): "a cada 3" ao pé da letra.
+  - Abrir outra tela também fecha o aviso; nesse caso, como no aviso que some sozinho, não há anúncio.
+  - O consentimento do UMP só é pedido quando os anúncios começam, nunca na primeira semana.
+  - A chave **Anúncios pelo meu interesse** fica numa tela de **Ajustes** mínima, que por enquanto só aparece na versão grátis (a tela completa vem na #70). Texto de apoio: "Desligada, ainda aparecem anúncios, mas sem usar seus interesses." · "Sua lista nunca vai para os anúncios."
+  - IDs do AdMob, limite de frequência, categorias e o que muda na política: [configurar-anuncios.md](configurar-anuncios.md).
 - **Riscos aceitos:** toque acidental (o "X" do anúncio é do Google, o app não controla o tamanho) e impacto na nota da loja. Acompanhar as avaliações e os números do AdMob, e ajustar frequência e limites se preciso.
 
 ### 3.8 Ordem das seções e produtos riscados
@@ -380,7 +388,7 @@ shopping-list/
 | Crashes | MVP | Firebase Crashlytics + Play Console Android Vitals | Sem dados pessoais nos logs |
 | Uso do app | MVP | Firebase Analytics com lista fechada de eventos | Nunca nome de produto; coleta automática de ID de publicidade desligada; opção para desativar nas configurações |
 | Termos desconhecidos | Fase 2 | Envio agregado, sem identificador | Só com consentimento explícito ("Ajudar a melhorar o app"); filtrar termos de saúde (remédios, etc.) |
-| Anúncios (só grátis) | Fase 2 | Google Mobile Ads (AdMob) + UMP | ID de publicidade só para anúncios; personalização desligável nos Ajustes ("Anúncios pelo meu interesse"); nada da lista vai para o anúncio (seção 3.7) |
+| Anúncios (só grátis) | Fase 2 | Google Mobile Ads (AdMob) + UMP | ID de publicidade só para anúncios; personalização desligável nos Ajustes ("Anúncios pelo meu interesse"); nada da lista vai para o anúncio (seção 3.7). O que entra na política e no formulário: [configurar-anuncios.md](configurar-anuncios.md) (#89) |
 | Conteúdo da lista / histórico | Nunca | — | — |
 
 **Eventos iniciais do analytics (lista fechada):**

@@ -43,6 +43,16 @@ sealed interface EditUiState {
     data class Closed(val removedName: String?) : EditUiState
 }
 
+/** Como a pessoa saiu da edição; mudar ou tirar da lista conta para os anúncios (#89). */
+sealed interface EditOutcome {
+    data object Unchanged : EditOutcome
+
+    data object Changed : EditOutcome
+
+    /** "Tirar da lista": a lista mostra "Feijão saiu da lista." com o [name]. */
+    data class Removed(val name: String) : EditOutcome
+}
+
 /**
  * Edição do produto (#55, plano §1.1): nome, quantidade com − / + e detalhe. Não existe "Salvar":
  * o rascunho é gravado ao sair da tela ([onClose]) e quando o app vai para segundo plano ([onSave]),
@@ -71,11 +81,15 @@ class EditViewModel(
     private var loadJob: Job? = null
     private val mutex = Mutex()
 
+    /** Se alguma gravação desta edição mudou o produto (ex.: o app foi para segundo plano no meio). */
+    private var edited = false
+
     /** Abre o produto [id]. Se ele já está aberto (rotação de tela), o rascunho continua. */
     fun open(id: ListItemId) {
         if (id == openId && _uiState.value !is EditUiState.Closed) return
         openId = id
         saved = null
+        edited = false
         _uiState.value = EditUiState.Loading
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
@@ -102,15 +116,23 @@ class EditViewModel(
         val item = draft() ?: return
         viewModelScope.launch {
             mutex.withLock {
-                if (editItem(item)) saved = item
+                if (editItem(item)) {
+                    saved = item
+                    edited = true
+                }
             }
         }
     }
 
-    /** Saindo da tela pelo "Voltar para a lista" ou pelo voltar do celular: grava e fecha. */
-    fun onClose() {
+    /**
+     * Saindo da tela pelo "Voltar para a lista" ou pelo voltar do celular: grava e fecha. Diz se a
+     * pessoa mudou o produto nesta edição.
+     */
+    fun onClose(): EditOutcome {
+        val changed = edited || draft().let { it != null && it != saved }
         onSave()
         close()
+        return if (changed) EditOutcome.Changed else EditOutcome.Unchanged
     }
 
     /** "Tirar da lista": o rascunho não é gravado; o aviso usa o nome que está na tela. */

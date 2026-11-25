@@ -84,6 +84,7 @@ import br.com.mentealerta.listadecompras.ui.components.ComicCard
 import br.com.mentealerta.listadecompras.ui.components.HoldButton
 import br.com.mentealerta.listadecompras.ui.components.IconOnlyButton
 import br.com.mentealerta.listadecompras.ui.components.LabeledTextField
+import br.com.mentealerta.listadecompras.ui.components.NoticeResult
 import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.UndoNoticeHost
@@ -137,11 +138,11 @@ fun AddScreen(onClose: () -> Unit, modifier: Modifier = Modifier, viewModel: Add
     val accessibilityManager = LocalAccessibilityManager.current
     LaunchedEffect(removed) {
         val name = removed ?: return@LaunchedEffect
-        val undo = noticeState.showUndoNotice(
+        val result = noticeState.showUndoNotice(
             message = context.resources.getString(R.string.list_item_removed, name.capitalized()),
             accessibilityManager = accessibilityManager,
         )
-        viewModel.removal.onNoticeClosed(undo)
+        viewModel.removal.onNoticeClosed(undo = result == NoticeResult.Action)
     }
     Box(modifier) {
         AddContent(

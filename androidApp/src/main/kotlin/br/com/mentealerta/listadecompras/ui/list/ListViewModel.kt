@@ -3,7 +3,9 @@ package br.com.mentealerta.listadecompras.ui.list
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.com.mentealerta.listadecompras.ads.AdMoment
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
+import br.com.mentealerta.listadecompras.domain.AdsUseCases
 import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
@@ -16,6 +18,8 @@ import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.ui.catalog.iconRes
+import br.com.mentealerta.listadecompras.ui.components.NoticeResult
+import br.com.mentealerta.listadecompras.ui.edit.EditOutcome
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -71,7 +75,7 @@ data class ListRowUi(
     @DrawableRes val icon: Int,
 )
 
-/** Aviso com "Desfazer" que a tela mostra depois de uma ação. */
+/** Aviso no meio da tela: com "Desfazer" depois de uma ação, ou o do fim da primeira semana. */
 sealed interface ListNotice {
     /** "Terminei" (#57): [bought] produtos comprados, [remaining] ficaram na lista. */
     data class Finished(val bought: Int, val remaining: Int) : ListNotice
@@ -79,8 +83,14 @@ sealed interface ListNotice {
     /** "Jogar a lista fora" (#58). */
     data object Cleared : ListNotice
 
-    /** "Tirar da lista" pela ação do TalkBack na linha (#71): "Feijão saiu da lista.". */
+    /** "Tirar da lista" pela ação do TalkBack na linha (#71) ou na edição: "Feijão saiu da lista.". */
     data class Removed(val name: String) : ListNotice
+
+    /**
+     * Fim da primeira semana (#89): "A partir de amanhã, o app continua de graça, com alguns
+     * anúncios…", com **Conhecer a versão completa** no lugar do "Desfazer".
+     */
+    data object WeekEnding : ListNotice
 }
 
 /**
@@ -90,6 +100,11 @@ sealed interface ListNotice {
  * (#71) entram na pilha do "Desfazer"; [onUndo] desfaz a última ação. [hasHistory] diz se há compras
  * para mostrar em "O que já comprei" (#66); [canBuyFullVersion], se aparece o botão "Versão completa"
  * (#88).
+ *
+ * Anúncios da versão grátis (#89, plano §3.7), pelos [ads]: ao voltar da tela de adicionar e ao sair
+ * da edição com algo mudado, a cada 3 vezes; depois de **Certo** ou **Desfazer** no aviso do
+ * "Terminei" e do "Jogar a lista fora" (nunca quando o aviso some sozinho). Ao abrir o app, o aviso do
+ * fim da primeira semana, uma vez só.
  */
 class ListViewModel(
     observeList: ObserveListUseCase,
@@ -101,8 +116,12 @@ class ListViewModel(
     private val undoLastAction: UndoLastActionUseCase,
     observeHistory: ObservePurchaseHistoryUseCase,
     observePremium: ObservePremiumUseCase,
+    private val ads: AdsUseCases,
 ) : ViewModel() {
     private val mutableNotice = MutableStateFlow<ListNotice?>(null)
+
+    /** Aviso "Feijão saiu da lista." da edição que caiu na vez do anúncio: ele vem depois do aviso. */
+    private var adAfterNotice: ListNotice? = null
 
     /** Aviso a mostrar; a tela chama [onNoticeShown] quando ele sai. Fica guardado numa rotação de tela. */
     val notice: StateFlow<ListNotice?> = mutableNotice.asStateFlow()
@@ -133,6 +152,12 @@ class ListViewModel(
         .map { !it }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), !observePremium().value)
 
+    /**
+     * Se aparece o botão "Ajustes" (#89): por enquanto a tela só tem a chave dos anúncios, então só na
+     * versão grátis. A tela completa vem na #70.
+     */
+    val hasSettings: StateFlow<Boolean> = canBuyFullVersion
+
     /** Risca o produto que não estava riscado, ou tira o risco de quem estava ([checked] é o estado atual). */
     fun onToggleCheck(id: ListItemId, checked: Boolean) {
         viewModelScope.launch { setItemChecked(id, !checked) }
@@ -159,14 +184,62 @@ class ListViewModel(
         }
     }
 
-    /** O aviso saiu da tela (sumiu sozinho ou a pessoa tocou em "Desfazer"). */
-    fun onNoticeShown() {
-        mutableNotice.value = null
+    /** O app abriu ou voltou para a frente: na vez, mostra o aviso do fim da primeira semana. */
+    fun onAppOpened() {
+        viewModelScope.launch {
+            if (ads.onAppOpened()) {
+                ads.onWeekNoticeShown()
+                adAfterNotice = null
+                mutableNotice.value = ListNotice.WeekEnding
+            }
+        }
     }
 
-    /** "Desfazer" do aviso (ex.: "Feijão saiu da lista."): desfaz a última ação. */
-    fun onUndo() {
-        viewModelScope.launch { undoLastAction() }
+    /** A pessoa voltou da tela de adicionar para a lista. */
+    fun onBackFromAdd() {
+        viewModelScope.launch {
+            if (ads.count(AdMoment.BackFromAdd) && ads.canShow()) ads.show()
+        }
+    }
+
+    /**
+     * A edição fechou. Produto tirado da lista mostra o aviso "Feijão saiu da lista."; se era a vez do
+     * anúncio, ele espera o aviso, como no "Terminei".
+     */
+    fun onEditClosed(outcome: EditOutcome) {
+        if (outcome == EditOutcome.Unchanged) return
+        viewModelScope.launch {
+            val due = ads.count(AdMoment.Edit)
+            when (outcome) {
+                is EditOutcome.Removed -> {
+                    val notice = ListNotice.Removed(outcome.name)
+                    adAfterNotice = notice.takeIf { due }
+                    mutableNotice.value = notice
+                }
+                else -> if (due && ads.canShow()) ads.show()
+            }
+        }
+    }
+
+    /**
+     * O aviso [notice] saiu da tela: **Desfazer** desfaz a última ação. Depois de **Certo** ou
+     * **Desfazer** no aviso do "Terminei" e do "Jogar a lista fora", pode vir um anúncio; quando o aviso
+     * some sozinho, nunca (a pessoa pode já ter guardado o celular).
+     */
+    fun onNoticeClosed(notice: ListNotice, result: NoticeResult) {
+        if (mutableNotice.value == notice) mutableNotice.value = null
+        val afterAd = notice === adAfterNotice
+        if (afterAd) adAfterNotice = null
+        val wantsAd = result != NoticeResult.Closed &&
+            (notice is ListNotice.Finished || notice == ListNotice.Cleared || afterAd)
+        val undo = result == NoticeResult.Action && notice != ListNotice.WeekEnding
+        if (!wantsAd && !undo) return
+        viewModelScope.launch {
+            // Antes do "Desfazer": os riscados que ele devolve não são "estar comprando".
+            val showAd = wantsAd && ads.canShow()
+            if (undo) undoLastAction()
+            if (showAd) ads.show()
+        }
     }
 
     private companion object {

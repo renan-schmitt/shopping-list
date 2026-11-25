@@ -126,8 +126,26 @@ class EditViewModelTest {
     }
 
     @Test
+    fun closingSaysWhetherTheProductChanged() {
+        val viewModel = opened()
+        viewModel.onIncrease()
+        assertEquals(EditOutcome.Changed, viewModel.onClose())
+
+        assertEquals(EditOutcome.Unchanged, opened().onClose())
+    }
+
+    @Test
+    fun savedWhenLeavingTheAppStillCountsAsChanged() {
+        val viewModel = opened()
+        viewModel.onDetailChange("carioca")
+        viewModel.onSave()
+
+        assertEquals(EditOutcome.Changed, viewModel.onClose())
+    }
+
+    @Test
     fun closingWithoutChangesRecordsNothing() {
-        opened().onClose()
+        assertEquals(EditOutcome.Unchanged, opened().onClose())
         assertEquals(beans, stored)
         assertNull(fixture.undoStack.lastAction.value)
     }

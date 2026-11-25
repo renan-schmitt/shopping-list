@@ -12,6 +12,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +29,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Aviso no meio da tela, com **Desfazer** e **Certo** (guia de linguagem, 2026-11-23).
- * Ex.: "Feijão saiu da lista." · **Desfazer** · **Certo**.
+ * Ex.: "Feijão saiu da lista." · **Desfazer** · **Certo**. O mesmo aviso serve para outra ação no lugar
+ * do **Desfazer** (ex.: **Conhecer a versão completa**, #89), mostrado com [showNotice].
  *
  * Uso: `UndoNoticeHost(state)` por cima da tela, mostrando o aviso com [showUndoNotice]. Não escurece
  * nem trava o resto da tela: tocar fora do aviso continua funcionando.
@@ -46,18 +48,29 @@ fun UndoNoticeHost(state: SnackbarHostState, modifier: Modifier = Modifier) {
 fun UndoNotice(data: SnackbarData, modifier: Modifier = Modifier) {
     UndoNotice(
         message = data.visuals.message,
+        actionText = data.visuals.actionLabel ?: stringResource(R.string.undo),
         onUndo = data::performAction,
-        onDismiss = data::dismiss,
+        onDismiss = {
+            (data.visuals as? NoticeVisuals)?.dismissedByPerson = true
+            data.dismiss()
+        },
         modifier = modifier,
     )
 }
 
 /**
  * A mensagem fica em caixa normal (pode ter mais de uma linha, guia, princípio 9) e os botões vão
- * embaixo dela, um embaixo do outro e em largura total. O TalkBack anuncia o aviso quando ele aparece.
+ * embaixo dela, um embaixo do outro e em largura total: [actionText] (por padrão **Desfazer**) e
+ * **Certo**. O TalkBack anuncia o aviso quando ele aparece.
  */
 @Composable
-fun UndoNotice(message: String, onUndo: () -> Unit, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+fun UndoNotice(
+    message: String,
+    onUndo: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    actionText: String = stringResource(R.string.undo),
+) {
     val tokens = ComicTheme.tokens
     Column(
         modifier = modifier
@@ -81,7 +94,7 @@ fun UndoNotice(message: String, onUndo: () -> Unit, onDismiss: () -> Unit, modif
         // Um embaixo do outro, em largura total: lado a lado, "Desfazer" partia a palavra com a fonte
         // em 200%.
         SecondaryButton(
-            text = stringResource(R.string.undo),
+            text = actionText,
             onClick = onUndo,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -96,23 +109,63 @@ fun UndoNotice(message: String, onUndo: () -> Unit, onDismiss: () -> Unit, modif
 /** Quanto tempo o aviso fica na tela: 15 s, 50% a mais que o `Long` do Material (#59, público 60+). */
 const val UNDO_NOTICE_MILLIS = 15_000L
 
+/** Como o aviso saiu da tela. */
+enum class NoticeResult {
+    /** A pessoa tocou na ação (**Desfazer** ou a outra ação do aviso). */
+    Action,
+
+    /** A pessoa tocou em **Certo**. */
+    Dismissed,
+
+    /** O aviso sumiu sozinho, outro tomou o lugar dele ou a pessoa abriu outra tela. */
+    Closed,
+}
+
+/** O aviso, lembrando se foi a pessoa que tocou em **Certo**: o `dismiss()` também fecha por código. */
+private class NoticeVisuals(override val message: String, override val actionLabel: String?) : SnackbarVisuals {
+    override val withDismissAction = false
+    override val duration = SnackbarDuration.Indefinite
+    var dismissedByPerson = false
+}
+
 /**
- * Mostra o aviso com **Desfazer** e **Certo** por [UNDO_NOTICE_MILLIS] e devolve `true` se a pessoa
- * tocou em **Desfazer**; **Certo** só fecha o aviso. Com o TalkBack ligado, o [accessibilityManager]
- * pode pedir mais tempo (preferência de acessibilidade do Android). Um aviso que já estava na tela
- * sai na hora, sem fila: o novo é o que vale.
+ * Mostra o aviso com **Desfazer** e **Certo** por [UNDO_NOTICE_MILLIS] e diz como ele saiu. Com o
+ * TalkBack ligado, o [accessibilityManager] pode pedir mais tempo (preferência de acessibilidade do
+ * Android). Um aviso que já estava na tela sai na hora, sem fila: o novo é o que vale.
  */
-suspend fun SnackbarHostState.showUndoNotice(message: String, accessibilityManager: AccessibilityManager?): Boolean {
-    currentSnackbarData?.dismiss()
+suspend fun SnackbarHostState.showUndoNotice(
+    message: String,
+    accessibilityManager: AccessibilityManager?,
+): NoticeResult {
     val timeout = accessibilityManager?.calculateRecommendedTimeoutMillis(
         originalTimeoutMillis = UNDO_NOTICE_MILLIS,
         containsIcons = false,
         containsText = true,
         containsControls = true,
     ) ?: UNDO_NOTICE_MILLIS
+    return showNotice(message, actionText = null, timeoutMillis = timeout)
+}
+
+/**
+ * Mostra o aviso com [actionText] (`null`: **Desfazer**) e **Certo**. Sem [timeoutMillis], fica até a
+ * pessoa tocar num botão ou outro aviso tomar o lugar.
+ */
+suspend fun SnackbarHostState.showNotice(
+    message: String,
+    actionText: String?,
+    timeoutMillis: Long? = null,
+): NoticeResult {
+    currentSnackbarData?.dismiss()
+    val visuals = NoticeVisuals(message, actionText)
     // Sumir sozinho é cancelar o aviso "Indefinite": o SnackbarHostState tira ele da tela.
-    val result = withTimeoutOrNull(timeout) {
-        showSnackbar(message = message, duration = SnackbarDuration.Indefinite)
+    val result = if (timeoutMillis == null) {
+        showSnackbar(visuals)
+    } else {
+        withTimeoutOrNull(timeoutMillis) { showSnackbar(visuals) }
     }
-    return result == SnackbarResult.ActionPerformed
+    return when {
+        result == SnackbarResult.ActionPerformed -> NoticeResult.Action
+        visuals.dismissedByPerson -> NoticeResult.Dismissed
+        else -> NoticeResult.Closed
+    }
 }

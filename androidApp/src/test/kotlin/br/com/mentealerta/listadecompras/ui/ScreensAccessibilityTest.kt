@@ -32,6 +32,9 @@ import br.com.mentealerta.listadecompras.ui.list.ListContent
 import br.com.mentealerta.listadecompras.ui.list.ListUiState
 import br.com.mentealerta.listadecompras.ui.list.SampleListState
 import br.com.mentealerta.listadecompras.ui.list.SampleListStateNotShopping
+import br.com.mentealerta.listadecompras.ui.list.WeekNoticeSample
+import br.com.mentealerta.listadecompras.ui.settings.SettingsContent
+import br.com.mentealerta.listadecompras.ui.settings.SettingsUiState
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 import br.com.mentealerta.listadecompras.ui.theme.ThemeScreenshotTest
 import org.junit.Assert.assertTrue
@@ -88,6 +91,12 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "lista vazia com versão completa" to {
                 ListContent(ListUiState.Empty, hasHistory = true, canBuyFullVersion = true)
             },
+            "lista vazia com ajustes" to {
+                ListContent(ListUiState.Empty, hasHistory = true, canBuyFullVersion = true, hasSettings = true)
+            },
+            "ajustes" to { SettingsContent(SettingsUiState.Content(personalizedAds = true)) },
+            "ajustes desligada" to { SettingsContent(SettingsUiState.Content(personalizedAds = false)) },
+            "aviso do fim da primeira semana" to { WeekNoticeSample() },
             "versão completa" to { FullVersionContent(SampleFullVersionState) },
             "versão completa com recado" to { FullVersionContent(SampleFullVersionMessageState) },
             "versão completa esperando a loja" to { FullVersionContent(SampleFullVersionBusyState) },

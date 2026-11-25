@@ -28,6 +28,7 @@ import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
 import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
+import br.com.mentealerta.listadecompras.ui.list.AdsFixture
 import br.com.mentealerta.listadecompras.ui.list.ListViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -156,6 +157,9 @@ class EditFixture {
     private fun removedItemsOf(items: List<ListItem>) =
         RemovedItems.of(items.map { it to Instant.fromEpochMilliseconds(order.getValue(it.id)) })
 
+    /** Anúncios (#89): primeira semana, a não ser que o teste mude. */
+    val ads = AdsFixture(premium, repository)
+
     fun editViewModel() = EditViewModel(
         ObserveListUseCase(repository),
         index,
@@ -174,6 +178,7 @@ class EditFixture {
         UndoLastActionUseCase(repository, undoStack),
         observeHistory(),
         ObservePremiumUseCase(premium),
+        ads.useCases,
     )
 
     fun historyViewModel() = HistoryViewModel(observeHistory(), index)

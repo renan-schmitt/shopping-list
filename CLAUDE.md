@@ -9,6 +9,7 @@ Lista de compras para pessoas **60+**, da família de apps **Mente Alerta**. And
 - [docs/ideias.md](docs/ideias.md) — ideias originais
 - [docs/prototipos/](docs/prototipos/) — protótipos HTML (cores, fontes, ícones)
 - [docs/configurar-compras.md](docs/configurar-compras.md) — compra da versão completa: Play Console e testes em sandbox (debug usa loja falsa)
+- [docs/configurar-anuncios.md](docs/configurar-anuncios.md) — anúncios da versão grátis: AdMob, IDs, política e testes (no debug, um minuto vale um dia)
 - Identidade visual (cores, fontes, tamanhos, linha do produto): [plano §4.8](docs/plano-implementacao.md#48-identidade-visual)
 
 Leia o plano e o guia antes de implementar qualquer tela ou texto.

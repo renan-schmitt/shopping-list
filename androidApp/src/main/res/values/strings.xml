@@ -54,6 +54,12 @@
     <string name="list_history">O que já comprei</string>
     <!-- Abre a tela "Versão completa" (#88); só na versão grátis -->
     <string name="list_full_version">Versão completa</string>
+    <!-- Abre a tela "Ajustes" (#89); por enquanto só na versão grátis (a tela completa vem na #70) -->
+    <string name="list_settings">Ajustes</string>
+    <!-- Aviso no meio da tela no fim da primeira semana (#89), uma vez só, na versão grátis -->
+    <string name="week_notice">A partir de amanhã, o app continua de graça, com alguns anúncios. Se preferir sem anúncios, tem a versão completa.</string>
+    <!-- Botão do aviso do fim da primeira semana: abre a tela "Versão completa" -->
+    <string name="week_notice_full_version">Conhecer a versão completa</string>
     <!-- Botão no fim da folha (#67), só com produtos a comprar: manda a lista pelo WhatsApp ou outro app -->
     <string name="list_share">Mandar a lista</string>
     <!-- Texto mandado (#67), com o negrito do WhatsApp (*): título no topo -->
@@ -311,4 +317,13 @@
     <string name="full_version_unavailable">Não consegui falar com a loja. Confira a internet e tente de novo.</string>
     <string name="full_version_failed">Não deu certo. Tente de novo mais tarde.</string>
     <string name="full_version_nothing_to_restore">Não achei a compra nesta conta do Google.</string>
+
+    <!-- Tela de ajustes (#89; completa na #70). Título; caixa alta vem do estilo -->
+    <string name="settings_title">Ajustes</string>
+    <!-- Chave dos anúncios (plano §3.7), ligada por padrão; desligada, só anúncios não personalizados -->
+    <string name="settings_personalized_ads">Anúncios pelo meu interesse</string>
+    <!-- Abaixo da chave dos anúncios -->
+    <string name="settings_personalized_ads_off">Desligada, ainda aparecem anúncios, mas sem usar seus interesses.</string>
+    <!-- Abaixo da chave dos anúncios, em outra linha (plano §4.5) -->
+    <string name="settings_personalized_ads_privacy">Sua lista nunca vai para os anúncios.</string>
 </resources>

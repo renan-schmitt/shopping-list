@@ -46,21 +46,27 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.ui.add.AddScreen
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
+import br.com.mentealerta.listadecompras.ui.components.NoticeResult
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.SectionTitle
 import br.com.mentealerta.listadecompras.ui.components.UndoNoticeHost
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
 import br.com.mentealerta.listadecompras.ui.components.halftone
+import br.com.mentealerta.listadecompras.ui.components.showNotice
 import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
+import br.com.mentealerta.listadecompras.ui.edit.EditOutcome
 import br.com.mentealerta.listadecompras.ui.edit.EditScreen
 import br.com.mentealerta.listadecompras.ui.fullversion.FullVersionScreen
 import br.com.mentealerta.listadecompras.ui.history.HistoryScreen
+import br.com.mentealerta.listadecompras.ui.settings.SettingsScreen
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -78,19 +84,22 @@ import org.koin.compose.viewmodel.koinViewModel
  * outra tela fecha o aviso. Riscar não mostra aviso (guia).
  * "O que já comprei" (#66) fica no fim da folha e na lista vazia, só quando há compras no histórico.
  * "Mandar a lista" (#67), no fim da folha, abre a tela de compartilhar do Android com o que falta comprar.
- * "Versão completa" (#88) fica depois dele e na lista vazia, só na versão grátis.
- * [editScreen], [historyScreen] e [fullVersionScreen] são as telas de edição, do histórico e da versão
- * completa; os testes trocam por outras com o ViewModel deles.
+ * "Versão completa" (#88) fica depois dele e na lista vazia, só na versão grátis, assim como "Ajustes"
+ * (#89). Ao abrir o app, pode aparecer o aviso do fim da primeira semana, com **Conhecer a versão
+ * completa** (#89); os anúncios da versão grátis ficam com o [ListViewModel].
+ * [editScreen], [historyScreen], [fullVersionScreen] e [settingsScreen] são as telas de edição, do
+ * histórico, da versão completa e dos ajustes; os testes trocam por outras com o ViewModel deles.
  */
 @Composable
 fun ListScreen(
     modifier: Modifier = Modifier,
     viewModel: ListViewModel = koinViewModel(),
-    editScreen: @Composable (id: ListItemId, onClose: (removedName: String?) -> Unit) -> Unit = { id, onClose ->
+    editScreen: @Composable (id: ListItemId, onClose: (EditOutcome) -> Unit) -> Unit = { id, onClose ->
         EditScreen(id = id, onClose = onClose)
     },
     historyScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> HistoryScreen(onClose = onClose) },
     fullVersionScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> FullVersionScreen(onClose = onClose) },
+    settingsScreen: @Composable (onClose: () -> Unit) -> Unit = { onClose -> SettingsScreen(onClose = onClose) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var adding by rememberSaveable { mutableStateOf(false) }
@@ -98,18 +107,17 @@ fun ListScreen(
     var viewing by rememberSaveable { mutableStateOf<ExtraScreen?>(null) }
     val hasHistory by viewModel.hasHistory.collectAsStateWithLifecycle()
     val canBuyFullVersion by viewModel.canBuyFullVersion.collectAsStateWithLifecycle()
+    val hasSettings by viewModel.hasSettings.collectAsStateWithLifecycle()
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
-    var removedName by rememberSaveable { mutableStateOf<String?>(null) }
     var askingToClear by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val notice by viewModel.notice.collectAsStateWithLifecycle()
+    LifecycleEventEffect(Lifecycle.Event.ON_START) { viewModel.onAppOpened() }
     ListNotices(
         state = snackbarHostState,
-        removedName = removedName,
         notice = notice,
-        onUndo = viewModel::onUndo,
-        onRemovedNoticeEnd = { removedName = null },
-        onNoticeEnd = viewModel::onNoticeShown,
+        onNoticeEnd = viewModel::onNoticeClosed,
+        onFullVersion = { viewing = ExtraScreen.FullVersion },
     )
 
     // Sem produtos, não há o que mudar: volta para a lista vazia.
@@ -126,11 +134,16 @@ fun ListScreen(
     val context = LocalContext.current
     Box(modifier) {
         when {
-            adding -> AddScreen(onClose = { adding = false })
-            extra != null -> extra.Content(historyScreen, fullVersionScreen) { viewing = null }
-            editing != null -> editScreen(ListItemId(editing)) { removed ->
+            adding -> AddScreen(
+                onClose = {
+                    adding = false
+                    viewModel.onBackFromAdd()
+                },
+            )
+            extra != null -> extra.Content(historyScreen, fullVersionScreen, settingsScreen) { viewing = null }
+            editing != null -> editScreen(ListItemId(editing)) { outcome ->
                 editingId = null
-                if (removed != null) removedName = removed
+                viewModel.onEditClosed(outcome)
             }
             changing -> {
                 BackHandler { changing = false }
@@ -172,6 +185,11 @@ fun ListScreen(
                     dismissNotice()
                     viewing = ExtraScreen.FullVersion
                 },
+                hasSettings = hasSettings,
+                onSettings = {
+                    dismissNotice()
+                    viewing = ExtraScreen.Settings
+                },
             )
         }
         if (!adding && viewing == null && editing == null) UndoNoticeHost(snackbarHostState)
@@ -196,55 +214,54 @@ fun ListScreen(
 private enum class ExtraScreen {
     History,
     FullVersion,
+    Settings,
     ;
 
     @Composable
     fun Content(
         historyScreen: @Composable (onClose: () -> Unit) -> Unit,
         fullVersionScreen: @Composable (onClose: () -> Unit) -> Unit,
+        settingsScreen: @Composable (onClose: () -> Unit) -> Unit,
         onClose: () -> Unit,
     ) = when (this) {
         History -> historyScreen(onClose)
         FullVersion -> fullVersionScreen(onClose)
+        Settings -> settingsScreen(onClose)
     }
 }
 
 /**
- * Mostra os avisos no [state]: o produto tirado na edição ([removedName]) e o [notice] do ViewModel
- * (tirar pelo TalkBack, "Terminei", jogar a lista fora). **Desfazer** chama [onUndo]; quando cada
- * aviso sai da tela, [onRemovedNoticeEnd] ou [onNoticeEnd].
+ * Mostra o [notice] do ViewModel no [state] (tirar da lista, "Terminei", jogar a lista fora, fim da
+ * primeira semana) e, quando ele sai da tela, chama [onNoticeEnd] dizendo como saiu. O do fim da
+ * primeira semana fica até a pessoa tocar num botão; **Conhecer a versão completa** chama
+ * [onFullVersion].
  */
 @Composable
 private fun ListNotices(
     state: SnackbarHostState,
-    removedName: String?,
     notice: ListNotice?,
-    onUndo: () -> Unit,
-    onRemovedNoticeEnd: () -> Unit,
-    onNoticeEnd: () -> Unit,
+    onNoticeEnd: (ListNotice, NoticeResult) -> Unit,
+    onFullVersion: () -> Unit,
 ) {
     val resources = LocalContext.current.resources
     val accessibilityManager = LocalAccessibilityManager.current
-    val currentOnUndo by rememberUpdatedState(onUndo)
-    val currentOnRemovedNoticeEnd by rememberUpdatedState(onRemovedNoticeEnd)
     val currentOnNoticeEnd by rememberUpdatedState(onNoticeEnd)
-    LaunchedEffect(removedName) {
-        val name = removedName ?: return@LaunchedEffect
-        val undo = state.showUndoNotice(
-            message = resources.getString(R.string.list_item_removed, name.replaceFirstChar { it.titlecase() }),
-            accessibilityManager = accessibilityManager,
-        )
-        if (undo) currentOnUndo()
-        currentOnRemovedNoticeEnd()
-    }
+    val currentOnFullVersion by rememberUpdatedState(onFullVersion)
     LaunchedEffect(notice) {
         val current = notice ?: return@LaunchedEffect
-        val undo = state.showUndoNotice(
-            message = noticeMessage(resources, current),
-            accessibilityManager = accessibilityManager,
-        )
-        if (undo) currentOnUndo()
-        currentOnNoticeEnd()
+        val result = if (current == ListNotice.WeekEnding) {
+            state.showNotice(
+                message = resources.getString(R.string.week_notice),
+                actionText = resources.getString(R.string.week_notice_full_version),
+            )
+        } else {
+            state.showUndoNotice(
+                message = noticeMessage(resources, current),
+                accessibilityManager = accessibilityManager,
+            )
+        }
+        currentOnNoticeEnd(current, result)
+        if (current == ListNotice.WeekEnding && result == NoticeResult.Action) currentOnFullVersion()
     }
 }
 
@@ -254,6 +271,7 @@ private fun ListNotices(
  */
 private fun noticeMessage(resources: Resources, notice: ListNotice): String = when (notice) {
     ListNotice.Cleared -> resources.getString(R.string.list_cleared)
+    ListNotice.WeekEnding -> resources.getString(R.string.week_notice)
     is ListNotice.Removed -> resources.getString(
         R.string.list_item_removed,
         notice.name.replaceFirstChar {
@@ -282,8 +300,8 @@ private fun noticeMessage(resources: Resources, notice: ListNotice): String = wh
  * na linha (#71); [onRemove] recebe o produto e o nome dele, para o aviso. [onShare] é o "Mandar a
  * lista" (#67), no fim da folha quando há o que comprar. Com [hasHistory], o botão
  * "O que já comprei" ([onHistory], #66) aparece no fim da folha ou na lista vazia; com
- * [canBuyFullVersion], o "Versão completa" ([onFullVersion], #88) também, depois dele. Comprando, a
- * tela não apaga.
+ * [canBuyFullVersion], o "Versão completa" ([onFullVersion], #88) também, depois dele; com
+ * [hasSettings], o "Ajustes" ([onSettings], #89), por último. Comprando, a tela não apaga.
  */
 @Composable
 fun ListContent(
@@ -300,9 +318,12 @@ fun ListContent(
     onHistory: () -> Unit = {},
     canBuyFullVersion: Boolean = false,
     onFullVersion: () -> Unit = {},
+    hasSettings: Boolean = false,
+    onSettings: () -> Unit = {},
 ) {
     val history = onHistory.takeIf { hasHistory }
     val fullVersion = onFullVersion.takeIf { canBuyFullVersion }
+    val settings = onSettings.takeIf { hasSettings }
     val colors = MaterialTheme.colorScheme
     val content = uiState as? ListUiState.Content
     val isShopping = content?.isShopping == true
@@ -333,7 +354,11 @@ fun ListContent(
             ComicCard(modifier = Modifier.fillMaxSize()) {
                 when (uiState) {
                     ListUiState.Loading -> Unit
-                    ListUiState.Empty -> EmptyList(onHistory = history, onFullVersion = fullVersion)
+                    ListUiState.Empty -> EmptyList(
+                        onHistory = history,
+                        onFullVersion = fullVersion,
+                        onSettings = settings,
+                    )
                     is ListUiState.Content -> Sheet(
                         uiState.sections,
                         SheetActions(
@@ -344,6 +369,7 @@ fun ListContent(
                             onShare = onShare.takeIf { uiState.canShare },
                             onHistory = history,
                             onFullVersion = fullVersion,
+                            onSettings = settings,
                         ),
                     )
                 }
@@ -354,7 +380,8 @@ fun ListContent(
 
 /**
  * O que a folha faz com os produtos, o "Mudar a lista", o "Mandar a lista" (`null`: nada a comprar) e o
- * "O que já comprei" (`null`: sem histórico) e o "Versão completa" (`null`: já tem).
+ * "O que já comprei" (`null`: sem histórico), o "Versão completa" (`null`: já tem) e o "Ajustes" (`null`: nada a
+ * ajustar).
  */
 private class SheetActions(
     val onToggleCheck: (ListItemId, Boolean) -> Unit,
@@ -364,6 +391,7 @@ private class SheetActions(
     val onShare: (() -> Unit)?,
     val onHistory: (() -> Unit)?,
     val onFullVersion: (() -> Unit)?,
+    val onSettings: (() -> Unit)?,
 )
 
 /**
@@ -428,7 +456,26 @@ private fun Sheet(sections: List<SectionUi>, actions: SheetActions) {
                 )
             }
         }
+        actions.onSettings?.let { onSettings ->
+            item(key = "settings", contentType = "settings") {
+                SettingsButton(
+                    onClick = onSettings,
+                    modifier = Modifier.animateItem().fillMaxWidth().padding(top = 16.dp, end = 4.dp, bottom = 4.dp),
+                )
+            }
+        }
     }
+}
+
+/** "Ajustes" (#89): abre a tela de ajustes. */
+@Composable
+private fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SecondaryButton(
+        text = stringResource(R.string.list_settings),
+        onClick = onClick,
+        icon = painterResource(R.drawable.ic_settings),
+        modifier = modifier,
+    )
 }
 
 /** "Versão completa" (#88): abre a tela que explica e vende a versão completa. */
@@ -463,10 +510,10 @@ internal fun SectionUi.title(): String = if (bought) stringResource(R.string.lis
  * negrito, então o trecho em `<b>` ganha a cor de destaque para se distinguir. Com histórico, embaixo,
  * "O que já comprei" ([onHistory], #66): depois do "Terminei", a lista costuma ficar vazia. Com letra
  * grande, a folha rola em vez de cortar o texto. Na versão grátis, por último, "Versão completa"
- * ([onFullVersion], #88).
+ * ([onFullVersion], #88) e "Ajustes" ([onSettings], #89).
  */
 @Composable
-private fun EmptyList(onHistory: (() -> Unit)?, onFullVersion: (() -> Unit)?) {
+private fun EmptyList(onHistory: (() -> Unit)?, onFullVersion: (() -> Unit)?, onSettings: (() -> Unit)?) {
     val html = AnnotatedString.fromHtml(stringResource(R.string.list_empty))
     val accent = SpanStyle(color = MaterialTheme.colorScheme.primary)
     val text = buildAnnotatedString {
@@ -525,6 +572,9 @@ private fun EmptyList(onHistory: (() -> Unit)?, onFullVersion: (() -> Unit)?) {
             }
             if (onFullVersion != null) {
                 FullVersionButton(onClick = onFullVersion, modifier = Modifier.fillMaxWidth())
+            }
+            if (onSettings != null) {
+                SettingsButton(onClick = onSettings, modifier = Modifier.fillMaxWidth())
             }
         }
     }
