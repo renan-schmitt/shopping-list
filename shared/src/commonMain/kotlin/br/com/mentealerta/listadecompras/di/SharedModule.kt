@@ -23,6 +23,7 @@ import br.com.mentealerta.listadecompras.domain.GetSectionsUseCase
 import br.com.mentealerta.listadecompras.domain.LearnPreferredTermUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveFeaturesUseCase
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
+import br.com.mentealerta.listadecompras.domain.ObserveOverdueProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePersonalizedAdsUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
@@ -79,6 +80,7 @@ val sharedModule = module {
     factoryOf(::ObserveListUseCase)
     // Fuso do celular lido a cada tela aberta: o padrão do construtor.
     factory { ObservePurchaseHistoryUseCase(get(), get(), get()) }
+    factory { ObserveOverdueProductsUseCase(get(), get(), get(), get()) }
     factoryOf(::LearnPreferredTermUseCase)
     factoryOf(::RememberSectionUseCase)
     factoryOf(::AddItemsUseCase)

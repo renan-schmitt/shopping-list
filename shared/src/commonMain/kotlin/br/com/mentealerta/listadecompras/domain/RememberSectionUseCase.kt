@@ -1,7 +1,6 @@
 package br.com.mentealerta.listadecompras.domain
 
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
-import br.com.mentealerta.listadecompras.normalization.searchKey
 
 /**
  * Lembra a seção que a pessoa escolheu para um produto (plano §1.4, #56). A escolha vale para o
@@ -38,6 +37,5 @@ class SectionChoices internal constructor(private val choices: Map<String, Strin
     }
 }
 
-/** Chave da escolha: o `id` do produto ou, para produto desconhecido, a chave de busca do nome. */
-private fun sectionChoiceKey(item: ListItem, index: CatalogIndex): String =
-    item.productId?.let { index.product(it)?.id ?: it } ?: searchKey(item.name)
+/** Chave da escolha: a mesma da previsão ([productKey]). */
+private fun sectionChoiceKey(item: ListItem, index: CatalogIndex): String = productKey(item.productId, item.name, index)

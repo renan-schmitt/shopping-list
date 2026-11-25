@@ -75,7 +75,7 @@ O que precisa existir na primeira versão publicada.
 - [ ] Histórico de compras (data + produtos comprados + quantidade) gravado a cada "Terminei"
 - [x] Tela **O que já comprei** — 2026-11-23, #66: compras da mais recente para a mais antiga, cada uma com a data por extenso na faixa ("Hoje, 2 produtos", "Ontem", "Há 12 dias", em dias do calendário no fuso do celular; sem "semana passada", ambíguo) e os produtos com ícone e quantidade, só para ver. Grátis mostra os últimos 30 dias (de hoje até há 30 dias); as compras antigas ficam no banco para a previsão e o premium. Entrada pelo botão **O que já comprei** no fim da folha, abaixo de "Mudar a lista", e na lista vazia, só quando há compra nesses 30 dias
 - [ ] Previsões no MVP usam só a frequência; quantidade fica gravada para uso futuro
-- [ ] Modelo simples: intervalo entre compras de cada produto (mediana dos últimos 5, a partir de 3 compras; parâmetros na §3.4, 2026-11-25, #62)
+- [x] Modelo simples: intervalo entre compras de cada produto (mediana dos últimos 5, a partir de 3 compras; parâmetros na §3.4, 2026-11-25, #62) — 2026-11-25, #63: `shared/prediction` calcula o padrão de cada produto e os que estão faltando, do mais atrasado ao menos, fora os que já estão na lista; o "Não" já está na regra e passa a ser gravado com a #64
 - [ ] Sugestão no topo da lista: "Faz 12 dias que você comprou café. Está faltando?" — **Sim, pôr na lista** adiciona (§3.4)
 
 ### 1.6 Compartilhar (sem backend)
