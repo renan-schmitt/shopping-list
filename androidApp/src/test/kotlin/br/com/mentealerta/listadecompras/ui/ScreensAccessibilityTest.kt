@@ -10,6 +10,7 @@ import br.com.mentealerta.listadecompras.ui.add.SampleAddListeningState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddNothingFoundState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddPastedNothingState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddRepeatedState
+import br.com.mentealerta.listadecompras.ui.add.SampleAddReviewEditingState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddReviewState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddVoiceMessageState
@@ -120,6 +121,7 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "adicionar colar a lista" to add(SampleAddAddedState, withAdded = true, canPaste = true),
             "adicionar colado sem produto" to add(SampleAddPastedNothingState, canPaste = true),
             "adicionar conferência" to add(SampleAddReviewState),
+            "adicionar conferência mudando" to add(SampleAddReviewEditingState),
         )
 
         @JvmStatic

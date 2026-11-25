@@ -163,7 +163,7 @@
     <string name="add_shared_nothing">Não achei produtos na mensagem.</string>
     <!-- Conferência da lista colada, antes de pôr na lista (#68) -->
     <string name="review_title">Lista recebida</string>
-    <string name="review_hint">Toque na lixeira para tirar o que não quer.</string>
+    <string name="review_hint">Toque no produto para mudar. Toque na lixeira para tirar o que não quer.</string>
     <string name="review_already_on_list">%1$s já está na lista.</string>
     <plurals name="review_already_on_list_many">
         <item quantity="one">%d produto já está na lista.</item>
@@ -176,6 +176,8 @@
         <item quantity="other">Pôr %d produtos na lista</item>
     </plurals>
     <string name="review_dismiss">Deixa pra lá</string>
+    <!-- Topo da edição de um produto da conferência (#136): o produto ainda não está na lista -->
+    <string name="review_edit_back">Voltar para a lista recebida</string>
 
     <!-- Edição do produto (#55): tudo é salvo sozinho, não existe "Salvar" -->
     <string name="edit_name_label">Nome</string>

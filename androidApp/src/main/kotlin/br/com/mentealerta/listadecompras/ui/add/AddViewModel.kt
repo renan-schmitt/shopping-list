@@ -14,10 +14,13 @@ import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
+import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
+import br.com.mentealerta.listadecompras.domain.toListItem
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
 import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
+import br.com.mentealerta.listadecompras.ui.edit.EditUiState
 import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.list.toRow
 import br.com.mentealerta.listadecompras.voice.VoiceEvent
@@ -78,8 +81,19 @@ enum class PasteSource { COPIED, SHARED }
 /**
  * Conferência (#68): os produtos entendidos na lista colada que ainda não estão na lista ([items]),
  * na ordem do texto, e os nomes dos que já estão nela ([alreadyOnList]), que não entram de novo.
+ * Com [editing], um produto está aberto para mudar (#136), na tela de edição.
  */
-data class ReviewUi(val items: List<AddOptionUi>, val alreadyOnList: List<String> = emptyList())
+data class ReviewUi(
+    val items: List<AddOptionUi>,
+    val alreadyOnList: List<String> = emptyList(),
+    val editing: ReviewEditing? = null,
+)
+
+/**
+ * Produto da conferência aberto para mudar (#136): a posição dele em [ReviewUi.items] e o rascunho
+ * na tela, como na edição de um produto da lista.
+ */
+data class ReviewEditing(val index: Int, val draft: EditUiState.Editing)
 
 /**
  * O que entrou na lista: [again] quando a pessoa respondeu "Sim, mais um". Pela voz podem entrar
@@ -164,6 +178,7 @@ class AddViewModel(
     private val findSameItem: FindSameItemUseCase,
     private val editItem: EditItemUseCase,
     removeItem: RemoveItemUseCase,
+    renameItem: RenameItemUseCase,
     undoLastAction: UndoLastActionUseCase,
     private val parseSpeech: ParseSpeechUseCase,
     parsePastedList: ParsePastedListUseCase,
@@ -190,6 +205,7 @@ class AddViewModel(
         state = _uiState,
         parsePastedList = parsePastedList,
         findSameItem = findSameItem,
+        renameItem = renameItem,
         dispatcher = searchDispatcher,
         toOption = { it.toOption() },
         put = { items ->
@@ -543,12 +559,17 @@ class AddedRemoval(
  * [ParsePastedListUseCase] e aparece para conferir ([AddUiState.review]). A pessoa tira o que não
  * quer e toca em **Pôr na lista**; o que já está na lista não entra de novo, como na voz. [put] põe
  * na lista, um por vez, e diz o que entrou.
+ *
+ * Tocar num produto abre a edição ([onEdit], #136): nome, quantidade com Menos / Mais e detalhe,
+ * como na edição de um produto da lista, sem gravar nada. Ao voltar ([onEditClose]), o produto fica
+ * mudado no mesmo lugar da conferência. Nome em branco mantém o nome anterior.
  */
 class PasteReview(
     private val scope: CoroutineScope,
     private val state: MutableStateFlow<AddUiState>,
     private val parsePastedList: ParsePastedListUseCase,
     private val findSameItem: FindSameItemUseCase,
+    private val renameItem: RenameItemUseCase,
     private val dispatcher: CoroutineDispatcher,
     private val toOption: (ParsedItem) -> AddOptionUi,
     private val put: suspend (List<ParsedItem>) -> AddedUi,
@@ -609,5 +630,70 @@ class PasteReview(
     /** **Deixa pra lá** (ou o voltar do celular): nada entra. */
     fun onDismiss() {
         state.update { it.copy(review = null) }
+    }
+
+    /** Tocou num produto da conferência: abre a edição dele. */
+    fun onEdit(option: AddOptionUi) {
+        state.update { current ->
+            val review = current.review ?: return@update current
+            val index = review.items.indexOf(option).takeIf { it >= 0 } ?: return@update current
+            val item = option.item
+            val draft = editingOf(item, item.name, item.detail.orEmpty(), item.quantity)
+            current.copy(review = review.copy(editing = ReviewEditing(index, draft)))
+        }
+    }
+
+    fun onEditName(name: String) = updateDraft { base, draft -> editingOf(base, name, draft.detail, draft.quantity) }
+
+    fun onEditDetail(detail: String) = updateDraft { base, draft ->
+        editingOf(base, draft.name, detail, draft.quantity)
+    }
+
+    fun onEditIncrease() = updateDraft { base, draft ->
+        val quantity = base.copy(quantity = draft.quantity).toListItem().increaseQuantity().quantity
+        editingOf(base, draft.name, draft.detail, quantity)
+    }
+
+    fun onEditDecrease() = updateDraft { base, draft ->
+        val quantity = base.copy(quantity = draft.quantity).toListItem().decreaseQuantity().quantity
+        editingOf(base, draft.name, draft.detail, quantity)
+    }
+
+    /** "Voltar para a lista recebida" (ou o voltar do celular): o produto fica como está no rascunho. */
+    fun onEditClose() {
+        state.update { current ->
+            val review = current.review ?: return@update current
+            val editing = review.editing ?: return@update current
+            val base = review.items[editing.index].item
+            val draft = editing.draft
+            val changed = draftOf(base, draft.name, draft.detail, draft.quantity)
+            val items = review.items.toMutableList().apply { set(editing.index, toOption(changed)) }
+            current.copy(review = review.copy(items = items, editing = null))
+        }
+    }
+
+    /** O produto como ficaria com o rascunho. */
+    private fun draftOf(base: ParsedItem, name: String, detail: String, quantity: Quantity?): ParsedItem =
+        renameItem(base, name).copy(quantity = quantity, detail = detail.trim().ifEmpty { null })
+
+    private fun editingOf(base: ParsedItem, name: String, detail: String, quantity: Quantity?): EditUiState.Editing {
+        val item = draftOf(base, name, detail, quantity)
+        return EditUiState.Editing(
+            name = name,
+            detail = detail,
+            quantity = quantity,
+            canDecrease = item.toListItem().canDecreaseQuantity,
+            icon = toOption(item).icon,
+        )
+    }
+
+    /** Muda o rascunho do produto aberto; [change] recebe o produto como veio e o rascunho atual. */
+    private fun updateDraft(change: (ParsedItem, EditUiState.Editing) -> EditUiState.Editing) {
+        state.update { current ->
+            val review = current.review ?: return@update current
+            val editing = review.editing ?: return@update current
+            val base = review.items[editing.index].item
+            current.copy(review = review.copy(editing = editing.copy(draft = change(base, editing.draft))))
+        }
     }
 }

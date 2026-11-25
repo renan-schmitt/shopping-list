@@ -104,6 +104,9 @@ fun EditScreen(
  * com **Menos** / **Mais** em verde, detalhe e, por último, **Tirar da lista** em destaque, com o
  * cesto de lixo do "Jogar a lista fora" (#124). Não existe "Salvar". O
  * teclado só abre quando a pessoa toca num campo, para não cobrir os botões.
+ *
+ * [inReview]: produto da conferência **Lista recebida** (#136), que ainda não está na lista. O topo
+ * diz "Voltar para a lista recebida" e não há **Tirar da lista**: a lixeira fica na conferência.
  */
 @Composable
 fun EditContent(
@@ -115,6 +118,7 @@ fun EditContent(
     onDecrease: () -> Unit = {},
     onRemove: () -> Unit = {},
     onClose: () -> Unit = {},
+    inReview: Boolean = false,
 ) {
     val colors = MaterialTheme.colorScheme
     Column(modifier = modifier.fillMaxSize().background(colors.surface)) {
@@ -125,7 +129,10 @@ fun EditContent(
                 .statusBarsPadding()
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
         ) {
-            BackToListButton(onClick = onClose)
+            BackToListButton(
+                onClick = onClose,
+                text = stringResource(if (inReview) R.string.review_edit_back else R.string.back_to_list),
+            )
         }
         if (uiState is EditUiState.Editing) {
             Column(
@@ -163,14 +170,16 @@ fun EditContent(
                     onValueChange = onDetailChange,
                     placeholder = stringResource(R.string.edit_detail_hint),
                 )
-                SecondaryButton(
-                    text = stringResource(R.string.edit_remove),
-                    onClick = onRemove,
-                    icon = painterResource(R.drawable.catalog_fluent_wastebasket),
-                    tintIcon = false,
-                    prominent = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (!inReview) {
+                    SecondaryButton(
+                        text = stringResource(R.string.edit_remove),
+                        onClick = onRemove,
+                        icon = painterResource(R.drawable.catalog_fluent_wastebasket),
+                        tintIcon = false,
+                        prominent = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }

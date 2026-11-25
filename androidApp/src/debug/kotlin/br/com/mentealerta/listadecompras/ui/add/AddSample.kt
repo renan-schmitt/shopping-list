@@ -7,6 +7,7 @@ import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import br.com.mentealerta.listadecompras.normalization.ParsedItem
+import br.com.mentealerta.listadecompras.ui.edit.EditUiState
 import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 
@@ -97,6 +98,22 @@ val SampleAddReviewState = AddUiState(
     ),
 )
 
+/** Mudando um produto da conferência (#136): a edição, sem **Tirar da lista**. */
+val SampleAddReviewEditingState = AddUiState(
+    review = SampleAddReviewState.review!!.copy(
+        editing = ReviewEditing(
+            index = 3,
+            draft = EditUiState.Editing(
+                name = "Zabumbinha de goiabada",
+                detail = "",
+                quantity = Quantity(2.0),
+                canDecrease = true,
+                icon = R.drawable.catalog_fluent_shopping_cart,
+            ),
+        ),
+    ),
+)
+
 /** O texto colado não tinha produto (#68), com o botão **Colar a lista** ainda na tela. */
 val SampleAddPastedNothingState = AddUiState(pastedNothing = PasteSource.COPIED)
 
@@ -123,6 +140,12 @@ private fun AddAddedPreview() {
 @Composable
 private fun AddReviewPreview() {
     ShoppingListTheme { AddContent(SampleAddReviewState, canSpeak = true) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddReviewEditingPreview() {
+    ShoppingListTheme { AddContent(SampleAddReviewEditingState) }
 }
 
 @Preview(showBackground = true)

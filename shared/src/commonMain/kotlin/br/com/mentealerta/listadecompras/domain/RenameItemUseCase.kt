@@ -1,6 +1,7 @@
 package br.com.mentealerta.listadecompras.domain
 
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
+import br.com.mentealerta.listadecompras.normalization.ParsedItem
 
 /**
  * Troca o nome do item na edição (#55), sem gravar: quem grava é o [EditItemUseCase].
@@ -19,6 +20,21 @@ class RenameItemUseCase(private val parser: ItemTextParser) {
             item.copy(name = trimmed)
         } else {
             item.copy(name = trimmed, productId = product.id, sectionId = product.sectionId)
+        }
+    }
+
+    /**
+     * O mesmo, para um produto da conferência (#136), que ainda não está na lista: outro produto
+     * conhecido troca o produto; o mesmo ou um desconhecido mantém o que o leitor tinha entendido.
+     */
+    operator fun invoke(item: ParsedItem, name: String): ParsedItem {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty() || trimmed == item.name) return item
+        val match = parser.parse(trimmed)?.match
+        return if (match == null || match.product.id == item.match?.product?.id) {
+            item.copy(name = trimmed)
+        } else {
+            item.copy(name = trimmed, match = match)
         }
     }
 }

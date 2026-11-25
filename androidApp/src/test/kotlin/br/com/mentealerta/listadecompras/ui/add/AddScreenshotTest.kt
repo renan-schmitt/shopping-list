@@ -17,7 +17,7 @@ import org.robolectric.annotation.GraphicsMode
  * Screenshots da tela de adicionar (#53) com fonte em 100% e 200%, no modo claro e no escuro
  * (plano §4.6): produtos achados com quantidade e nome longo, nada achado, a pergunta do produto
  * repetido (#54), a voz (#60): explicação do microfone, escuta e recado; e a lista colada (#68): o
- * botão **Colar a lista** e a conferência.
+ * botão **Colar a lista**, a conferência e a edição de um produto dela (#136).
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -131,6 +131,22 @@ class AddScreenshotTest {
     @Test
     @Config(qualifiers = "+night", fontScale = 1.0f)
     fun review_dark_font100() = capture("review_dark_font100", SampleAddReviewState)
+
+    @Test
+    @Config(fontScale = 1.0f)
+    fun reviewEditing_light_font100() = capture("review_editing_light_font100", SampleAddReviewEditingState)
+
+    @Test
+    @Config(fontScale = 1.5f)
+    fun reviewEditing_light_font150() = capture("review_editing_light_font150", SampleAddReviewEditingState)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun reviewEditing_light_font200() = capture("review_editing_light_font200", SampleAddReviewEditingState)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun reviewEditing_dark_font100() = capture("review_editing_dark_font100", SampleAddReviewEditingState)
 
     @Test
     @Config(fontScale = 1.0f)

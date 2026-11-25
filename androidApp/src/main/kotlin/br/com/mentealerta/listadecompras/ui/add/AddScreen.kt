@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
@@ -41,6 +42,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +53,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -91,6 +94,7 @@ import br.com.mentealerta.listadecompras.ui.components.UndoNoticeHost
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 import br.com.mentealerta.listadecompras.ui.components.comicStyle
 import br.com.mentealerta.listadecompras.ui.components.showUndoNotice
+import br.com.mentealerta.listadecompras.ui.edit.EditContent
 import br.com.mentealerta.listadecompras.ui.list.ItemName
 import br.com.mentealerta.listadecompras.ui.list.ListRowUi
 import br.com.mentealerta.listadecompras.ui.list.format
@@ -132,6 +136,8 @@ fun AddScreen(
     }
     BackHandler(onBack = close)
     BackHandler(enabled = uiState.review != null, onBack = viewModel.paste::onDismiss)
+    // Mudando um produto da conferência (#136), o voltar do celular volta para a conferência.
+    BackHandler(enabled = uiState.review?.editing != null, onBack = viewModel.paste::onEditClose)
     val hasCopiedText = rememberHasCopiedText()
     val askMicrophone = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -180,6 +186,14 @@ fun AddScreen(
             onReviewRemove = viewModel.paste::onRemove,
             onReviewConfirm = viewModel.paste::onConfirm,
             onReviewDismiss = viewModel.paste::onDismiss,
+            reviewEdit = ReviewEditActions(
+                onOpen = viewModel.paste::onEdit,
+                onNameChange = viewModel.paste::onEditName,
+                onDetailChange = viewModel.paste::onEditDetail,
+                onIncrease = viewModel.paste::onEditIncrease,
+                onDecrease = viewModel.paste::onEditDecrease,
+                onClose = viewModel.paste::onEditClose,
+            ),
             onClose = close,
         )
         UndoNoticeHost(noticeState, Modifier.imePadding())
@@ -217,6 +231,20 @@ private fun Context.copiedText(): String? = getSystemService(ClipboardManager::c
     ?.toString()
 
 /**
+ * Mudar um produto da conferência (#136): [onOpen] abre a edição do produto tocado; as outras são
+ * as da tela de edição, e [onClose] volta para a conferência.
+ */
+@Immutable
+data class ReviewEditActions(
+    val onOpen: (AddOptionUi) -> Unit = {},
+    val onNameChange: (String) -> Unit = {},
+    val onDetailChange: (String) -> Unit = {},
+    val onIncrease: () -> Unit = {},
+    val onDecrease: () -> Unit = {},
+    val onClose: () -> Unit = {},
+)
+
+/**
  * Topo verde com "Voltar para a lista", o campo "Digite ou fale o que quer comprar." e, se o celular
  * tem voz ([canSpeak]), o botão **Falar**. Com busca, as opções aparecem embaixo, no mesmo verde do
  * topo, cada uma numa caixa de papel. Sem busca, no papel: o aviso do que entrou ("Adicionado:
@@ -247,20 +275,34 @@ fun AddContent(
     onReviewRemove: (AddOptionUi) -> Unit = {},
     onReviewConfirm: () -> Unit = {},
     onReviewDismiss: () -> Unit = {},
+    reviewEdit: ReviewEditActions = ReviewEditActions(),
     onClose: () -> Unit = {},
 ) {
     val colors = MaterialTheme.colorScheme
     val voice = uiState.voice
     val review = uiState.review
+    // Fora do "if" da edição: ao voltar para a conferência, a rolagem continua onde estava e o
+    // teclado não reabre.
+    val listState = rememberLazyListState()
+    var focusedOnOpen by remember { mutableStateOf(false) }
+    val editing = review?.editing
+    if (editing != null) {
+        EditContent(
+            uiState = editing.draft,
+            onNameChange = reviewEdit.onNameChange,
+            onDetailChange = reviewEdit.onDetailChange,
+            onIncrease = reviewEdit.onIncrease,
+            onDecrease = reviewEdit.onDecrease,
+            onClose = reviewEdit.onClose,
+            inReview = true,
+            modifier = modifier,
+        )
+        return
+    }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
-    LaunchedEffect(voice) {
-        when (voice) {
-            null, VoiceUi.Message.NOT_UNDERSTOOD -> Unit
-            is VoiceUi.Message -> focusRequester.requestFocus()
-            else -> focusManager.clearFocus()
-        }
-    }
+    FocusOnFirstOpen(done = focusedOnOpen, onDone = { focusedOnOpen = true }, focusRequester = focusRequester)
+    LaunchedEffect(voice) { moveFocusFor(voice, focusRequester, focusManager) }
     // Conferindo, o teclado sai da frente.
     LaunchedEffect(review != null) { if (review != null) focusManager.clearFocus() }
     Column(modifier = modifier.fillMaxSize().background(colors.surface)) {
@@ -278,6 +320,7 @@ fun AddContent(
         val repeated = uiState.repeated
         val searching = uiState.showsOptions
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
@@ -293,7 +336,7 @@ fun AddContent(
                 voice is VoiceUi.Listening -> item(key = "listening", contentType = "listening") {
                     Listening(listening = voice)
                 }
-                review != null -> reviewItems(review, onReviewRemove)
+                review != null -> reviewItems(review, onReviewRemove, reviewEdit.onOpen)
                 repeated != null -> item(key = "repeated", contentType = "repeated") {
                     RepeatedQuestion(name = repeated.name, onAddMore = onAddMore, onKeepAsIs = onKeepAsIs)
                 }
@@ -305,6 +348,33 @@ fun AddContent(
         review?.let {
             ReviewButtons(count = it.items.size, onConfirm = onReviewConfirm, onDismiss = onReviewDismiss)
         }
+    }
+}
+
+/**
+ * O campo abre com o teclado, só na primeira vez que a tela aparece ([done]): voltar da edição de um
+ * produto da conferência (#136) não pode abrir o teclado por cima dela.
+ */
+@Composable
+private fun FocusOnFirstOpen(done: Boolean, onDone: () -> Unit, focusRequester: FocusRequester) {
+    val currentOnDone by rememberUpdatedState(onDone)
+    LaunchedEffect(Unit) {
+        if (!done) {
+            currentOnDone()
+            focusRequester.requestFocus()
+        }
+    }
+}
+
+/**
+ * O teclado na voz: a explicação e a escuta o escondem; depois de um recado que sugere escrever, ele
+ * volta. "Não entendi" deixa como está.
+ */
+private fun moveFocusFor(voice: VoiceUi?, focusRequester: FocusRequester, focusManager: FocusManager) {
+    when (voice) {
+        null, VoiceUi.Message.NOT_UNDERSTOOD -> Unit
+        is VoiceUi.Message -> focusRequester.requestFocus()
+        else -> focusManager.clearFocus()
     }
 }
 
@@ -491,7 +561,6 @@ private fun SearchField(
     val state = rememberTextFieldState(query)
     val currentQuery by rememberUpdatedState(query)
     val currentOnQueryChange by rememberUpdatedState(onQueryChange)
-    LaunchedEffect(Unit) { focusRequester.requestFocus() }
     LaunchedEffect(query) {
         if (state.text.toString() != query) state.setTextAndPlaceCursorAtEnd(query)
     }
@@ -772,6 +841,9 @@ private fun AddedRow(row: ListRowUi, onRemove: () -> Unit) {
  * Linha com nome (com [detail] e [quantity]) → ícone → lixeira, de "Adicionados" e da conferência
  * (#68). Para o TalkBack, o nome é um texto só, em caixa normal, e a lixeira é o botão "Tirar leite
  * da lista". Com [checked], o nome aparece riscado, como na lista.
+ *
+ * Com [onClick] (conferência, #136), tocar no nome ou no ícone abre a edição; para o TalkBack, o
+ * nome vira um botão com a ação "Mudar". A lixeira continua à parte.
  */
 @Composable
 internal fun TrashRow(
@@ -781,42 +853,71 @@ internal fun TrashRow(
     @DrawableRes icon: Int,
     onRemove: () -> Unit,
     checked: Boolean = false,
+    onClick: (() -> Unit)? = null,
 ) {
     val dividerColor = MaterialTheme.colorScheme.outlineVariant
+    val tokens = ComicTheme.tokens
     val fullName = detail?.let { stringResource(R.string.list_item_name_with_detail, name, it) } ?: name
     val formatted = quantity?.format(LocalContext.current.resources)
     val label = formatted?.let { stringResource(R.string.list_item_with_quantity, fullName, it.spoken) } ?: fullName
+    val changeLabel = stringResource(R.string.list_item_change)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = ComicTheme.tokens.minRowHeight)
+            .heightIn(min = tokens.minRowHeight)
             .drawBehind {
                 val y = size.height - AddedDividerWidth.toPx() / 2
                 drawLine(dividerColor, Offset(0f, y), Offset(size.width, y), AddedDividerWidth.toPx())
-            }
-            .padding(vertical = 4.dp),
+            },
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        FlowRow(
-            modifier = Modifier.weight(1f).clearAndSetSemantics { text = AnnotatedString(label) },
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            itemVerticalAlignment = Alignment.CenterVertically,
+        // A área de toque do nome ocupa a altura toda da linha; o respiro fica dentro dela.
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = tokens.minRowHeight)
+                .then(
+                    if (onClick == null) {
+                        Modifier
+                    } else {
+                        Modifier.clickable(onClickLabel = changeLabel, role = Role.Button, onClick = onClick)
+                    },
+                )
+                .clearAndSetSemantics {
+                    text = AnnotatedString(label)
+                    if (onClick != null) {
+                        role = Role.Button
+                        onClick(label = changeLabel) {
+                            onClick()
+                            true
+                        }
+                    }
+                }
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            ItemName(text = fullName, checked = checked)
-            if (formatted != null) ListQuantityBadge(text = formatted.visible, checked = checked)
+            FlowRow(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                itemVerticalAlignment = Alignment.CenterVertically,
+            ) {
+                ItemName(text = fullName, checked = checked)
+                if (formatted != null) ListQuantityBadge(text = formatted.visible, checked = checked)
+            }
+            Image(
+                painter = painterResource(icon),
+                contentDescription = null,
+                modifier = Modifier.size(OptionIconSize),
+            )
         }
-        Image(
-            painter = painterResource(icon),
-            contentDescription = null,
-            modifier = Modifier.size(OptionIconSize).clearAndSetSemantics {},
-        )
         IconOnlyButton(
             icon = painterResource(R.drawable.ic_trash),
             label = stringResource(R.string.add_added_remove, name),
             onClick = onRemove,
-            modifier = Modifier.padding(bottom = ComicTheme.tokens.smallShadow),
+            modifier = Modifier.padding(vertical = 4.dp).padding(bottom = tokens.smallShadow),
         )
     }
 }

@@ -5,8 +5,10 @@ import android.content.ClipboardManager
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -14,6 +16,8 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextReplacement
+import br.com.mentealerta.listadecompras.domain.Quantity
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 import br.com.mentealerta.listadecompras.ui.theme.ThemeScreenshotTest
 import kotlinx.coroutines.Dispatchers
@@ -28,8 +32,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Colar uma lista recebida pelo WhatsApp (#68): o botão só aparece com texto copiado; tocar abre a
- * conferência, a lixeira tira um produto e **Pôr na lista** põe o resto; o voltar do celular é o
- * **Deixa pra lá**.
+ * conferência, a lixeira tira um produto, tocar no produto abre a edição (#136) e **Pôr na lista**
+ * põe o resto; o voltar do celular é o **Deixa pra lá**.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -108,6 +112,48 @@ class AddPasteFlowTest {
         compose.onNode(hasText("Deixa pra lá") and hasClickAction()).performClick()
         compose.onAllNodesWithText("Lista recebida").assertCountEquals(0)
         assertTrue(fixture.added.isEmpty())
+    }
+
+    @Test
+    fun tapProductChangeItAndPut() {
+        copy("zabumbinha\nbanana")
+        show()
+        compose.onNode(pasteButton).performClick()
+
+        compose.onNode(hasText("zabumbinha") and hasClickAction()).performClick()
+        compose.onNode(hasText("Voltar para a lista recebida") and hasClickAction()).assertExists()
+        compose.onAllNodesWithText("Tirar da lista").assertCountEquals(0)
+
+        compose.onNode(hasText("zabumbinha") and hasSetTextAction()).performTextReplacement("Goiabada")
+        compose.onNode(hasText("Mais") and hasClickAction()).performClick()
+        compose.onNode(hasText("Voltar para a lista recebida") and hasClickAction()).performClick()
+
+        compose.onNodeWithText("Lista recebida").assertExists()
+        compose.onNodeWithText("Goiabada, 2").assertExists()
+        // Voltando da edição, o teclado não abre por cima da conferência.
+        compose.onNode(hasSetTextAction()).assertIsNotFocused()
+        compose.onNode(hasText("Pôr 2 produtos na lista") and hasClickAction()).performClick()
+
+        assertEquals(listOf("Goiabada", "banana"), fixture.added.map { it.name })
+        assertEquals(Quantity(2.0), fixture.added.first().quantity)
+        assertEquals(0, closes)
+    }
+
+    @Test
+    fun backWhileChangingReturnsToTheReview() {
+        copy("banana\nmaçã")
+        show()
+        compose.onNode(pasteButton).performClick()
+        compose.onNode(hasText("banana") and hasClickAction()).performClick()
+        compose.onNode(hasText("Mais") and hasClickAction()).performClick()
+
+        compose.activity.onBackPressedDispatcher.onBackPressed()
+        compose.waitForIdle()
+
+        compose.onNodeWithText("Lista recebida").assertExists()
+        compose.onNodeWithText("banana, 2").assertExists()
+        assertTrue(fixture.added.isEmpty())
+        assertEquals(0, closes)
     }
 
     @Test

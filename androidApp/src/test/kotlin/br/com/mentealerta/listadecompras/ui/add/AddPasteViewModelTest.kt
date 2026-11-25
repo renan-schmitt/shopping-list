@@ -2,6 +2,7 @@ package br.com.mentealerta.listadecompras.ui.add
 
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.Quantity
+import br.com.mentealerta.listadecompras.domain.QuantityUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -9,14 +10,16 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 /**
- * Colar uma lista recebida (#68) ou recebê-la pelo "Compartilhar" (#135): conferência, tirar, pôr
- * na lista, deixar pra lá.
+ * Colar uma lista recebida (#68) ou recebê-la pelo "Compartilhar" (#135): conferência, tirar, mudar
+ * um produto (#136), pôr na lista, deixar pra lá.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddPasteViewModelTest {
@@ -162,5 +165,90 @@ class AddPasteViewModelTest {
         viewModel.paste.onShared("*Lista de compras*")
 
         assertEquals(PasteSource.SHARED, viewModel.uiState.value.pastedNothing)
+    }
+
+    @Test
+    fun tappingAProductOpensItsDraft() {
+        val viewModel = fixture.viewModel()
+        viewModel.paste.onPaste(whatsApp)
+
+        viewModel.paste.onEdit(viewModel.uiState.value.review!!.items.first())
+
+        val editing = viewModel.uiState.value.review!!.editing!!
+        assertEquals(0, editing.index)
+        assertEquals("Banana", editing.draft.name)
+        assertEquals(Quantity(6.0), editing.draft.quantity)
+        assertTrue(editing.draft.canDecrease)
+        assertEquals("", editing.draft.detail)
+    }
+
+    @Test
+    fun changedProductStaysInTheSamePlaceAndIsPut() {
+        val viewModel = fixture.viewModel()
+        viewModel.paste.onPaste(whatsApp)
+        val bergamota = viewModel.uiState.value.review!!.items[2]
+        val unknownIcon = bergamota.icon
+
+        viewModel.paste.onEdit(bergamota)
+        viewModel.paste.onEditName("Maçã verde")
+        // O ícone acompanha o nome enquanto a pessoa digita.
+        assertNotEquals(unknownIcon, viewModel.uiState.value.review!!.editing!!.draft.icon)
+        viewModel.paste.onEditIncrease()
+        viewModel.paste.onEditDetail(" desnatado ")
+        viewModel.paste.onEditClose()
+
+        val review = viewModel.uiState.value.review!!
+        assertNull(review.editing)
+        assertEquals(listOf("Banana", "Maçã", "Maçã verde"), review.items.map { it.name })
+        val apple = review.items[2]
+        assertEquals(Quantity(2.0), apple.quantity)
+        assertEquals("desnatado", apple.detail)
+
+        viewModel.paste.onConfirm()
+        val added = fixture.added.last()
+        assertEquals("Maçã verde", added.name)
+        assertEquals("apple", added.productId)
+        assertEquals(Quantity(2.0), added.quantity)
+        assertEquals("desnatado", added.detail)
+    }
+
+    @Test
+    fun lessAndMoreFollowTheEditScreen() {
+        val viewModel = fixture.viewModel()
+        viewModel.paste.onPaste("2 kg de arroz")
+        viewModel.paste.onEdit(viewModel.uiState.value.review!!.items.single())
+
+        viewModel.paste.onEditDecrease()
+        val draft = viewModel.uiState.value.review!!.editing!!.draft
+        assertEquals(Quantity(1.0, QuantityUnit.KILOGRAM), draft.quantity)
+        assertFalse(draft.canDecrease)
+
+        viewModel.paste.onEditDecrease()
+        assertEquals(Quantity(1.0, QuantityUnit.KILOGRAM), viewModel.uiState.value.review!!.editing!!.draft.quantity)
+    }
+
+    @Test
+    fun blankNameKeepsTheNameThatCame() {
+        val viewModel = fixture.viewModel()
+        viewModel.paste.onPaste(whatsApp)
+        viewModel.paste.onEdit(viewModel.uiState.value.review!!.items[1])
+
+        viewModel.paste.onEditName("   ")
+        viewModel.paste.onEditClose()
+
+        assertEquals(listOf("Banana", "Maçã", "Bergamota"), viewModel.uiState.value.review!!.items.map { it.name })
+    }
+
+    @Test
+    fun sharedTextWhileChangingOpensTheNewReview() {
+        val viewModel = fixture.viewModel()
+        viewModel.paste.onPaste(whatsApp)
+        viewModel.paste.onEdit(viewModel.uiState.value.review!!.items.first())
+
+        viewModel.paste.onShared("arroz")
+
+        val review = viewModel.uiState.value.review!!
+        assertNull(review.editing)
+        assertEquals(listOf("arroz"), review.items.map { it.name })
     }
 }

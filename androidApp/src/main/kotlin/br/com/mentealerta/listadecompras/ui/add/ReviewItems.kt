@@ -26,12 +26,17 @@ import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 
 /**
- * Conferência da lista colada (#68), no papel: título **Lista recebida**, "Toque na lixeira para tirar
- * o que não quer.", um produto por linha com a lixeira ([TrashRow]) e, embaixo, quantos já estão na
- * lista ("Leite já está na lista."), que não entram. Os botões ficam fora da rolagem
+ * Conferência da lista colada (#68), no papel: título **Lista recebida**, "Toque no produto para
+ * mudar. Toque na lixeira para tirar o que não quer.", um produto por linha com a lixeira
+ * ([TrashRow]) e, embaixo, quantos já estão na lista ("Leite já está na lista."), que não entram.
+ * Tocar no produto abre a edição ([onEdit], #136). Os botões ficam fora da rolagem
  * ([ReviewButtons]), para a pessoa não precisar descer até o fim de uma lista comprida.
  */
-internal fun LazyListScope.reviewItems(review: ReviewUi, onRemove: (AddOptionUi) -> Unit) {
+internal fun LazyListScope.reviewItems(
+    review: ReviewUi,
+    onRemove: (AddOptionUi) -> Unit,
+    onEdit: (AddOptionUi) -> Unit,
+) {
     item(key = "review-title", contentType = "title") {
         Column(modifier = Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             UppercaseText(
@@ -54,6 +59,7 @@ internal fun LazyListScope.reviewItems(review: ReviewUi, onRemove: (AddOptionUi)
             quantity = option.quantity,
             icon = option.icon,
             onRemove = { onRemove(option) },
+            onClick = { onEdit(option) },
         )
     }
     val already = review.alreadyOnList

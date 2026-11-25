@@ -18,6 +18,7 @@ import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
+import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
@@ -128,6 +129,7 @@ class AddFixture {
         FindSameItemUseCase(repository),
         EditItemUseCase(repository, undoStack),
         RemoveItemUseCase(repository, undoStack),
+        RenameItemUseCase(ItemTextParser(index)),
         UndoLastActionUseCase(repository, undoStack),
         ParseSpeechUseCase(ItemTextParser(index)),
         ParsePastedListUseCase(ItemTextParser(index), index),
