@@ -31,8 +31,8 @@ class LearnedPreferenceDaoTest {
     }
 
     @Test
-    fun sectionChoiceIsNullUntilChosen() = runTest {
-        assertNull(dao.getSectionChoice("coffee"))
+    fun noSectionChoiceUntilChosen() = runTest {
+        assertEquals(emptyList(), dao.getSectionChoices())
     }
 
     @Test
@@ -41,7 +41,9 @@ class LearnedPreferenceDaoTest {
         dao.upsertSectionChoice(SectionChoiceEntity(productKey = "coffee", sectionId = "grocery"))
         dao.upsertSectionChoice(SectionChoiceEntity(productKey = "flocao da vo", sectionId = "grocery"))
 
-        assertEquals("grocery", dao.getSectionChoice("coffee"))
-        assertEquals("grocery", dao.getSectionChoice("flocao da vo"))
+        assertEquals(
+            mapOf("coffee" to "grocery", "flocao da vo" to "grocery"),
+            dao.getSectionChoices().associate { it.productKey to it.sectionId },
+        )
     }
 }

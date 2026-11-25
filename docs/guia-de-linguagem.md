@@ -74,5 +74,6 @@
 | Colar uma lista recebida | "Copiou uma lista no WhatsApp?" acima de **Colar a lista**; conferência com o título **Lista recebida**, "Toque na lixeira para tirar o que não quer.", "Leite já está na lista." ou "2 produtos já estão na lista.", **Pôr 5 produtos na lista** · **Deixa pra lá**; sem produto, "Não achei produtos no texto copiado." (2026-11-24, #68) |
 | Mudar um produto da lista recebida | Na conferência, "Toque no produto para mudar. Toque na lixeira para tirar o que não quer."; o TalkBack lê a ação **Mudar**. A edição é a de sempre, com **Voltar para a lista recebida** no topo e sem **Tirar da lista** (o produto ainda não está na lista) (2026-11-25, #136) |
 | Receber uma lista pelo "Compartilhar" | Na tela de compartilhar do Android, o nome do app: **Lista de Compras**; abre a mesma conferência **Lista recebida**; sem produto, "Não achei produtos na mensagem." (2026-11-25, #135) |
+| Mudar a seção de um produto | Na edição, "Seção" com o nome da seção e o ícone ao lado, e o botão **Mudar de seção**; a escolha tem o título "Em qual seção fica?", as seções na ordem do mercado, a atual com ✓ e "Está aqui", e **Voltar para o produto** no topo (2026-11-25, #56) |
 | Sugestão | "Faz 12 dias que você comprou café. Está faltando?" · **Sim, pôr na lista** · **Não** |
 | Lembrete | "Sua lista já tem 20 produtos. Que tal ir ao mercado?" |

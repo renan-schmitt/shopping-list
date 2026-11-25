@@ -17,6 +17,7 @@ import br.com.mentealerta.listadecompras.domain.ListSection
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
+import br.com.mentealerta.listadecompras.domain.RememberSectionUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
@@ -26,6 +27,7 @@ import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import br.com.mentealerta.listadecompras.ui.FakePreferredTermRepository
+import br.com.mentealerta.listadecompras.ui.FakeSectionChoiceRepository
 import br.com.mentealerta.listadecompras.voice.VoiceEvent
 import br.com.mentealerta.listadecompras.voice.VoicePreferences
 import br.com.mentealerta.listadecompras.voice.VoiceRecognizer
@@ -128,12 +130,16 @@ class AddFixture {
     val preferredTerms = FakePreferredTermRepository()
     private val learnPreferredTerm get() = LearnPreferredTermUseCase(index, preferredTerms)
 
+    /** Seções escolhidas pela pessoa (#56), aplicadas ao pôr na lista. */
+    val sectionChoices = FakeSectionChoiceRepository()
+    private val rememberSection get() = RememberSectionUseCase(index, sectionChoices)
+
     fun viewModel(searchDispatcher: CoroutineDispatcher = Dispatchers.Unconfined) = AddViewModel(
         SearchProductsUseCase(index, ItemTextParser(index), preferredTerms),
         index,
-        AddItemsUseCase(repository, learnPreferredTerm),
+        AddItemsUseCase(repository, learnPreferredTerm, rememberSection),
         FindSameItemUseCase(repository),
-        EditItemUseCase(repository, undoStack, learnPreferredTerm),
+        EditItemUseCase(repository, undoStack, learnPreferredTerm, rememberSection),
         RemoveItemUseCase(repository, undoStack),
         RenameItemUseCase(ItemTextParser(index)),
         UndoLastActionUseCase(repository, undoStack),

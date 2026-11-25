@@ -175,4 +175,51 @@ class EditFlowTest {
         button("Tirar da lista").performScrollTo().performClick()
         compose.onNodeWithText("Feijão saiu da lista.").assertExists()
     }
+
+    @Test
+    fun changingTheSectionMovesTheProductOnTheList() {
+        showAndOpenBeans()
+        button("Mudar de seção").performScrollTo().performClick()
+        compose.onNode(hasText("Em qual seção fica?") and isHeading()).assertExists()
+        // A seção atual é marcada com "Está aqui", não só pela cor.
+        compose.onNode(hasText("Mercearia") and hasAnyDescendant(hasText("Está aqui")), useUnmergedTree = true)
+            .assertDoesNotExist()
+        compose.onNode(SemanticsMatcher.expectValue(SemanticsProperties.Selected, true))
+            .assert(hasText("Mercearia"))
+            .assert(hasText("Está aqui"))
+
+        compose.onNode(SemanticsMatcher.expectValue(SemanticsProperties.Selected, false) and hasText("Hortifrúti"))
+            .assertHeightIsAtLeast(64.dp)
+            .performClick()
+
+        // Volta para a edição, com a seção nova.
+        button("Mudar de seção").performScrollTo()
+        compose.onNodeWithText("Hortifrúti").assertExists()
+        button("Voltar para a lista").performClick()
+
+        assertEquals("produce", fixture.items.single().sectionId)
+        assertEquals(mapOf("beans" to "produce"), fixture.sectionChoices.sections)
+    }
+
+    @Test
+    fun phoneBackOnTheChoiceGoesBackToTheProduct() {
+        showAndOpenBeans()
+        button("Mudar de seção").performScrollTo().performClick()
+
+        compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+
+        compose.onNodeWithText("Em qual seção fica?").assertDoesNotExist()
+        button("Mudar de seção").assertExists()
+        assertEquals("pantry", fixture.items.single().sectionId)
+    }
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun sectionChoiceIsReachableWithLargeFont() {
+        showAndOpenBeans()
+        button("Mudar de seção").performScrollTo().performClick()
+        compose.onNode(hasText("Outros") and hasClickAction()).performScrollTo().performClick()
+        button("Voltar para a lista").performClick()
+        assertEquals("other", fixture.items.single().sectionId)
+    }
 }

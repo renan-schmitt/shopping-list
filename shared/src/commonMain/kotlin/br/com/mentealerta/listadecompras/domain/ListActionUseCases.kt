@@ -12,14 +12,16 @@ class SetItemCheckedUseCase(private val repository: ShoppingListRepository, priv
 /**
  * Grava a edição do item, guardando para o "Desfazer". Devolve `false` se o item não está mais
  * na lista; edição que não muda nada não entra na pilha. Nome trocado ensina o termo preferido
- * do produto ([LearnPreferredTermUseCase]).
+ * do produto ([LearnPreferredTermUseCase]); seção escolhida pela pessoa ([sectionChosen]) e
+ * diferente da que estava fica lembrada para o produto ([RememberSectionUseCase], #56).
  */
 class EditItemUseCase(
     private val repository: ShoppingListRepository,
     private val undoStack: UndoStack,
     private val learnPreferredTerm: LearnPreferredTermUseCase,
+    private val rememberSection: RememberSectionUseCase,
 ) {
-    suspend operator fun invoke(item: ListItem): Boolean {
+    suspend operator fun invoke(item: ListItem, sectionChosen: Boolean = false): Boolean {
         var previous: ListItem? = null
         undoStack.record {
             repository.update(item)
@@ -29,6 +31,7 @@ class EditItemUseCase(
         }
         val before = previous ?: return false
         if (before.name != item.name) learnPreferredTerm(item)
+        if (sectionChosen && before.sectionId != item.sectionId) rememberSection.learn(item)
         return true
     }
 }

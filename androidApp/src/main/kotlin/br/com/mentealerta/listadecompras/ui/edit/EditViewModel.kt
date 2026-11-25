@@ -4,13 +4,17 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
+import br.com.mentealerta.listadecompras.catalog.CatalogSection
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ObserveListUseCase
 import br.com.mentealerta.listadecompras.domain.Quantity
+import br.com.mentealerta.listadecompras.domain.RememberSectionUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
+import br.com.mentealerta.listadecompras.domain.SectionChoices
+import br.com.mentealerta.listadecompras.ui.catalog.drawableRes
 import br.com.mentealerta.listadecompras.ui.catalog.iconRes
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +34,10 @@ sealed interface EditUiState {
     /**
      * O rascunho na tela: [name] e [detail] como a pessoa digitou; [quantity] já com o − / +; [icon]
      * acompanha o nome (trocar "leite" por "pão" troca o ícone).
+     *
+     * [section]: onde o produto vai ficar na lista, com o **Mudar de seção** (#56); `null` esconde o
+     * bloco (produto da conferência, que ainda não está na lista). Com [choosingSection], a tela
+     * mostra a escolha entre as [sections], na ordem do mercado.
      */
     data class Editing(
         val name: String,
@@ -37,11 +45,17 @@ sealed interface EditUiState {
         val quantity: Quantity?,
         val canDecrease: Boolean,
         @DrawableRes val icon: Int,
+        val section: SectionUi? = null,
+        val sections: List<SectionUi> = emptyList(),
+        val choosingSection: Boolean = false,
     ) : EditUiState
 
     /** A edição acabou sozinha: o produto saiu da lista ([removedName]) ou já não estava nela (`null`). */
     data class Closed(val removedName: String?) : EditUiState
 }
+
+/** Seção do catálogo na edição (#56): o nome com o ícone ao lado. */
+data class SectionUi(val id: String, val name: String, @DrawableRes val icon: Int)
 
 /** Como a pessoa saiu da edição; mudar ou tirar da lista conta para os anúncios (#89). */
 sealed interface EditOutcome {
@@ -59,6 +73,11 @@ sealed interface EditOutcome {
  * pelo [EditItemUseCase] — cada gravação que muda algo vira uma entrada do "Desfazer". Nome em
  * branco mantém o nome anterior.
  *
+ * **Mudar de seção** ([onChoosingSectionChange]) abre a escolha das seções; tocar numa ([onSectionSelect])
+ * volta para a edição com o produto nela. Ao gravar, a escolha fica lembrada para o produto (#56).
+ * Trocar o nome para outro produto leva o item para a seção que a pessoa escolheu antes para esse
+ * produto, se houver, a não ser que ela tenha escolhido a seção nesta edição.
+ *
  * "Tirar da lista" ([onRemove]) tira o produto pelo [RemoveItemUseCase] e fecha a edição; a lista
  * mostra o aviso com o "Desfazer".
  *
@@ -71,6 +90,7 @@ class EditViewModel(
     private val renameItem: RenameItemUseCase,
     private val editItem: EditItemUseCase,
     private val removeItem: RemoveItemUseCase,
+    private val rememberSection: RememberSectionUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<EditUiState>(EditUiState.Loading)
     val uiState: StateFlow<EditUiState> = _uiState.asStateFlow()
@@ -84,15 +104,25 @@ class EditViewModel(
     /** Se alguma gravação desta edição mudou o produto (ex.: o app foi para segundo plano no meio). */
     private var edited = false
 
+    /** Seção escolhida pela pessoa nesta edição; `null` enquanto ela não escolhe. */
+    private var chosenSectionId: String? = null
+
+    /** Seções escolhidas antes, para quem troca o nome para outro produto. */
+    private var sectionChoices = SectionChoices.none(catalogIndex)
+
+    private val sections = catalogIndex.catalog.sections.map { it.toUi() }
+
     /** Abre o produto [id]. Se ele já está aberto (rotação de tela), o rascunho continua. */
     fun open(id: ListItemId) {
         if (id == openId && _uiState.value !is EditUiState.Closed) return
         openId = id
         saved = null
         edited = false
+        chosenSectionId = null
         _uiState.value = EditUiState.Loading
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
+            sectionChoices = rememberSection.choices()
             val item = observeList().first().asSequence().flatMap { it.items }.find { it.id == id }
             saved = item
             _uiState.value = item?.let { editingOf(it, it.name, it.detail.orEmpty()) } ?: EditUiState.Closed(null)
@@ -109,6 +139,23 @@ class EditViewModel(
 
     fun onIncrease() = updateQuantity { it.increaseQuantity() }
 
+    /**
+     * **Mudar de seção** ([choosing] verdadeiro) mostra as seções para escolher; **Voltar para o
+     * produto** (ou o voltar do celular) na escolha volta para a edição sem mudar nada.
+     */
+    fun onChoosingSectionChange(choosing: Boolean) {
+        _uiState.update { state -> (state as? EditUiState.Editing)?.copy(choosingSection = choosing) ?: state }
+    }
+
+    /** A pessoa tocou numa seção: o produto vai para ela e a edição volta. */
+    fun onSectionSelect(sectionId: String) {
+        if (catalogIndex.section(sectionId) == null) return
+        chosenSectionId = sectionId
+        updateDraft { base, editing ->
+            editingOf(base, editing.name, editing.detail, editing.quantity).copy(choosingSection = false)
+        }
+    }
+
     fun onDecrease() = updateQuantity { it.decreaseQuantity() }
 
     /** Grava o rascunho, se ele muda algo. */
@@ -116,7 +163,7 @@ class EditViewModel(
         val item = draft() ?: return
         viewModelScope.launch {
             mutex.withLock {
-                if (editItem(item)) {
+                if (editItem(item, sectionChosen = chosenSectionId != null)) {
                     saved = item
                     edited = true
                 }
@@ -169,8 +216,16 @@ class EditViewModel(
         return draftOf(base, editing.name, editing.detail, editing.quantity)
     }
 
-    private fun draftOf(base: ListItem, name: String, detail: String, quantity: Quantity?): ListItem =
-        renameItem(base, name).copy(quantity = quantity, detail = detail.trim().ifEmpty { null })
+    private fun draftOf(base: ListItem, name: String, detail: String, quantity: Quantity?): ListItem {
+        val renamed = renameItem(base, name)
+        val chosen = chosenSectionId
+        val placed = when {
+            chosen != null -> renamed.copy(sectionId = chosen)
+            sectionChoices.sameProduct(base, renamed) -> renamed
+            else -> sectionChoices.applyTo(renamed)
+        }
+        return placed.copy(quantity = quantity, detail = detail.trim().ifEmpty { null })
+    }
 
     private fun editingOf(
         base: ListItem,
@@ -185,6 +240,9 @@ class EditViewModel(
             quantity = quantity,
             canDecrease = item.canDecreaseQuantity,
             icon = item.iconRes(catalogIndex),
+            section = (catalogIndex.section(item.sectionId) ?: catalogIndex.section(CatalogSection.OTHER_ID))?.toUi(),
+            sections = sections,
+            choosingSection = (_uiState.value as? EditUiState.Editing)?.choosingSection == true,
         )
     }
 
@@ -198,3 +256,9 @@ class EditViewModel(
         editingOf(base, editing.name, editing.detail, changed.quantity)
     }
 }
+
+private fun CatalogSection.toUi() = SectionUi(
+    id = id,
+    name = name,
+    icon = checkNotNull(icon.drawableRes()) { "Seção \"$id\" sem ícone convertido" },
+)

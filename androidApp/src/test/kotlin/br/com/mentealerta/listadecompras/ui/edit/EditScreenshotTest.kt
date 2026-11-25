@@ -14,7 +14,7 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Screenshots da edição do produto (#55) com fonte em 100% e 200%, no modo claro e no escuro
- * (plano §4.6), e o produto sem quantidade nem detalhe.
+ * (plano §4.6), o produto sem quantidade nem detalhe e a escolha da seção (#56).
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -46,6 +46,22 @@ class EditScreenshotTest {
     @Test
     @Config(fontScale = 1.0f)
     fun empty_light_font100() = capture("empty_light_font100", SampleEditEmptyState)
+
+    @Test
+    @Config(fontScale = 1.0f)
+    fun section_light_font100() = capture("section_light_font100", SampleEditChoosingSectionState)
+
+    @Test
+    @Config(fontScale = 1.5f)
+    fun section_light_font150() = capture("section_light_font150", SampleEditChoosingSectionState)
+
+    @Test
+    @Config(fontScale = 2.0f)
+    fun section_light_font200() = capture("section_light_font200", SampleEditChoosingSectionState)
+
+    @Test
+    @Config(qualifiers = "+night", fontScale = 1.0f)
+    fun section_dark_font100() = capture("section_dark_font100", SampleEditChoosingSectionState)
 
     private fun capture(name: String, state: EditUiState = SampleEditState) {
         compose.setContent { ShoppingListTheme { EditContent(state) } }

@@ -17,6 +17,7 @@ import br.com.mentealerta.listadecompras.ui.add.SampleAddVoiceMessageState
 import br.com.mentealerta.listadecompras.ui.add.SampleAddVoiceNoticeState
 import br.com.mentealerta.listadecompras.ui.add.SampleAdded
 import br.com.mentealerta.listadecompras.ui.edit.EditContent
+import br.com.mentealerta.listadecompras.ui.edit.SampleEditChoosingSectionState
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditEmptyState
 import br.com.mentealerta.listadecompras.ui.edit.SampleEditState
 import br.com.mentealerta.listadecompras.ui.fullversion.FullVersionContent
@@ -110,6 +111,7 @@ class ScreensAccessibilityTest(private val screen: String, private val fontScale
             "jogar a lista fora" to { ClearListQuestion(total = 12, onConfirm = {}, onDismiss = {}) },
             "edição" to { EditContent(SampleEditState) },
             "edição sem quantidade" to { EditContent(SampleEditEmptyState) },
+            "edição escolhendo a seção" to { EditContent(SampleEditChoosingSectionState) },
             "adicionar buscando" to add(SampleAddState),
             "adicionar nada achado" to add(SampleAddNothingFoundState),
             "adicionar repetido" to add(SampleAddRepeatedState),

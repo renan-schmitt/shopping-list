@@ -20,6 +20,7 @@ import br.com.mentealerta.listadecompras.domain.ObservePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.ObservePurchaseHistoryUseCase
 import br.com.mentealerta.listadecompras.domain.Purchase
 import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
+import br.com.mentealerta.listadecompras.domain.RememberSectionUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RemovedItems
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
@@ -29,6 +30,7 @@ import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
 import br.com.mentealerta.listadecompras.ui.FakePreferredTermRepository
+import br.com.mentealerta.listadecompras.ui.FakeSectionChoiceRepository
 import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
 import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
 import br.com.mentealerta.listadecompras.ui.list.AdsFixture
@@ -169,12 +171,17 @@ class EditFixture {
     /** Termos que a pessoa usa (#44), aprendidos ao renomear. */
     val preferredTerms = FakePreferredTermRepository()
 
+    /** Seções escolhidas pela pessoa (#56). */
+    val sectionChoices = FakeSectionChoiceRepository()
+    private val rememberSection get() = RememberSectionUseCase(index, sectionChoices)
+
     fun editViewModel() = EditViewModel(
         ObserveListUseCase(repository),
         index,
         RenameItemUseCase(ItemTextParser(index)),
-        EditItemUseCase(repository, undoStack, LearnPreferredTermUseCase(index, preferredTerms)),
+        EditItemUseCase(repository, undoStack, LearnPreferredTermUseCase(index, preferredTerms), rememberSection),
         RemoveItemUseCase(repository, undoStack),
+        rememberSection,
     )
 
     fun listViewModel() = ListViewModel(

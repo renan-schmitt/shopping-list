@@ -22,7 +22,12 @@ class AddItemsUseCaseTest {
     private val repository = RoomShoppingListRepository(database, EmbeddedCatalogRepository(), StepClock())
     private val index = CatalogIndex(EmbeddedCatalog.catalog)
     private val preferredTerms = InMemoryPreferredTermRepository()
-    private val addItems = AddItemsUseCase(repository, LearnPreferredTermUseCase(index, preferredTerms))
+    private val sectionChoices = InMemorySectionChoiceRepository()
+    private val addItems = AddItemsUseCase(
+        repository,
+        LearnPreferredTermUseCase(index, preferredTerms),
+        RememberSectionUseCase(index, sectionChoices),
+    )
     private val parser = ItemTextParser(index)
 
     @AfterTest
@@ -95,5 +100,19 @@ class AddItemsUseCaseTest {
         addItems(parser.parseAll("2 kg de macaxeiras, cacetinho da padaria e xyzzy"))
 
         assertEquals(mapOf("cassava" to "macaxeira", "french_bread" to "cacetinho"), preferredTerms.terms)
+    }
+
+    @Test
+    fun addingPutsTheProductInTheSectionThePersonChose() = runTest {
+        sectionChoices.learn("coffee", "beverages")
+        sectionChoices.learn("sabao de coco", "cleaning")
+
+        val added = addItems(parser.parseAll("café, sabões de coco e arroz"))
+
+        assertEquals(listOf("beverages", "cleaning", "pantry"), added.map { it.sectionId })
+        assertEquals(
+            listOf("pantry" to listOf(added[2]), "beverages" to listOf(added[0]), "cleaning" to listOf(added[1])),
+            repository.observeSections().first().map { it.section.id to it.items },
+        )
     }
 }

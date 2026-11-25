@@ -20,8 +20,8 @@ internal interface LearnedPreferenceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertPreferredTerm(preferredTerm: PreferredTermEntity)
 
-    @Query("SELECT section_id FROM section_choice WHERE product_key = :productKey")
-    suspend fun getSectionChoice(productKey: String): String?
+    @Query("SELECT * FROM section_choice")
+    suspend fun getSectionChoices(): List<SectionChoiceEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertSectionChoice(sectionChoice: SectionChoiceEntity)

@@ -190,6 +190,13 @@
     <!-- TalkBack num campo vazio: o rótulo e o exemplo que aparece dentro dele, ex.: "Detalhe, Ex.: desnatado" (#71) -->
     <string name="field_label_with_hint">%1$s, %2$s</string>
     <string name="edit_remove">Tirar da lista</string>
+    <!-- Seção do produto na edição (#56): a escolha fica lembrada para as próximas vezes -->
+    <string name="edit_section_label">Seção</string>
+    <string name="edit_section_change">Mudar de seção</string>
+    <string name="edit_section_title">Em qual seção fica?</string>
+    <!-- Ao lado da seção onde o produto está, com o ✓ -->
+    <string name="edit_section_current">Está aqui</string>
+    <string name="edit_section_back">Voltar para o produto</string>
 
     <!--
         Quantidade do produto. %1$s é o número já formatado ("2", "1,5", "½").

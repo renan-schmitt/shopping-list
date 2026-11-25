@@ -61,7 +61,7 @@ O que precisa existir na primeira versão publicada.
 
 ### 1.4 Categorias
 - [ ] Agrupamento automático pela categoria do catálogo
-- [ ] Mudar a categoria de um item manualmente (e o app lembra da escolha)
+- [x] Mudar a categoria de um item manualmente (e o app lembra da escolha) — 2026-11-25, #56: na edição, **Mudar de seção** abre uma tela com as seções na ordem do mercado (a atual com ✓ e "Está aqui"; tocar escolhe e volta). Grava ao sair da edição, como o resto, e o "Desfazer" volta a seção do item, sem esquecer a escolha. A escolha fica no celular (`section_choice`), pelo produto do catálogo (vale para qualquer nome dele: "aipim" e "mandioca") ou, se desconhecido, pelo nome normalizado ("Sabões de coco" = "sabão de coco"); vale a última. Aplica ao pôr na lista (digitando, falando ou colando) e ao trocar o nome para outro produto, a não ser que a pessoa tenha escolhido a seção naquela edição. Na conferência da **Lista recebida** não aparece: a escolha vale quando o produto entra
 - [ ] Categorias ordenadas como um mercado costuma ser (hortifrúti, padaria, açougue, frios, mercearia, limpeza, higiene...)
 
 **Seções decididas (2026-11-11, #14)** — lista fechada em [catalog/sections.csv](../catalog/sections.csv), nesta ordem: Hortifrúti, Padaria, Açougue e peixaria, Frios e laticínios, **Congelados**, Mercearia, Bebidas, Limpeza, Higiene e farmácia, Pet e **Outros**.

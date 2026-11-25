@@ -5,6 +5,7 @@ import br.com.mentealerta.listadecompras.catalog.CatalogRepository
 import br.com.mentealerta.listadecompras.data.EmbeddedCatalogRepository
 import br.com.mentealerta.listadecompras.data.RoomPreferredTermRepository
 import br.com.mentealerta.listadecompras.data.RoomPurchaseHistoryRepository
+import br.com.mentealerta.listadecompras.data.RoomSectionChoiceRepository
 import br.com.mentealerta.listadecompras.data.RoomShoppingListRepository
 import br.com.mentealerta.listadecompras.data.StorePremiumRepository
 import br.com.mentealerta.listadecompras.data.database.AppDatabase
@@ -29,10 +30,12 @@ import br.com.mentealerta.listadecompras.domain.ParsePastedListUseCase
 import br.com.mentealerta.listadecompras.domain.ParseSpeechUseCase
 import br.com.mentealerta.listadecompras.domain.PreferredTermRepository
 import br.com.mentealerta.listadecompras.domain.PurchaseHistoryRepository
+import br.com.mentealerta.listadecompras.domain.RememberSectionUseCase
 import br.com.mentealerta.listadecompras.domain.RemoveItemUseCase
 import br.com.mentealerta.listadecompras.domain.RenameItemUseCase
 import br.com.mentealerta.listadecompras.domain.RestorePremiumUseCase
 import br.com.mentealerta.listadecompras.domain.SearchProductsUseCase
+import br.com.mentealerta.listadecompras.domain.SectionChoiceRepository
 import br.com.mentealerta.listadecompras.domain.SetItemCheckedUseCase
 import br.com.mentealerta.listadecompras.domain.SetPersonalizedAdsUseCase
 import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
@@ -62,6 +65,7 @@ val sharedModule = module {
     singleOf(::RoomShoppingListRepository) bind ShoppingListRepository::class
     singleOf(::RoomPurchaseHistoryRepository) bind PurchaseHistoryRepository::class
     singleOf(::RoomPreferredTermRepository) bind PreferredTermRepository::class
+    singleOf(::RoomSectionChoiceRepository) bind SectionChoiceRepository::class
     single { get<AppDatabase>().listItemDao() }
     single { get<AppDatabase>().purchaseDao() }
     single { get<AppDatabase>().learnedPreferenceDao() }
@@ -76,6 +80,7 @@ val sharedModule = module {
     // Fuso do celular lido a cada tela aberta: o padrão do construtor.
     factory { ObservePurchaseHistoryUseCase(get(), get(), get()) }
     factoryOf(::LearnPreferredTermUseCase)
+    factoryOf(::RememberSectionUseCase)
     factoryOf(::AddItemsUseCase)
     factoryOf(::FindSameItemUseCase)
     factoryOf(::SearchProductsUseCase)

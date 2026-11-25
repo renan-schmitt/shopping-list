@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -19,7 +20,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
@@ -58,6 +63,7 @@ import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import org.koin.compose.viewmodel.koinViewModel
 
 private val ProductIconSize = 64.dp
+private val SectionIconSize = 40.dp
 
 /**
  * Edição do produto [id] (#55, plano §1.1): ocupa a tela toda, por cima da lista, como a de
@@ -86,13 +92,23 @@ fun EditScreen(
     // Fechada por fora (uma lista chegou pelo "Compartilhar", #135): o rascunho também é gravado.
     DisposableEffect(viewModel) { onDispose { viewModel.onSave() } }
     val close = { onClose(viewModel.onClose()) }
-    BackHandler(onBack = close)
+    // Na escolha da seção, o voltar do celular volta para a edição, não para a lista.
+    BackHandler {
+        if ((uiState as? EditUiState.Editing)?.choosingSection == true) {
+            viewModel.onChoosingSectionChange(false)
+        } else {
+            close()
+        }
+    }
     EditContent(
         uiState = uiState,
         onNameChange = viewModel::onNameChange,
         onDetailChange = viewModel::onDetailChange,
         onIncrease = viewModel::onIncrease,
         onDecrease = viewModel::onDecrease,
+        onChooseSection = { viewModel.onChoosingSectionChange(true) },
+        onSectionSelect = viewModel::onSectionSelect,
+        onChooseSectionDismiss = { viewModel.onChoosingSectionChange(false) },
         onRemove = viewModel::onRemove,
         onClose = close,
         modifier = modifier,
@@ -101,9 +117,12 @@ fun EditScreen(
 
 /**
  * Topo verde com "Voltar para a lista"; embaixo, no papel: nome com o ícone do produto, quantidade
- * com **Menos** / **Mais** em verde, detalhe e, por último, **Tirar da lista** em destaque, com o
- * cesto de lixo do "Jogar a lista fora" (#124). Não existe "Salvar". O
- * teclado só abre quando a pessoa toca num campo, para não cobrir os botões.
+ * com **Menos** / **Mais** em verde, detalhe, a seção com **Mudar de seção** (#56) e, por último,
+ * **Tirar da lista** em destaque, com o cesto de lixo do "Jogar a lista fora" (#124). Não existe
+ * "Salvar". O teclado só abre quando a pessoa toca num campo, para não cobrir os botões.
+ *
+ * Escolhendo a seção ([EditUiState.Editing.choosingSection]), a tela troca para a lista das seções,
+ * com **Voltar para o produto** no topo.
  *
  * [inReview]: produto da conferência **Lista recebida** (#136), que ainda não está na lista. O topo
  * diz "Voltar para a lista recebida" e não há **Tirar da lista**: a lixeira fica na conferência.
@@ -116,11 +135,15 @@ fun EditContent(
     onDetailChange: (String) -> Unit = {},
     onIncrease: () -> Unit = {},
     onDecrease: () -> Unit = {},
+    onChooseSection: () -> Unit = {},
+    onSectionSelect: (String) -> Unit = {},
+    onChooseSectionDismiss: () -> Unit = {},
     onRemove: () -> Unit = {},
     onClose: () -> Unit = {},
     inReview: Boolean = false,
 ) {
     val colors = MaterialTheme.colorScheme
+    val choosingSection = uiState is EditUiState.Editing && uiState.choosingSection
     Column(modifier = modifier.fillMaxSize().background(colors.surface)) {
         Box(
             modifier = Modifier
@@ -130,21 +153,22 @@ fun EditContent(
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
         ) {
             BackToListButton(
-                onClick = onClose,
-                text = stringResource(if (inReview) R.string.review_edit_back else R.string.back_to_list),
+                onClick = if (choosingSection) onChooseSectionDismiss else onClose,
+                text = stringResource(
+                    when {
+                        choosingSection -> R.string.edit_section_back
+                        inReview -> R.string.review_edit_back
+                        else -> R.string.back_to_list
+                    },
+                ),
             )
         }
-        if (uiState is EditUiState.Editing) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .imePadding()
-                    .verticalScroll(rememberScrollState())
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp)
-                    .navigationBarsPadding(),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-            ) {
+        if (uiState is EditUiState.Editing && choosingSection) {
+            ScrollingBody(modifier = Modifier.weight(1f)) {
+                SectionChoice(uiState, onSectionSelect)
+            }
+        } else if (uiState is EditUiState.Editing) {
+            ScrollingBody(modifier = Modifier.weight(1f).imePadding()) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Bottom) {
                     LabeledTextField(
                         label = stringResource(R.string.edit_name_label),
@@ -170,6 +194,7 @@ fun EditContent(
                     onValueChange = onDetailChange,
                     placeholder = stringResource(R.string.edit_detail_hint),
                 )
+                uiState.section?.let { CurrentSection(it, onChooseSection) }
                 if (!inReview) {
                     SecondaryButton(
                         text = stringResource(R.string.edit_remove),
@@ -178,6 +203,136 @@ fun EditContent(
                         tintIcon = false,
                         prominent = true,
                         modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Corpo da tela, abaixo do topo verde, com rolagem. */
+@Composable
+private fun ScrollingBody(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp)
+            .navigationBarsPadding(),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        content = content,
+    )
+}
+
+/**
+ * "Seção" (#56): a seção onde o produto fica na lista, com o ícone ao lado do nome, e embaixo o
+ * **Mudar de seção**.
+ */
+@Composable
+private fun CurrentSection(section: SectionUi, onChooseSection: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        UppercaseText(
+            text = stringResource(R.string.edit_section_label),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.onSurface,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.semantics { heading() },
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Image(
+                painter = painterResource(section.icon),
+                contentDescription = null,
+                modifier = Modifier.size(SectionIconSize),
+            )
+            Text(
+                text = section.name,
+                style = MaterialTheme.typography.bodyLarge,
+                color = colors.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        SecondaryButton(
+            text = stringResource(R.string.edit_section_change),
+            onClick = onChooseSection,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+/**
+ * Escolha da seção (#56): "Em qual seção fica?" e as seções do mercado, na ordem, uma por linha,
+ * com o ícone ao lado do nome. A seção atual tem o ✓ e "Está aqui" — o estado nunca fica só na cor.
+ * Para o TalkBack, as linhas são opções de um grupo, e a atual é lida como selecionada.
+ */
+@Composable
+private fun SectionChoice(uiState: EditUiState.Editing, onSectionSelect: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(
+            text = stringResource(R.string.edit_section_title),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.fillMaxWidth().semantics { heading() },
+        )
+        Column(modifier = Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            uiState.sections.forEach { section ->
+                SectionOption(
+                    section = section,
+                    selected = section.id == uiState.section?.id,
+                    onClick = { onSectionSelect(section.id) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionOption(section: SectionUi, selected: Boolean, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    val tokens = ComicTheme.tokens
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            .comicStyle(
+                shape = MaterialTheme.shapes.medium,
+                background = colors.surface,
+                outline = colors.outline,
+                outlineWidth = if (selected) tokens.thickOutline else tokens.thinOutline,
+                shadow = 0.dp,
+            )
+            .heightIn(min = tokens.minTouchTarget)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            painter = painterResource(section.icon),
+            contentDescription = null,
+            modifier = Modifier.size(SectionIconSize),
+        )
+        // "Está aqui" fica embaixo do nome: ao lado, a fonte em 200% partiria as palavras.
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(text = section.name, style = MaterialTheme.typography.bodyLarge, color = colors.onSurface)
+            if (selected) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_check),
+                        contentDescription = null,
+                        tint = colors.primary,
+                        modifier = Modifier.size(SectionIconSize / 2),
+                    )
+                    Text(
+                        text = stringResource(R.string.edit_section_current),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.primary,
                     )
                 }
             }

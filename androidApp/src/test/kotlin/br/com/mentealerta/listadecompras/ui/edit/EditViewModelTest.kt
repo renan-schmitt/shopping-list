@@ -21,7 +21,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-/** Edição do produto (#55): rascunho na tela, gravado ao sair; − / +; trocar o nome; tirar da lista. */
+/**
+ * Edição do produto (#55): rascunho na tela, gravado ao sair; − / +; trocar o nome; mudar de seção
+ * (#56); tirar da lista.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class EditViewModelTest {
     private val fixture = EditFixture()
@@ -39,6 +42,10 @@ class EditViewModelTest {
 
     private val stored get() = fixture.items.single()
 
+    private val produce = SectionUi("produce", "Hortifrúti", R.drawable.catalog_fluent_leafy_green)
+    private val pantry = SectionUi("pantry", "Mercearia", R.drawable.catalog_fluent_hot_beverage)
+    private val other = SectionUi("other", "Outros", R.drawable.catalog_fluent_shopping_cart)
+
     @Test
     fun opensTheProductWithItsFields() {
         assertEquals(
@@ -48,6 +55,8 @@ class EditViewModelTest {
                 quantity = null,
                 canDecrease = false,
                 icon = R.drawable.catalog_fluent_hot_beverage,
+                section = pantry,
+                sections = listOf(produce, pantry, other),
             ),
             opened().uiState.value,
         )
@@ -194,5 +203,85 @@ class EditViewModelTest {
         // O rascunho não foi gravado: o "Desfazer" devolve o produto como estava.
         UndoLastActionUseCase(fixture.repository, fixture.undoStack)()
         assertEquals(listOf(beans), fixture.items)
+    }
+
+    @Test
+    fun choosingASectionMovesTheDraftAndIsRememberedOnClose() {
+        val viewModel = opened()
+        viewModel.onChoosingSectionChange(true)
+        assertTrue(viewModel.editing.choosingSection)
+
+        viewModel.onSectionSelect("produce")
+
+        assertFalse(viewModel.editing.choosingSection)
+        assertEquals(produce, viewModel.editing.section)
+        // Nada é gravado enquanto a pessoa está na tela.
+        assertEquals("pantry", stored.sectionId)
+        assertEquals(emptyMap<String, String>(), fixture.sectionChoices.sections)
+
+        assertEquals(EditOutcome.Changed, viewModel.onClose())
+        assertEquals("produce", stored.sectionId)
+        assertEquals(mapOf("beans" to "produce"), fixture.sectionChoices.sections)
+    }
+
+    @Test
+    fun goingBackFromTheChoiceChangesNothing() {
+        val viewModel = opened()
+        viewModel.onChoosingSectionChange(true)
+
+        viewModel.onChoosingSectionChange(false)
+
+        assertFalse(viewModel.editing.choosingSection)
+        assertEquals(pantry, viewModel.editing.section)
+        assertEquals(EditOutcome.Unchanged, viewModel.onClose())
+        assertEquals(emptyMap<String, String>(), fixture.sectionChoices.sections)
+    }
+
+    @Test
+    fun choosingTheCurrentSectionRemembersNothing() {
+        val viewModel = opened()
+        viewModel.onChoosingSectionChange(true)
+        viewModel.onSectionSelect("pantry")
+
+        assertEquals(EditOutcome.Unchanged, viewModel.onClose())
+        assertEquals(emptyMap<String, String>(), fixture.sectionChoices.sections)
+    }
+
+    @Test
+    fun choosingASectionKeepsTheOtherChangesOfTheDraft() {
+        val viewModel = opened()
+        viewModel.onIncrease()
+        viewModel.onNameChange("feijão carioca")
+        viewModel.onChoosingSectionChange(true)
+        viewModel.onSectionSelect("other")
+
+        assertEquals("feijão carioca", viewModel.editing.name)
+        assertEquals(Quantity(2.0), viewModel.editing.quantity)
+        assertEquals(other, viewModel.editing.section)
+    }
+
+    @Test
+    fun renamingToAnotherProductTakesTheSectionChosenBeforeForIt() = runTest {
+        fixture.sectionChoices.learn("banana", "pantry")
+        val viewModel = opened()
+
+        viewModel.onNameChange("Banana")
+
+        assertEquals(pantry, viewModel.editing.section)
+        viewModel.onClose()
+        assertEquals("banana", stored.productId)
+        assertEquals("pantry", stored.sectionId)
+    }
+
+    @Test
+    fun sectionChosenInThisEditWinsOverTheOneChosenBefore() = runTest {
+        fixture.sectionChoices.learn("banana", "pantry")
+        val viewModel = opened()
+        viewModel.onChoosingSectionChange(true)
+        viewModel.onSectionSelect("other")
+
+        viewModel.onNameChange("Banana")
+
+        assertEquals(other, viewModel.editing.section)
     }
 }
