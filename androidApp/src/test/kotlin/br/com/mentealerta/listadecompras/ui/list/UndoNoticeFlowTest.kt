@@ -6,6 +6,7 @@ import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
@@ -26,7 +27,7 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Aviso no meio da tela com "Desfazer" e "Certo" (#59, 2026-11-23): anunciado pelo TalkBack, fica
  * 15 s na tela (mais que o padrão, para o público 60+), some ao tocar num dos dois botões e um aviso
- * novo tira o anterior na hora.
+ * novo tira o anterior na hora. Desde 2026-11-25 abre num diálogo, que trava a tela de trás.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -71,6 +72,17 @@ class UndoNoticeFlowTest {
 
         compose.mainClock.advanceTimeBy(2_000)
         compose.onNodeWithText(finished).assertDoesNotExist()
+    }
+
+    @Test
+    fun noticeOpensInADialogThatClosesWithIt() {
+        show()
+        button("Terminei").performClick()
+        compose.onNode(isDialog() and hasAnyDescendant(hasText(finished))).assertExists()
+
+        button("Certo").performClick()
+
+        compose.onNode(isDialog()).assertDoesNotExist()
     }
 
     @Test

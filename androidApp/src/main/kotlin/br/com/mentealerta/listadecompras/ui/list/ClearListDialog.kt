@@ -22,6 +22,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.components.ComicCard
+import br.com.mentealerta.listadecompras.ui.components.DialogBackdrop
 import br.com.mentealerta.listadecompras.ui.components.PrimaryButton
 import br.com.mentealerta.listadecompras.ui.components.SecondaryButton
 import br.com.mentealerta.listadecompras.ui.components.UppercaseText
@@ -29,12 +30,14 @@ import br.com.mentealerta.listadecompras.ui.components.UppercaseText
 /**
  * Confirmação do "Jogar a lista fora" (#58), a única ação do app que pergunta antes (guia de
  * linguagem): "Jogar a lista fora? Os 12 produtos serão tirados." · **Sim, jogar fora** · **Não**.
- * Tocar fora da caixa ou no voltar do celular é o mesmo que "Não".
+ * Tocar fora da caixa ou no voltar do celular é o mesmo que "Não". O fundo fica escurecido e
+ * desfocado, como nos avisos ([DialogBackdrop], 2026-11-25).
  */
 @Composable
 fun ClearListDialog(total: Int, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     // Largura quase total: a caixa estreita padrão do diálogo apertaria a fonte em 200%.
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        DialogBackdrop()
         ClearListQuestion(
             total = total,
             onConfirm = onConfirm,

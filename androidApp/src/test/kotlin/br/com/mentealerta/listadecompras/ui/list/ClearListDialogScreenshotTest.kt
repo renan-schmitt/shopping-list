@@ -1,15 +1,11 @@
 package br.com.mentealerta.listadecompras.ui.list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
+import br.com.mentealerta.listadecompras.ui.components.BackdropSample
 import br.com.mentealerta.listadecompras.ui.theme.ShoppingListTheme
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
@@ -21,8 +17,8 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * Screenshots da confirmação do "Jogar a lista fora" (#58) com a fonte do sistema em 100%, 150% e
- * 200%, no modo claro e no escuro (plano §4.6). Só a caixa, sem a janela do diálogo, que o
- * Roborazzi não captura junto com a tela.
+ * 200%, no modo claro e no escuro (plano §4.6), por cima da lista desfocada e escurecida
+ * ([BackdropSample]): a janela do diálogo o Roborazzi não captura.
  *
  * Gravar: `./gradlew :androidApp:recordRoborazziDebug`
  * Conferir: `./gradlew :androidApp:verifyRoborazziDebug`
@@ -62,11 +58,8 @@ class ClearListDialogScreenshotTest {
     private fun capture(name: String) {
         compose.setContent {
             ShoppingListTheme {
-                // Fundo escurecido, como o diálogo aparece por cima da lista.
-                Box(
-                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f)),
-                    contentAlignment = Alignment.Center,
-                ) {
+                // Por cima da lista, desfocada e escurecida, como o diálogo aparece.
+                BackdropSample(behind = { ListContent(SampleListState) }) {
                     ClearListQuestion(total = 12, onConfirm = {}, onDismiss = {}, modifier = Modifier.padding(16.dp))
                 }
             }

@@ -1,9 +1,7 @@
 package br.com.mentealerta.listadecompras.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -15,7 +13,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.res.stringResource
@@ -23,6 +20,8 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import br.com.mentealerta.listadecompras.R
 import br.com.mentealerta.listadecompras.ui.theme.ComicTheme
 import kotlinx.coroutines.withTimeoutOrNull
@@ -32,13 +31,30 @@ import kotlinx.coroutines.withTimeoutOrNull
  * Ex.: "Feijão saiu da lista." · **Desfazer** · **Certo**. O mesmo aviso serve para outra ação no lugar
  * do **Desfazer** (ex.: **Conhecer a versão completa**, #89), mostrado com [showNotice].
  *
- * Uso: `UndoNoticeHost(state)` por cima da tela, mostrando o aviso com [showUndoNotice]. Não escurece
- * nem trava o resto da tela: tocar fora do aviso continua funcionando.
+ * Uso: `UndoNoticeHost(state)` na tela, mostrando o aviso com [showUndoNotice] ou [showNotice].
+ *
+ * Revisto em 2026-11-25: o aviso abre num diálogo, com o fundo escurecido e desfocado
+ * ([DialogBackdrop]), e nada atrás responde ao toque enquanto ele está na tela. Antes ele ficava solto
+ * sobre a tela e se misturava com ela, parecendo erro. Tocar fora da caixa ou no voltar do celular
+ * vale como **Certo**; no aviso que espera a pessoa responder ([showNotice] com
+ * `closesOnOutsideTap = false`, ex.: o do fim da primeira semana), tocar fora não faz nada.
  */
 @Composable
 fun UndoNoticeHost(state: SnackbarHostState, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        SnackbarHost(state) {
+    val data = state.currentSnackbarData ?: return
+    val visuals = data.visuals as? NoticeVisuals
+    Dialog(
+        onDismissRequest = {
+            visuals?.dismissedByPerson = true
+            data.dismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = visuals?.closesOnOutsideTap ?: true,
+        ),
+    ) {
+        DialogBackdrop()
+        SnackbarHost(state, modifier) {
             UndoNotice(it, modifier = Modifier.padding(horizontal = 24.dp))
         }
     }
@@ -122,7 +138,11 @@ enum class NoticeResult {
 }
 
 /** O aviso, lembrando se foi a pessoa que tocou em **Certo**: o `dismiss()` também fecha por código. */
-private class NoticeVisuals(override val message: String, override val actionLabel: String?) : SnackbarVisuals {
+private class NoticeVisuals(
+    override val message: String,
+    override val actionLabel: String?,
+    val closesOnOutsideTap: Boolean,
+) : SnackbarVisuals {
     override val withDismissAction = false
     override val duration = SnackbarDuration.Indefinite
     var dismissedByPerson = false
@@ -143,20 +163,22 @@ suspend fun SnackbarHostState.showUndoNotice(
         containsText = true,
         containsControls = true,
     ) ?: UNDO_NOTICE_MILLIS
-    return showNotice(message, actionText = null, timeoutMillis = timeout)
+    return showNotice(message, actionText = null, timeoutMillis = timeout, closesOnOutsideTap = true)
 }
 
 /**
  * Mostra o aviso com [actionText] (`null`: **Desfazer**) e **Certo**. Sem [timeoutMillis], fica até a
- * pessoa tocar num botão ou outro aviso tomar o lugar.
+ * pessoa tocar num botão ou outro aviso tomar o lugar. Com [closesOnOutsideTap], tocar fora da caixa
+ * vale como **Certo**.
  */
 suspend fun SnackbarHostState.showNotice(
     message: String,
     actionText: String?,
     timeoutMillis: Long? = null,
+    closesOnOutsideTap: Boolean = false,
 ): NoticeResult {
     currentSnackbarData?.dismiss()
-    val visuals = NoticeVisuals(message, actionText)
+    val visuals = NoticeVisuals(message, actionText, closesOnOutsideTap)
     // Sumir sozinho é cancelar o aviso "Indefinite": o SnackbarHostState tira ele da tela.
     val result = if (timeoutMillis == null) {
         showSnackbar(visuals)

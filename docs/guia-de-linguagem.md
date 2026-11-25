@@ -9,7 +9,7 @@
 3. **Botões dizem a ação concreta.** Nunca "OK" ou "Confirmar": usar "Sim, jogar fora" e "Não, deixar como está". Para só fechar um aviso, **Certo** (2026-11-23).
 4. **Nunca culpar a pessoa.** "Não entendi, pode falar de novo?", nunca "Erro no reconhecimento de voz".
 5. **Ícone sempre acompanhado de texto.** Nenhum botão só com ícone. Única exceção: a lixeira de cada produto em **Adicionados** e na conferência da lista colada, que se repete em cada linha; o TalkBack lê "Tirar leite da lista" (2026-11-23; conferência em 2026-11-24, #68).
-6. **Voltar atrás em vez de pedir confirmação.** Confirmação só para "Jogar a lista fora"; nas outras ações, aviso no meio da tela com **Desfazer** e **Certo** (2026-11-23, no lugar de "Ops, voltar", pedido no teste do app).
+6. **Voltar atrás em vez de pedir confirmação.** Confirmação só para "Jogar a lista fora"; nas outras ações, aviso no meio da tela com **Desfazer** e **Certo** (2026-11-23, no lugar de "Ops, voltar", pedido no teste do app). Desde 2026-11-25, o aviso fica em primeiro plano, com o fundo escurecido e desfocado e travado; tocar fora vale como **Certo**.
 7. **Datas relativas e por extenso:** "ontem", "há 12 dias", "semana passada".
 8. **Sem siglas e sem palavras em inglês.**
 9. **Caixa alta liberada em textos curtos** (logo, títulos, botões, rótulos, avisos de poucas palavras e nomes da lista) — faz parte do estilo quadrinhos. Frase com mais de uma linha, sempre em caixa normal. O texto é escrito em caixa normal e as maiúsculas vêm do estilo, para o TalkBack não soletrar palavras como se fossem siglas.

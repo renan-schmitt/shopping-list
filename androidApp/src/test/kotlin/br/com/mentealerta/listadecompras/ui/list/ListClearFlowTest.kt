@@ -111,7 +111,8 @@ class ListClearFlowTest {
 
         button("Sim, jogar fora").performClick()
 
-        compose.onNode(isDialog()).assertDoesNotExist()
+        // A pergunta fecha; o diálogo que fica é o do aviso (2026-11-25).
+        compose.onNodeWithText("Sim, jogar fora").assertDoesNotExist()
         assertTrue(fixture.items.isEmpty())
         assertNoticeShown("A lista foi jogada fora.")
         // Volta para a lista, vazia: sem o que mudar nem jogar fora.
