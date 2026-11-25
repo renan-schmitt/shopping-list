@@ -3,6 +3,7 @@ package br.com.mentealerta.listadecompras.domain
 import br.com.mentealerta.listadecompras.catalog.CatalogIndex
 import br.com.mentealerta.listadecompras.catalog.EmbeddedCatalog
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -13,12 +14,13 @@ import kotlin.test.assertTrue
 /** Opções da tela de adicionar enquanto a pessoa digita (#53). */
 class SearchProductsUseCaseTest {
     private val index = CatalogIndex(EmbeddedCatalog.catalog)
-    private val search = SearchProductsUseCase(index, ItemTextParser(index))
+    private val preferredTerms = InMemoryPreferredTermRepository()
+    private val search = SearchProductsUseCase(index, ItemTextParser(index), preferredTerms)
 
-    private fun foundIds(text: String) = search(text).found.map { it.match?.product?.id }
+    private suspend fun foundIds(text: String) = search(text).found.map { it.match?.product?.id }
 
     @Test
-    fun findsWithoutAccentsWhileTyping() {
+    fun findsWithoutAccentsWhileTyping() = runTest {
         assertEquals("apple", foundIds("maca").first())
         assertEquals("Maçã", search("maca").found.first().name)
         assertEquals("cassava", foundIds("macax").first())
@@ -26,7 +28,7 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun exactProductComesFirstWithoutTheUnknownOption() {
+    fun exactProductComesFirstWithoutTheUnknownOption() = runTest {
         val options = search("Leites")
 
         assertEquals("milk", options.found.first().match?.product?.id)
@@ -35,7 +37,7 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun regionalismKeepsTheTermThatMatched() {
+    fun regionalismKeepsTheTermThatMatched() = runTest {
         val first = search("macaxeiras").found.first()
 
         assertEquals("cassava", first.match?.product?.id)
@@ -43,7 +45,7 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun quantityGoesToEveryOption() {
+    fun quantityGoesToEveryOption() = runTest {
         val options = search("2 litros de leite")
         val twoLiters = Quantity(2.0, QuantityUnit.LITER)
 
@@ -53,7 +55,7 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun detailStaysOnTheProductAndTheWholeTextIsAlsoOffered() {
+    fun detailStaysOnTheProductAndTheWholeTextIsAlsoOffered() = runTest {
         val options = search("café da marca X")
 
         val first = options.found.first()
@@ -63,7 +65,7 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun unknownProductIsOfferedAsTyped() {
+    fun unknownProductIsOfferedAsTyped() = runTest {
         val options = search("2 pacotes de xyzzy")
 
         assertTrue(options.found.isEmpty())
@@ -74,7 +76,7 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun eachProductAppearsOnce() {
+    fun eachProductAppearsOnce() = runTest {
         listOf("maca", "leite", "pao", "arroz").forEach { text ->
             val ids = foundIds(text)
             assertEquals(ids.distinct(), ids, text)
@@ -82,13 +84,13 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun firstOptionIsTheTopFoundOrTheUnknown() {
+    fun firstOptionIsTheTopFoundOrTheUnknown() = runTest {
         assertEquals("apple", search("maca").first()?.match?.product?.id)
         assertEquals("xyzzy", search("xyzzy").first()?.name)
     }
 
     @Test
-    fun unknownComesFirstWhenOnlyApproximateProductsWereFound() {
+    fun unknownComesFirstWhenOnlyApproximateProductsWereFound() = runTest {
         val options = search("nescau")
 
         assertTrue(options.unknownFirst)
@@ -96,7 +98,7 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun productStartingWithTheTextStaysBeforeTheUnknown() {
+    fun productStartingWithTheTextStaysBeforeTheUnknown() = runTest {
         listOf("lei", "arr", "moid", "café da marca X").forEach { text ->
             assertFalse(search(text).unknownFirst, text)
         }
@@ -104,10 +106,28 @@ class SearchProductsUseCaseTest {
     }
 
     @Test
-    fun blankTextOrOnlyQuantityHasNoOptions() {
+    fun blankTextOrOnlyQuantityHasNoOptions() = runTest {
         assertTrue(search("").isEmpty())
         assertTrue(search("   ").isEmpty())
         assertTrue(search("2 kg").isEmpty())
         assertNull(search("").first())
+    }
+
+    @Test
+    fun approximateOptionsShowTheTermThePersonUses() = runTest {
+        assertEquals("macaxeira", search("macax").found.first().name)
+
+        preferredTerms.learn("cassava", "aipim")
+        val first = search("macax").found.first()
+
+        assertEquals("cassava", first.match?.product?.id)
+        assertEquals("aipim", first.name)
+    }
+
+    @Test
+    fun productNamedByTheTextKeepsTheTypedTerm() = runTest {
+        preferredTerms.learn("cassava", "aipim")
+
+        assertEquals("Mandioca", search("mandiocas").found.first().name)
     }
 }

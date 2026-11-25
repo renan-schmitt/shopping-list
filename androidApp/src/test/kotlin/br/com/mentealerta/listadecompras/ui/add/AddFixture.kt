@@ -10,6 +10,7 @@ import br.com.mentealerta.listadecompras.domain.AddItemsUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FindSameItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishedShopping
+import br.com.mentealerta.listadecompras.domain.LearnPreferredTermUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
@@ -24,6 +25,7 @@ import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
+import br.com.mentealerta.listadecompras.ui.FakePreferredTermRepository
 import br.com.mentealerta.listadecompras.voice.VoiceEvent
 import br.com.mentealerta.listadecompras.voice.VoicePreferences
 import br.com.mentealerta.listadecompras.voice.VoiceRecognizer
@@ -122,12 +124,16 @@ class AddFixture {
         override suspend fun undoFinishShopping(finished: FinishedShopping) = Unit
     }
 
+    /** Termos que a pessoa usa (#44), aprendidos ao pôr e ao renomear. */
+    val preferredTerms = FakePreferredTermRepository()
+    private val learnPreferredTerm get() = LearnPreferredTermUseCase(index, preferredTerms)
+
     fun viewModel(searchDispatcher: CoroutineDispatcher = Dispatchers.Unconfined) = AddViewModel(
-        SearchProductsUseCase(index, ItemTextParser(index)),
+        SearchProductsUseCase(index, ItemTextParser(index), preferredTerms),
         index,
-        AddItemsUseCase(repository),
+        AddItemsUseCase(repository, learnPreferredTerm),
         FindSameItemUseCase(repository),
-        EditItemUseCase(repository, undoStack),
+        EditItemUseCase(repository, undoStack, learnPreferredTerm),
         RemoveItemUseCase(repository, undoStack),
         RenameItemUseCase(ItemTextParser(index)),
         UndoLastActionUseCase(repository, undoStack),

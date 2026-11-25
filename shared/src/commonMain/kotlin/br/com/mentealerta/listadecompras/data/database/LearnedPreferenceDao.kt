@@ -14,6 +14,9 @@ internal interface LearnedPreferenceDao {
     @Query("SELECT term FROM preferred_term WHERE product_id = :productId")
     suspend fun getPreferredTerm(productId: String): String?
 
+    @Query("SELECT * FROM preferred_term WHERE product_id IN (:productIds)")
+    suspend fun getPreferredTerms(productIds: List<String>): List<PreferredTermEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertPreferredTerm(preferredTerm: PreferredTermEntity)
 

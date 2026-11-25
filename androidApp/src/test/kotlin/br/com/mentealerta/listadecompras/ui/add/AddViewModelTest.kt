@@ -73,6 +73,19 @@ class AddViewModelTest {
     }
 
     @Test
+    fun searchShowsTheTermThePersonUsesAndAddingTeachesIt() {
+        fixture.preferredTerms.terms["apple"] = "maçã gala"
+        val viewModel = fixture.viewModel()
+
+        viewModel.onQueryChange("mac")
+        assertEquals(listOf("maçã gala"), viewModel.uiState.value.found.map { it.name })
+
+        viewModel.onQueryChange("banana")
+        viewModel.onAdd(viewModel.uiState.value.found.first())
+        assertEquals("Banana", fixture.preferredTerms.terms["banana"])
+    }
+
+    @Test
     fun typingAgainHidesTheNotice() {
         val viewModel = fixture.viewModel()
         viewModel.onQueryChange("banana")

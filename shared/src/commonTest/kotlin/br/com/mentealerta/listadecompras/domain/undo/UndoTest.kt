@@ -1,6 +1,8 @@
 package br.com.mentealerta.listadecompras.domain.undo
 
 import app.cash.turbine.test
+import br.com.mentealerta.listadecompras.catalog.CatalogIndex
+import br.com.mentealerta.listadecompras.catalog.EmbeddedCatalog
 import br.com.mentealerta.listadecompras.data.EmbeddedCatalogRepository
 import br.com.mentealerta.listadecompras.data.RoomShoppingListRepository
 import br.com.mentealerta.listadecompras.data.StepClock
@@ -9,6 +11,8 @@ import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.FinishedShopping
+import br.com.mentealerta.listadecompras.domain.InMemoryPreferredTermRepository
+import br.com.mentealerta.listadecompras.domain.LearnPreferredTermUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
@@ -38,7 +42,11 @@ class UndoTest {
     private val undoStack = UndoStack(maxSize = 3)
 
     private val setChecked = SetItemCheckedUseCase(repository, undoStack)
-    private val edit = EditItemUseCase(repository, undoStack)
+    private val edit = EditItemUseCase(
+        repository,
+        undoStack,
+        LearnPreferredTermUseCase(CatalogIndex(EmbeddedCatalog.catalog), InMemoryPreferredTermRepository()),
+    )
     private val remove = RemoveItemUseCase(repository, undoStack)
     private val clear = ClearListUseCase(repository, undoStack)
     private val finish = FinishShoppingUseCase(repository, undoStack)

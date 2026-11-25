@@ -11,18 +11,25 @@ class SetItemCheckedUseCase(private val repository: ShoppingListRepository, priv
 
 /**
  * Grava a edição do item, guardando para o "Desfazer". Devolve `false` se o item não está mais
- * na lista; edição que não muda nada não entra na pilha.
+ * na lista; edição que não muda nada não entra na pilha. Nome trocado ensina o termo preferido
+ * do produto ([LearnPreferredTermUseCase]).
  */
-class EditItemUseCase(private val repository: ShoppingListRepository, private val undoStack: UndoStack) {
+class EditItemUseCase(
+    private val repository: ShoppingListRepository,
+    private val undoStack: UndoStack,
+    private val learnPreferredTerm: LearnPreferredTermUseCase,
+) {
     suspend operator fun invoke(item: ListItem): Boolean {
-        var found = false
+        var previous: ListItem? = null
         undoStack.record {
             repository.update(item)
-                ?.also { found = true }
+                ?.also { previous = it }
                 ?.takeIf { it != item }
                 ?.let(UndoableAction::ItemEdited)
         }
-        return found
+        val before = previous ?: return false
+        if (before.name != item.name) learnPreferredTerm(item)
+        return true
     }
 }
 

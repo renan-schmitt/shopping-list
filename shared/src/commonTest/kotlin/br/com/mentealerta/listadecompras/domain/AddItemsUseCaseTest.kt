@@ -20,8 +20,10 @@ import kotlin.test.assertNull
 class AddItemsUseCaseTest {
     private val database = createTestDatabase()
     private val repository = RoomShoppingListRepository(database, EmbeddedCatalogRepository(), StepClock())
-    private val addItems = AddItemsUseCase(repository)
-    private val parser = ItemTextParser(CatalogIndex(EmbeddedCatalog.catalog))
+    private val index = CatalogIndex(EmbeddedCatalog.catalog)
+    private val preferredTerms = InMemoryPreferredTermRepository()
+    private val addItems = AddItemsUseCase(repository, LearnPreferredTermUseCase(index, preferredTerms))
+    private val parser = ItemTextParser(index)
 
     @AfterTest
     fun tearDown() {
@@ -86,5 +88,12 @@ class AddItemsUseCaseTest {
     fun addingNothingChangesNothing() = runTest {
         assertEquals(emptyList(), addItems(emptyList()))
         assertEquals(emptyList(), repository.observeSections().first())
+    }
+
+    @Test
+    fun addingTeachesTheTermThePersonUses() = runTest {
+        addItems(parser.parseAll("2 kg de macaxeiras, cacetinho da padaria e xyzzy"))
+
+        assertEquals(mapOf("cassava" to "macaxeira", "french_bread" to "cacetinho"), preferredTerms.terms)
     }
 }

@@ -5,12 +5,19 @@ import br.com.mentealerta.listadecompras.normalization.ParsedItem
 
 /**
  * Põe na lista os produtos entendidos no texto ou na fala ([ParsedItem]), na ordem em que vieram.
- * Produto desconhecido entra normalmente, em "Outros" (ver [toListItem]).
+ * Produto desconhecido entra normalmente, em "Outros" (ver [toListItem]). O nome usado ensina o
+ * termo preferido do produto ([LearnPreferredTermUseCase]).
  */
-class AddItemsUseCase(private val repository: ShoppingListRepository) {
+class AddItemsUseCase(
+    private val repository: ShoppingListRepository,
+    private val learnPreferredTerm: LearnPreferredTermUseCase,
+) {
     /** Devolve os itens como entraram na lista. */
     suspend operator fun invoke(parsedItems: List<ParsedItem>): List<ListItem> =
-        parsedItems.map { it.toListItem() }.onEach { repository.add(it) }
+        parsedItems.map { it.toListItem() }.onEach {
+            repository.add(it)
+            learnPreferredTerm(it)
+        }
 }
 
 /**

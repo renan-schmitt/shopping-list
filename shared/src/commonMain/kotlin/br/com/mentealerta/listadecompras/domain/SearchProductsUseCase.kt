@@ -41,21 +41,30 @@ data class ProductOptions(
  *    ("nescau" → **Pôr “nescau” na lista** antes de Nescafé; "lei" → Leite continua primeiro).
  *
  * Produto do catálogo leva o nome ou o sinônimo do catálogo que bateu, com acento e no singular:
- * "maca" → Maçã, "macaxeiras" → macaxeira (regionalismo de Mandioca).
+ * "maca" → Maçã, "macaxeiras" → macaxeira (regionalismo de Mandioca). Nas opções da busca
+ * aproximada, o termo que a pessoa costuma usar ([PreferredTermRepository], plano §1.3) vem no
+ * lugar: quem já pôs "cacetinho" na lista vê "cacetinho" ao digitar "pão". O produto que o texto
+ * já nomeia fica com o termo digitado.
  */
-class SearchProductsUseCase(private val index: CatalogIndex, private val parser: ItemTextParser) {
-    operator fun invoke(text: String): ProductOptions {
+class SearchProductsUseCase(
+    private val index: CatalogIndex,
+    private val parser: ItemTextParser,
+    private val preferredTermRepository: PreferredTermRepository,
+) {
+    suspend operator fun invoke(text: String): ProductOptions {
         val parsed = parser.parse(text) ?: return ProductOptions.NONE
         // O texto depois da quantidade: o nome e o detalhe, ou o nome todo do desconhecido.
         val typed = listOfNotNull(parsed.name, parsed.detail).joinToString(" ")
 
         val results = index.search(typed, limit = MAX_RESULTS)
+        val preferredTerms = preferredTermRepository.preferredTerms(results.map { it.product.id })
         val found = buildList {
             parsed.match?.let { add(parsed.copy(name = it.catalogName())) }
             results.forEach { result ->
                 val match = ProductMatch(result.product, result.term)
                 if (none { it.match?.product?.id == result.product.id }) {
-                    add(ParsedItem(match.catalogName(), match, parsed.quantity, detail = null))
+                    val name = preferredTerms[result.product.id] ?: match.catalogName()
+                    add(ParsedItem(name, match, parsed.quantity, detail = null))
                 }
             }
         }.take(MAX_RESULTS)

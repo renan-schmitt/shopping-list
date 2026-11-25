@@ -56,8 +56,8 @@ O que precisa existir na primeira versão publicada.
 - [ ] Normalização: minúsculas, sem acento, plural → singular, sinônimos (maça = maçã = maçãs)
 - [ ] Regionalismos do Brasil inteiro (aipim/mandioca/macaxeira, mexerica/bergamota/tangerina, pão francês/cacetinho/pão de sal, bolacha/biscoito...)
 - [ ] Produtos regionais (flocão, goma de tapioca, farinha d'água, erva-mate, queijo coalho...)
-- [ ] Exibir sempre o nome que a pessoa usou; internamente mapeado ao produto canônico (mesmo ícone, categoria e histórico)
-- [ ] Aprender localmente o termo preferido da pessoa para as sugestões
+- [x] Exibir sempre o nome que a pessoa usou; internamente mapeado ao produto canônico (mesmo ícone, categoria e histórico) — 2026-11-25, #44: a lista e o histórico guardam o nome usado em cada compra
+- [x] Aprender localmente o termo preferido da pessoa para as sugestões — 2026-11-25, #44: aprende ao pôr na lista (digitando, falando ou colando) e ao trocar o nome, só quando o nome é exatamente um nome ou sinônimo do catálogo para aquele produto ("cacetinho" sim, "cacetinho da padaria" não), com a grafia do catálogo; vale o último usado. A busca mostra esse termo nas opções aproximadas ("pão" → cacetinho, com o ícone do pão francês); o produto que o texto já nomeia fica com o termo digitado. As sugestões da previsão usam o mesmo `PreferredTermRepository`
 
 ### 1.4 Categorias
 - [ ] Agrupamento automático pela categoria do catálogo

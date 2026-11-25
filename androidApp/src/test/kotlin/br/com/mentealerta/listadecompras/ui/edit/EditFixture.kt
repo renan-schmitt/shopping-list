@@ -10,6 +10,7 @@ import br.com.mentealerta.listadecompras.domain.ClearListUseCase
 import br.com.mentealerta.listadecompras.domain.EditItemUseCase
 import br.com.mentealerta.listadecompras.domain.FinishShoppingUseCase
 import br.com.mentealerta.listadecompras.domain.FinishedShopping
+import br.com.mentealerta.listadecompras.domain.LearnPreferredTermUseCase
 import br.com.mentealerta.listadecompras.domain.ListItem
 import br.com.mentealerta.listadecompras.domain.ListItemId
 import br.com.mentealerta.listadecompras.domain.ListSection
@@ -27,6 +28,7 @@ import br.com.mentealerta.listadecompras.domain.ShoppingListRepository
 import br.com.mentealerta.listadecompras.domain.UndoLastActionUseCase
 import br.com.mentealerta.listadecompras.domain.undo.UndoStack
 import br.com.mentealerta.listadecompras.normalization.ItemTextParser
+import br.com.mentealerta.listadecompras.ui.FakePreferredTermRepository
 import br.com.mentealerta.listadecompras.ui.fullversion.FakePremiumRepository
 import br.com.mentealerta.listadecompras.ui.history.HistoryViewModel
 import br.com.mentealerta.listadecompras.ui.list.AdsFixture
@@ -164,11 +166,14 @@ class EditFixture {
     /** Anúncios (#89): primeira semana, a não ser que o teste mude. */
     val ads = AdsFixture(premium, repository)
 
+    /** Termos que a pessoa usa (#44), aprendidos ao renomear. */
+    val preferredTerms = FakePreferredTermRepository()
+
     fun editViewModel() = EditViewModel(
         ObserveListUseCase(repository),
         index,
         RenameItemUseCase(ItemTextParser(index)),
-        EditItemUseCase(repository, undoStack),
+        EditItemUseCase(repository, undoStack, LearnPreferredTermUseCase(index, preferredTerms)),
         RemoveItemUseCase(repository, undoStack),
     )
 
