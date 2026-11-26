@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista de Compras — paleta do modo escuro (#9)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Lexend+Deca:wght@700&display=swap">
+<style>
+  /*
+   * Cada tema define as mesmas variáveis, na ordem do ColorScheme do app:
+   *   --fundo      background (onde vai a retícula)
+   *   --papel      surface (folha da lista, cartões)
+   *   --tinta      onSurface / onBackground (texto)
+   *   --contorno   outline (contornos grossos)
+   *   --sombra     cor da sombra sólida deslocada
+   *   --riscado    onSurfaceVariant (texto riscado)
+   *   --linha      outlineVariant (divisórias)
+   *   --verde      primary (topo, botão principal, marca)
+   *   --sobre-verde onPrimary
+   *   --marca      fundo da marca de riscar vazia
+   *   --pontos     cor dos pontinhos da retícula
+   */
+  .claro {
+    --fundo: #F4E7C2; --papel: #FBF3DC; --tinta: #141414; --contorno: #141414;
+    --sombra: #141414; --riscado: #66625A; --linha: #E2D5B3; --verde: #2E6B3A;
+    --sobre-verde: #FFFFFF; --marca: #FFFFFF; --pontos: rgba(0,0,0,.13);
+  }
+  .op1 {
+    --fundo: #14120F; --papel: #26231E; --tinta: #F4EBD3; --contorno: #F4EBD3;
+    --sombra: #000000; --riscado: #A9A291; --linha: #433E35; --verde: #7CC08A;
+    --sobre-verde: #141414; --marca: #26231E; --pontos: rgba(255,255,255,.07);
+  }
+  .op2 {
+    --fundo: #1C1A16; --papel: #26241F; --tinta: #FBF3DC; --contorno: #FBF3DC;
+    --sombra: #FBF3DC; --riscado: #ADA796; --linha: #3D3930; --verde: #8CC79A;
+    --sobre-verde: #141414; --marca: #26241F; --pontos: rgba(255,255,255,.07);
+  }
+  .op3 {
+    --fundo: #14120F; --papel: #26231E; --tinta: #F4EBD3; --contorno: #7CC08A;
+    --sombra: #000000; --riscado: #A9A291; --linha: #433E35; --verde: #7CC08A;
+    --sobre-verde: #141414; --marca: #26231E; --pontos: rgba(255,255,255,.07);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    font-family: 'Lexend Deca', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: .04em;
+    background: #8A8578;
+    color: #141414;
+  }
+  h1.pagina {
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    letter-spacing: .04em;
+    font-size: 44px;
+    text-align: center;
+    margin: 0 0 8px;
+  }
+  p.intro { max-width: 900px; margin: 0 auto 32px; text-align: center; font-size: 17px; line-height: 1.5; letter-spacing: 0; }
+  .grade { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; align-items: flex-start; }
+
+  .opcao {
+    width: 420px; max-width: 100%;
+    padding: 18px 16px 20px;
+    border-radius: 20px;
+    background-color: var(--fundo);
+    background-image: radial-gradient(var(--pontos) 1.4px, transparent 1.6px);
+    background-size: 12px 12px;
+    color: var(--tinta);
+  }
+  .rotulo {
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: .04em;
+    margin: 0 0 4px 4px;
+  }
+  .resumo { font-size: 15px; line-height: 1.4; letter-spacing: 0; margin: 0 4px 16px; opacity: .9; }
+
+  .celular {
+    background: var(--papel);
+    border: 4px solid var(--contorno);
+    border-radius: 28px;
+    box-shadow: 8px 8px 0 var(--sombra);
+    overflow: hidden;
+  }
+  .topo {
+    padding: 14px 18px 10px;
+    border-bottom: 4px solid var(--contorno);
+    background: var(--verde);
+  }
+  .marca-familia { font-size: 14px; text-transform: uppercase; color: var(--sobre-verde); }
+  .logo {
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    font-size: 44px;
+    letter-spacing: .05em;
+    line-height: 1;
+    color: #fff;
+    -webkit-text-stroke: 2px #141414;
+    paint-order: stroke fill;
+    text-shadow: 3px 3px 0 #141414;
+  }
+
+  .lista { padding: 6px 14px 14px; }
+  .secao h2 {
+    display: inline-block;
+    margin: 14px 0 6px;
+    font-family: Bangers, Impact, sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: .06em;
+    padding: 4px 12px 0;
+    background: var(--tinta);
+    color: var(--papel);
+    transform: rotate(-1.5deg);
+  }
+  .item {
+    display: flex; align-items: center; gap: 12px;
+    min-height: 72px; padding: 6px 2px;
+    border-bottom: 2px dashed var(--linha);
+    text-transform: uppercase;
+  }
+  .marca {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 50%;
+    border: 3px solid var(--contorno);
+    background: var(--marca);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sobre-verde); font-size: 24px;
+  }
+  .item.riscado .marca { background: var(--verde); box-shadow: 2px 2px 0 var(--sombra); }
+  .nome { flex-grow: 1; font-size: 26px; line-height: 1.1; }
+  .item.riscado .nome {
+    color: var(--riscado);
+    text-decoration: line-through;
+    text-decoration-thickness: 4px;
+    text-decoration-color: var(--riscado);
+  }
+  .item img { width: 48px; height: 48px; flex-shrink: 0; }
+  .item.riscado img { opacity: .55; }
+
+  .botoes { display: flex; gap: 12px; padding: 16px 14px 18px; }
+  .botao {
+    flex: 1; height: 72px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Bangers, Impact, sans-serif; font-weight: 400;
+    font-size: 30px; letter-spacing: .06em; text-transform: uppercase;
+    border: 4px solid var(--contorno);
+    border-radius: 18px;
+    box-shadow: 5px 5px 0 var(--sombra);
+  }
+  .botao.principal { background: var(--verde); color: var(--sobre-verde); }
+  .botao.secundario { background: var(--papel); color: var(--verde); }
+
+  .aviso {
+    margin: 22px 6px 0;
+    padding: 14px 16px;
+    background: var(--papel);
+    border: 4px solid var(--contorno);
+    border-radius: 18px;
+    box-shadow: 5px 5px 0 var(--sombra);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .aviso span { flex: 1; font-size: 20px; letter-spacing: .02em; }
+  .aviso .botao { flex: 0 0 auto; height: 64px; padding: 0 16px; font-size: 26px; }
+
+  table.contraste {
+    width: 100%; margin-top: 22px;
+    border-collapse: collapse;
+    font-size: 14px; letter-spacing: 0;
+    background: var(--papel);
+    border: 3px solid var(--contorno);
+  }
+  table.contraste td { padding: 6px 8px; border-bottom: 1px solid var(--linha); }
+  table.contraste td.taxa { text-align: right; white-space: nowrap; }
+  .amostra { display: inline-block; width: 14px; height: 14px; border: 1px solid #888; vertical-align: -2px; margin-right: 2px; }
+  .falha { color: #E0533D; }
+  table.cores { width: 100%; margin-top: 10px; font-size: 13px; letter-spacing: 0; border-collapse: collapse; }
+  table.cores td { padding: 3px 4px; }
+  code { font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body>
+
+<h1 class="pagina">Modo escuro: qual paleta?</h1>
+<p class="intro">
+  A mesma lista no claro (já decidido) e em três caminhos para o escuro. O problema central:
+  no claro, contornos e sombras são <b>pretos</b>; no fundo escuro eles somem.
+  Embaixo de cada tela, o contraste dos pares que o app testa (mínimo 4,5:1) e os códigos de cor.
+</p>
+
+<div class="grade" id="grade"></div>
+
+<template id="tela">
+  <div class="opcao">
+    <div class="rotulo"></div>
+    <p class="resumo"></p>
+    <div class="celular">
+      <div class="topo">
+        <div class="marca-familia">Mente Alerta</div>
+        <div class="logo">Lista de Compras</div>
+      </div>
+      <div class="lista">
+        <div class="secao">
+          <h2>Hortifrúti</h2>
+          <div class="item"><div class="marca"></div><div class="nome">Tomate</div><img src="../../catalog/fluent-svg/Tomato.svg" alt=""></div>
+          <div class="item"><div class="marca"></div><div class="nome">Banana prata</div><img src="../../catalog/fluent-svg/Banana.svg" alt=""></div>
+        </div>
+        <div class="secao">
+          <h2>Mercearia</h2>
+          <div class="item"><div class="marca"></div><div class="nome">Café</div><img src="../../catalog/own-icons/coffee_package.svg" alt=""></div>
+          <div class="item"><div class="marca"></div><div class="nome">Feijão</div><img src="../../catalog/own-icons/beans_package.svg" alt=""></div>
+          <div class="item"><div class="marca"></div><div class="nome">Leite</div><img src="../../catalog/own-icons/milk_carton.svg" alt=""></div>
+          <div class="item"><div class="marca"></div><div class="nome">Detergente</div><img src="../../catalog/own-icons/dish_detergent_bottle.svg" alt=""></div>
+        </div>
+        <div class="secao">
+          <h2>Já peguei</h2>
+          <div class="item riscado"><div class="marca">✓</div><div class="nome">Pão francês</div><img src="../../catalog/fluent-svg/Bread.svg" alt=""></div>
+          <div class="item riscado"><div class="marca">✓</div><div class="nome">Ovos</div><img src="../../catalog/fluent-svg/Egg.svg" alt=""></div>
+        </div>
+        <div class="aviso"><span>Tirei o café da lista.</span><div class="botao secundario">Desfazer</div></div>
+      </div>
+      <div class="botoes">
+        <div class="botao secundario">Terminei</div>
+        <div class="botao principal">Adicionar</div>
+      </div>
+    </div>
+    <table class="contraste"></table>
+    <table class="cores"></table>
+  </div>
+</template>
+
+<script>
+  const opcoes = [
+    { classe: 'claro', nome: 'Claro (atual)', resumo: 'Papel creme, tinta preta, verde-folha. Referência.' },
+    { classe: 'op1', nome: '1 · Papel invertido (escolhida, 2026-11-26)',
+      resumo: 'Fundo quase preto quente, papel carvão, texto e contornos em creme. Sombras em preto puro, mais escuras que o fundo: dão profundidade sem brilho. Verde-folha clareado, com texto escuro por cima.' },
+    { classe: 'op2', nome: '2 · Provisória de hoje',
+      resumo: 'Igual à 1, mas as sombras são creme como os contornos. Fica bem marcado, mas a sombra clara parece um brilho e pesa no escuro.' },
+    { classe: 'op3', nome: '3 · Contorno verde',
+      resumo: 'Contornos em verde-folha claro, sombras pretas. Mais cor, mas o verde deixa de ser só destaque e os itens perdem a hierarquia.' },
+  ];
+
+  const pares = [
+    ['texto da lista e dos avisos', '--tinta', '--papel'],
+    ['texto riscado', '--riscado', '--papel'],
+    ['botão principal (Adicionar)', '--sobre-verde', '--verde'],
+    ['botão secundário (Terminei, Desfazer)', '--verde', '--papel'],
+    ['título de seção', '--papel', '--tinta'],
+    ['contorno sobre o fundo', '--contorno', '--fundo'],
+    ['contorno sobre o papel', '--contorno', '--papel'],
+    ['sombra sobre o fundo', '--sombra', '--fundo'],
+  ];
+
+  const nomes = {
+    '--fundo': 'fundo', '--papel': 'papel', '--tinta': 'tinta', '--contorno': 'contorno',
+    '--sombra': 'sombra', '--riscado': 'riscado', '--linha': 'divisória',
+    '--verde': 'verde-folha', '--sobre-verde': 'texto no verde',
+  };
+
+  function lum(hex) {
+    const c = [1, 3, 5].map(i => parseInt(hex.substr(i, 2), 16) / 255)
+      .map(v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  function contraste(a, b) {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  }
+
+  const grade = document.getElementById('grade');
+  const tpl = document.getElementById('tela');
+  for (const op of opcoes) {
+    const no = tpl.content.firstElementChild.cloneNode(true);
+    no.classList.add(op.classe);
+    no.querySelector('.rotulo').textContent = op.nome;
+    no.querySelector('.resumo').textContent = op.resumo;
+    grade.appendChild(no);
+    const css = getComputedStyle(no);
+    const cor = v => css.getPropertyValue(v).trim().toUpperCase();
+
+    const tc = no.querySelector('table.contraste');
+    for (const [rotulo, a, b] of pares) {
+      const r = contraste(cor(a), cor(b));
+      // Contorno é elemento gráfico: mínimo 3:1 (WCAG 1.4.11); texto: 4,5:1.
+      // A sombra é decorativa (o contorno já desenha a forma): só informativa.
+      const decorativa = a === '--sombra';
+      const grafico = a === '--contorno';
+      const min = decorativa ? 0 : grafico ? 3 : 4.5;
+      const tr = tc.insertRow();
+      tr.insertCell().innerHTML =
+        `<span class="amostra" style="background:${cor(a)}"></span><span class="amostra" style="background:${cor(b)}"></span> ${rotulo}`;
+      const td = tr.insertCell();
+      td.className = 'taxa' + (r < min ? ' falha' : '');
+      td.textContent = `${r.toFixed(1).replace('.', ',')}:1 ${decorativa ? '(decorativa)' : r < min ? '✗' : '✓'}${grafico ? ' (mín. 3)' : ''}`;
+    }
+
+    const tcores = no.querySelector('table.cores');
+    const chaves = Object.keys(nomes);
+    for (let i = 0; i < chaves.length; i += 3) {
+      const tr = tcores.insertRow();
+      for (const k of chaves.slice(i, i + 3)) {
+        tr.insertCell().innerHTML = `<span class="amostra" style="background:${cor(k)}"></span> ${nomes[k]} <code>${cor(k)}</code>`;
+      }
+    }
+  }
+</script>
+</body>
+</html>
