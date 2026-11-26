@@ -393,7 +393,14 @@ shopping-list/
   - **Prioridade 3** (ocasional ou regional): 52 desenhos, 72 produtos, a maioria frutas regionais.
 - A prioridade é uma estimativa, sem dado de compra real; quando houver analytics, revisar.
 - A fila passa da estimativa de 50–100 ícones. Fazer a prioridade 1 e depois decidir até onde ir na 2; o resto continua com o ícone da seção.
-- Os 239 aproximados ficam fora da fila: a revisão deles é a #24.
+- Os 239 aproximados ficam fora da fila: a revisão deles é a #24 (abaixo).
+
+**Revisão dos aproximados (2026-11-26, #24).** Depois das levas #25–#129, o catálogo tem **271 aproximados** (213 Fluent e 58 próprios), não mais os 21 do primeiro levantamento. Cada um caiu num de três grupos:
+- **Manter (197 produtos):** o ícone mostra a mesma coisa num tipo genérico, e o nome ao lado diz qual é. Exemplos: os cortes de carne com o bife, os queijos amarelos com o queijo, as folhas e as ervas, os comprimidos, os pães e os bolos, os peixes inteiros, as rações com a cara do bicho, e os aproximados dos ícones próprios (multiuso com o detergente, apresuntado com o presunto).
+- **Desenhar (32 desenhos):** o ícone mostra outra coisa, não o que se pega na prateleira (um prato, um copo, um uso), e o produto é de compra frequente. Exemplos: pão francês (era baguete), pacote de macarrão (era o prato), pacote de biscoito (era o cookie), garrafa e galão de água (era a torneira), garrafa PET de refrigerante (era o copo), frango inteiro e peito na bandeja (era a coxa), pé de alface, salsichas, queijo minas, saco de lixo, colírio, pilha-botão.
+- **Variação de cor (8 desenhos):** um SVG que já existe com outra cor, de custo baixo: feijão preto, ketchup, mostarda, açúcar escuro (mascavo e demerara), pote de tempero escuro (pimenta-do-reino, cominho, canela, cravo, noz-moscada), repolho roxo, cebola roxa (recolorida do Fluent, MIT) e caixa de cereal (da caixa de aveia).
+- **Na fila:** os 40 desenhos novos cobrem 71 produtos, com **17 de prioridade 1**, 20 de prioridade 2 e 3 de prioridade 3. Lentilha, grão-de-bico e gim entraram em desenhos que já estavam na fila (pacote de grãos e garrafa de cachaça). A fila passa a ter **149 desenhos** (17, 77 e 55 por prioridade), e a prioridade 1 volta a ser a próxima leva.
+- Colorau e páprica ficam com o pote laranja, que já é a cor deles; feijão vermelho, branco e fradinho ficam com o pacote carioca, por serem compra rara; a bebida de soja e a vegetal seguem com o copo de leite (#26).
 
 **Descartados:** Noto Emoji (mesmas lacunas, estilo mais simples), OpenMoji (CC BY-SA obriga adaptações na mesma licença; estilo menos atraente), conjunto 100% próprio (custo e prazo).
 

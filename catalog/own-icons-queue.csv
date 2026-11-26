@@ -1,4 +1,21 @@
 icon_id,name,priority,products,notes
+french_bread,Pão francês,1,french_bread,Pãozinho; hoje baguete
+pasta_package,Pacote de macarrão,1,pasta;spaghetti;fusilli;penne;soup_pasta,
+cookie_package,Pacote de biscoito,1,biscuit;cream_cracker;water_cracker;cornstarch_cookie;sandwich_cookie;wafer;whole_wheat_cookie,
+condensed_milk_box,Caixinha de leite condensado,1,condensed_milk,
+black_beans_package,Pacote de feijão preto,1,black_beans,Variação de cor do beans_package
+lettuce_head,Pé de alface,1,lettuce,
+sweet_potato,Batata-doce crua,1,sweet_potato,
+zucchini,Abobrinha,1,zucchini,
+whole_chicken,Frango inteiro,1,whole_chicken;free_range_chicken;turkey,
+chicken_breast_tray,Peito de frango na bandeja,1,chicken_breast;chicken_fillet,
+hot_dog_sausages,Salsichas,1,hot_dog_sausage,
+minas_cheese,Queijo minas,1,minas_cheese,Branco e redondo
+water_bottle,Garrafa de água,1,water;sparkling_water,
+water_jug,Galão de água,1,water_jug,Galão de 20 L
+soda_bottle,Garrafa PET de refrigerante,1,soda;guarana;iced_tea,
+trash_bag_roll,Rolo de saco de lixo,1,trash_bag,
+eye_drops,Frasco de colírio,1,eye_drops,
 mouthwash,Enxaguante bucal,2,mouthwash,
 cotton,Algodão,2,cotton;cotton_swab,
 bandage,Gaze e esparadrapo,2,gauze;medical_tape;elastic_bandage,
@@ -24,7 +41,7 @@ cake_mix_box,Caixa de mistura para bolo,2,cake_mix;pudding_mix;gelatin,
 cassava_starch_bag,Saco de polvilho,2,sweet_cassava_starch;sour_cassava_starch;sago;breadcrumbs,
 toast_pack,Pacote de torrada,2,toast;polvilho_biscuit;rosquinha,
 snack_bag,Pacote de salgadinho,2,potato_chips;straw_potatoes;packaged_snack,
-seeds_pack,Pacote de grãos,2,chia;flaxseed;textured_soy;dried_peas;hominy,
+seeds_pack,Pacote de grãos,2,chia;flaxseed;textured_soy;dried_peas;hominy;lentil;chickpea,
 soy_sauce,Molho shoyu,2,soy_sauce;worcestershire_sauce;hot_sauce,Garrafinha escura
 palm_oil,Azeite de dendê,2,palm_oil,
 lard,Banha,2,lard,
@@ -56,6 +73,26 @@ arracacha,Mandioquinha,2,arracacha,
 taro,Inhame,2,taro;yam,
 radish,Rabanete,2,radish;turnip,
 leek,Alho-poró,2,leek;celery;fennel,
+tea_box,Caixinha de chá,2,tea;chamomile_tea;boldo_tea;mate_tea,
+instant_coffee_jar,Vidro de café solúvel,2,instant_coffee,
+instant_noodles_pack,Pacotinho de macarrão instantâneo,2,instant_noodles;instant_soup,
+coconut_milk_bottle,Vidrinho de leite de coco,2,coconut_milk,
+ketchup_bottle,Bisnaga de ketchup,2,ketchup,Variação de cor da sauce_squeeze_bottle
+mustard_bottle,Bisnaga de mostarda,2,mustard,Variação de cor da sauce_squeeze_bottle
+brown_sugar_package,Pacote de açúcar escuro,2,brown_sugar;demerara_sugar,Variação de cor do sugar_package
+dark_spice_jar,Pote de tempero escuro,2,black_pepper;cumin;cinnamon;clove;nutmeg,Variação de cor do spice_jar
+collard_bunch,Maço de couve,2,collard_greens,
+green_bean,Vagem,2,green_bean,
+green_coconut,Coco verde,2,green_coconut;coconut_water,
+red_cabbage,Repolho roxo,2,red_cabbage,Variação de cor do cabbage
+red_onion,Cebola roxa,2,red_onion,Variação de cor da cebola do Fluent (MIT)
+fish_fillet,Filé de peixe,2,fish_fillet;tilapia_fillet;frozen_fish,
+burger_patty_box,Caixa de hambúrguer congelado,2,hamburger,
+button_battery,Pilha-botão,2,hearing_aid_battery,
+shampoo_bottle,Frasco de xampu,2,shampoo;conditioner;liquid_soap,
+rubber_gloves,Luva de borracha,2,cleaning_gloves,
+insecticide_can,Inseticida em spray,2,insecticide,
+matchbox,Caixa de fósforo,2,matches,
 scarlet_eggplant,Jiló,3,scarlet_eggplant,
 gherkin,Maxixe,3,gherkin,
 brussels_sprout,Couve-de-bruxelas,3,brussels_sprout,
@@ -90,7 +127,7 @@ cuca,Cuca,3,cuca,
 honey_cake,Pão de mel,3,honey_cake,
 sprinkles,Granulado,3,sprinkles,
 chewing_gum,Chiclete,3,chewing_gum,
-liquor_bottle,Garrafa de cachaça,3,cachaca;vodka;liqueur,
+liquor_bottle,Garrafa de cachaça,3,cachaca;vodka;liqueur;gin,
 canned_drink,Lata de bebida,3,energy_drink;sports_drink;tonic_water,
 ice_pop,Geladinho,3,ice_pop,
 hair_dye,Tintura de cabelo,3,hair_dye,
@@ -108,3 +145,6 @@ pet_collar,Coleira,3,pet_collar,
 pet_bowl,Comedouro,3,pet_bowl,
 pet_toy,Brinquedo para pet,3,pet_toy,
 adhesive_tape,Fita adesiva,3,adhesive_tape;glue,
+cereal_box,Caixa de cereal,3,breakfast_cereal;granola,Variação da oats_box
+salt_cod,Bacalhau salgado,3,cod,
+popsicle,Picolé,3,popsicle,
