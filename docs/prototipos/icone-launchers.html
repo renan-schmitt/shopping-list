@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ícone nos launchers e tela de abertura</title>
+<!--
+  Conferência da #74. Usa as camadas reais do ícone adaptativo do app:
+  a arte (androidApp/.../mipmap-xxxhdpi/ic_launcher_foreground.png, 108dp) sobre o azul-petróleo #02979F.
+  Cada launcher mostra só o miolo de 72dp, recortado no formato dele.
+-->
+<style>
+  :root { --tinta: #141414; --petroleo: #02979F; --creme: #F4E7C2; --escuro: #1C1A16; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px 64px;
+    font-family: system-ui, sans-serif; color: var(--tinta); background: var(--creme);
+  }
+  h1 { text-align: center; font-size: 32px; margin: 0 0 8px; }
+  p.sub { text-align: center; margin: 0 0 32px; font-size: 18px; }
+  h2 { font-size: 22px; margin: 40px 0 12px; }
+  section { max-width: 1100px; margin: 0 auto; }
+
+  /* Ícone adaptativo: a camada de 108dp aparece ampliada 108/72 e centrada; o formato recorta o miolo. */
+  .ic {
+    --t: 56px;
+    width: var(--t); height: var(--t); flex: none;
+    background: url("../../androidApp/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png") center / 150% no-repeat,
+                var(--petroleo);
+  }
+  .circulo     { border-radius: 50%; }
+  .squircle    { border-radius: 38%; }
+  .arredondado { border-radius: 20%; }
+  .gota        { border-radius: 50% 50% 12% 50%; }
+  .quadrado    { border-radius: 0; }
+
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; }
+  .papel {
+    padding: 20px 12px; border: 4px solid var(--tinta); border-radius: 24px;
+    display: flex; gap: 18px; align-items: flex-end; justify-content: center; flex-wrap: wrap;
+  }
+  .papel.claro  { background: linear-gradient(160deg, #cfe3f5, #f5e7d0); }
+  .papel.escuro { background: linear-gradient(160deg, #1b2433, #3a2a3f); color: #fff; }
+  .papel h3 { flex-basis: 100%; margin: 0; font-size: 16px; text-align: center; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 84px; }
+  .app span { font-size: 13px; text-align: center; }
+
+  /* Tela de abertura: ícone de 240dp com o círculo de 160dp (proporção da API de splash do Android). */
+  .telas { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; }
+  .telas figure { margin: 0; text-align: center; font-size: 16px; }
+  .celular {
+    width: 216px; height: 456px; margin: 0 auto 8px;
+    border: 6px solid var(--tinta); border-radius: 32px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .celular.claro  { background: var(--creme); }
+  .celular.escuro { background: var(--escuro); }
+  .celular .ic { --t: 96px; border-radius: 50%; }
+
+  .nota { max-width: 1100px; margin: 40px auto 0; font-size: 16px; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h1>Ícone nos launchers</h1>
+  <p class="sub">O mesmo ícone adaptativo recortado no formato de cada celular, em tamanho de tela</p>
+
+  <section>
+    <div class="grade" id="grade"></div>
+
+    <h2>Tela de abertura</h2>
+    <div class="telas">
+      <figure><div class="celular claro"><div class="ic"></div></div><figcaption>Claro</figcaption></figure>
+      <figure><div class="celular escuro"><div class="ic"></div></div><figcaption>Escuro</figcaption></figure>
+    </div>
+  </section>
+
+  <p class="nota">
+    A tela de abertura é igual do Android 8 ao 16: o ícone no círculo azul-petróleo sobre o fundo do app,
+    sem texto. Ela fica até a lista carregar, e a lista aparece direto, sem piscar o fundo vazio.
+    No escuro, o fundo segue a cor do app (<code>@color/background</code> do <code>values-night</code>).
+  </p>
+
+<script>
+  const formatos = [
+    ["circulo", "Círculo (Pixel)"],
+    ["squircle", "Squircle (Samsung)"],
+    ["arredondado", "Quadrado arredondado"],
+    ["gota", "Gota"],
+    ["quadrado", "Quadrado"],
+  ];
+  const grade = document.getElementById("grade");
+  for (const [classe, nome] of formatos) {
+    for (const fundo of ["claro", "escuro"]) {
+      const papel = document.createElement("div");
+      papel.className = `papel ${fundo}`;
+      papel.innerHTML = `<h3>${nome} · ${fundo}</h3>` + [48, 56, 72].map(t =>
+        `<div class="app"><div class="ic ${classe}" style="--t:${t}px"></div><span>${t} px</span></div>`
+      ).join("");
+      grade.appendChild(papel);
+    }
+  }
+</script>
+</body>
+</html>

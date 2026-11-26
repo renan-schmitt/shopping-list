@@ -26,11 +26,13 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}" />
+        <!-- Tema de abertura (#74): troca para o Theme.ShoppingList quando a lista aparece -->
         <!-- singleTask: a lista recebida pelo "Compartilhar" (#135) chega ao app já aberto, sem abrir outro -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.ShoppingList.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

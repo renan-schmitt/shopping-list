@@ -4,4 +4,15 @@
     <style name="Theme.ShoppingList" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/background</item>
     </style>
+
+    <!-- Tela de abertura (#74), igual do Android 8 ao 16: o ícone do app no círculo azul-petróleo,
+         sobre o fundo do app (creme ou escuro, pelo values-night). Sem texto.
+         A arte ocupa 72 de 108dp, que aqui viram o círculo de 160dp: rostos, prancheta e carrinho
+         ficam inteiros, como no ícone redondo. -->
+    <style name="Theme.ShoppingList.Starting" parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenBackground">@color/background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/ic_launcher_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.ShoppingList</item>
+    </style>
 </resources>
