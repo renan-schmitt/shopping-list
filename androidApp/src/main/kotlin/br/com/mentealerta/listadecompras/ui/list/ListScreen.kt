@@ -378,7 +378,7 @@ fun ListContent(
         // A retícula cobre a tela toda, por trás da folha e do rodapé.
         modifier = modifier
             .background(colors.background)
-            .halftone(colors.outline, ComicTheme.tokens.halftoneSpacing),
+            .halftone(ComicTheme.colors.halftoneDot, ComicTheme.tokens.halftoneSpacing),
         containerColor = Color.Transparent,
         bottomBar = {
             if (uiState != ListUiState.Loading) {
@@ -605,6 +605,7 @@ private fun EmptyList(
                         outline = MaterialTheme.colorScheme.outline,
                         outlineWidth = tokens.thickOutline,
                         shadow = tokens.mediumShadow,
+                        shadowColor = ComicTheme.colors.shadow,
                     ),
             )
             // Nome da família pequeno, colado acima do título, como no logo.

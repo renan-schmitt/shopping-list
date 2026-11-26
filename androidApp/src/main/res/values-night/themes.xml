@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Paleta escura provisória até a #9. -->
+    <!-- Tema da janela no escuro: fundo quase preto para a tela não piscar clara ao abrir (#72). -->
     <style name="Theme.ShoppingList" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/background</item>
     </style>

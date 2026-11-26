@@ -836,6 +836,7 @@ private fun OptionCard(
                 outline = colors.outline,
                 outlineWidth = tokens.thinOutline,
                 shadow = tokens.smallShadow,
+                shadowColor = ComicTheme.colors.shadow,
             )
             .heightIn(min = tokens.minRowHeight)
             .padding(horizontal = 12.dp, vertical = 8.dp),

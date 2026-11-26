@@ -260,6 +260,7 @@ private fun ComicButton(
                 outline = MaterialTheme.colorScheme.outline,
                 outlineWidth = tokens.thickOutline,
                 shadow = shadow,
+                shadowColor = ComicTheme.colors.shadow,
                 pressOffset = pressOffset,
             )
             .heightIn(min = minHeight)

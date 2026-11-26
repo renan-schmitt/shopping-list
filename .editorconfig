@@ -13,7 +13,7 @@ max_line_length = 120
 ktlint_code_style = intellij_idea
 # Funções @Composable começam com maiúscula (convenção do Compose)
 ktlint_function_naming_ignore_when_annotated_with = Composable
-# Regras de Compose: CompositionLocals permitidos (tokens do tema)
-compose_allowed_composition_locals = LocalComicTokens
+# Regras de Compose: CompositionLocals permitidos (tokens e cores extras do tema)
+compose_allowed_composition_locals = LocalComicTokens,LocalComicColors
 # Sem linha em branco obrigatória entre ramos do when
 ktlint_standard_blank-line-between-when-conditions = disabled

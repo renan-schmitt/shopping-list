@@ -32,7 +32,8 @@ import androidx.compose.ui.unit.dp
 /**
  * Visual do estilo quadrinhos (plano §4.8): contorno grosso e sombra sólida
  * deslocada para baixo e para a direita, como o `box-shadow: 5px 5px 0` do
- * protótipo.
+ * protótipo. A sombra tem cor própria ([shadowColor], `ComicTheme.colors.shadow`): no escuro é
+ * preta, enquanto o contorno é creme.
  *
  * O espaço da sombra é reservado no layout (à direita e embaixo), para ela não
  * ser cortada nem invadir o vizinho. Com [pressOffset] > 0, a face desce e a
@@ -44,13 +45,14 @@ fun Modifier.comicStyle(
     outline: Color,
     outlineWidth: Dp,
     shadow: Dp,
+    shadowColor: Color,
     pressOffset: Dp = 0.dp,
 ): Modifier = this
     .padding(end = shadow, bottom = shadow)
     .drawBehind {
         val offset = shadow.toPx()
         translate(offset, offset) {
-            drawOutline(shape.createOutline(size, layoutDirection, this), outline)
+            drawOutline(shape.createOutline(size, layoutDirection, this), shadowColor)
         }
     }
     .offset(x = pressOffset, y = pressOffset)

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#1C1A16</color>
-    <!-- Seta do "Voltar para a lista" no escuro (paleta provisória, #9) -->
-    <color name="back_arrow_fill">#8CC79A</color>
-    <color name="back_arrow_outline">#FBF3DC</color>
+    <!-- Paleta "papel invertido" (#9, plano §4.8): fundo quase preto quente -->
+    <color name="background">#14120F</color>
+    <!-- Seta do "Voltar para a lista" no escuro: verde-folha clareado com contorno creme -->
+    <color name="back_arrow_fill">#7CC08A</color>
+    <color name="back_arrow_outline">#F4EBD3</color>
 </resources>

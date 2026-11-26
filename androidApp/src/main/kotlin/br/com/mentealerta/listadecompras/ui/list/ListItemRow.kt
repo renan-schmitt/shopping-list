@@ -230,6 +230,7 @@ private fun CheckMarkShape(checked: Boolean) {
                 outline = colors.outline,
                 outlineWidth = tokens.thinOutline,
                 shadow = shadow,
+                shadowColor = ComicTheme.colors.shadow,
             )
             .size(MarkSize),
         contentAlignment = Alignment.Center,

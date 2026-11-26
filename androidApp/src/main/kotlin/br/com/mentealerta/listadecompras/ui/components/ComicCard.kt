@@ -21,6 +21,7 @@ fun ComicCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.()
             outline = MaterialTheme.colorScheme.outline,
             outlineWidth = tokens.thickOutline,
             shadow = tokens.largeShadow,
+            shadowColor = ComicTheme.colors.shadow,
         ),
         content = content,
     )

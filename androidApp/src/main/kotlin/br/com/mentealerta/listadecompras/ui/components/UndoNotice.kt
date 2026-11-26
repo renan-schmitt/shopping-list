@@ -98,6 +98,7 @@ fun UndoNotice(
                 outline = MaterialTheme.colorScheme.outline,
                 outlineWidth = tokens.thickOutline,
                 shadow = tokens.largeShadow,
+                shadowColor = ComicTheme.colors.shadow,
             )
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),

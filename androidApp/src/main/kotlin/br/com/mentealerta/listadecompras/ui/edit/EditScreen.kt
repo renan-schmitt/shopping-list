@@ -304,6 +304,7 @@ private fun SectionOption(section: SectionUi, selected: Boolean, onClick: () -> 
                 outline = colors.outline,
                 outlineWidth = if (selected) tokens.thickOutline else tokens.thinOutline,
                 shadow = 0.dp,
+                shadowColor = ComicTheme.colors.shadow,
             )
             .heightIn(min = tokens.minTouchTarget)
             .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -368,6 +369,7 @@ private fun QuantityStepper(quantity: Quantity?, canDecrease: Boolean, onIncreas
                     outline = colors.outline,
                     outlineWidth = tokens.thinOutline,
                     shadow = 0.dp,
+                    shadowColor = ComicTheme.colors.shadow,
                 )
                 .heightIn(min = tokens.minTouchTarget)
                 .padding(8.dp)

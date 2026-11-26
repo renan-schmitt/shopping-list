@@ -47,6 +47,7 @@ fun SuggestionCard(
                 outline = colors.outline,
                 outlineWidth = tokens.thinOutline,
                 shadow = tokens.smallShadow,
+                shadowColor = ComicTheme.colors.shadow,
             )
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
